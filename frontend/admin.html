@@ -124,7 +124,7 @@ async function login(){
   const password = document.getElementById("password").value.trim();
   const messageBox = document.getElementById("loginMessage");
 
-  messageBox.style.display = "none";
+  messageBox.style.display = "none"; 
   messageBox.className = "message";
 
   if(!username || !password){
@@ -133,7 +133,7 @@ async function login(){
   }
 
   try{
-    const res = await fetch(`${API}/admin/login`,{
+    const res = await fetch(`${URL_API}/admin/login`,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({username,password})
