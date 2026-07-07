@@ -1,4 +1,4 @@
-const API_URL ="https://fadila-barber.onrender.com";
+const API_URL = "https://fadila-barber.onrender.com/api";
 /* ===============================
    DOM ELEMENTS
 =================================*/
