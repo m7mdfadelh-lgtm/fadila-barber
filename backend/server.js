@@ -63,7 +63,10 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
-
+// أي طلب ينتهي بـ .html أو يطلب صفحة معينة، قم بتقديمه فوراً من مجلد الفرونت إيند
+app.get('/:page.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend', `${req.params.page}.html`));
+});
 /* ========================
    ERROR HANDLING (تأكد أن هذا القسم يظل بالأسفل دائماً)
 ======================== */
