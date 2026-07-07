@@ -51,7 +51,28 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+const path = require('path');
 
+/* ========================
+   SERVE FRONTEND FILES
+======================== */
+// 1. إخبار Express بمكان المجلد الفرعي للفرونت إيند لتقديم الملفات كـ Static
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// 2. عند فتح الرابط الرئيسي "/"، قم بإرسال ملف index.html فوراً
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
+});
+
+/* ========================
+   ERROR HANDLING (تأكد أن هذا القسم يظل بالأسفل دائماً)
+======================== */
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'Route not found'
+  });
+});
 /* ========================
    ERROR HANDLING
 ======================== */
