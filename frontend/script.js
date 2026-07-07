@@ -163,8 +163,8 @@ async function submitBooking(e) {
       bookingForm.reset();
       priceDisplay.textContent = "";
       timeSelect.disabled = true;
-      window.location.href = "gallery.html";
-    } else {
+      window.location.href = "/gallery.html";
+       } else {
       showMessage(result.error || "שגיאה בקביעת תור", "error");
     }
 
