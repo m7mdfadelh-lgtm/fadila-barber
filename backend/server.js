@@ -135,3 +135,5 @@ process.on('SIGINT', () => {
   cronService.stop();
   process.exit(0);
 });
+
+module.exports = app;
