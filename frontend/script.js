@@ -197,7 +197,7 @@ async function submitBooking(e) {
     });
 
     if (res.ok) {
-      localStorage.setItem("bookingSuccess", "✅ התור שלך נקבע בהצלحة! נתראה בקרוב 💈");
+      localStorage.setItem("bookingSuccess", "✅ התור שלך נקבע בהצלחה! נתראה בקרוב 💈");
       
       if (bookingForm) bookingForm.reset();
       if (priceDisplay) priceDisplay.textContent = "";
