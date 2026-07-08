@@ -1,8 +1,9 @@
-const API_URL = "https://fadila-barber.onrender.com/api";
+// ✅ تم التحديث ليرتبط بسيرفر Railway الجديد 24/7
+const API_URL = "https://fadila-barber-production.up.railway.app/api";
+
 /* ===============================
    DOM ELEMENTS
 =================================*/
-
 const bookingForm = document.getElementById("bookingForm");
 const dateInput = document.getElementById("date");
 const timeSelect = document.getElementById("time");
@@ -13,24 +14,23 @@ const priceDisplay = document.getElementById("servicePriceDisplay");
 /* ===============================
    INIT AFTER DOM LOAD
 =================================*/
-
 document.addEventListener("DOMContentLoaded", () => {
 
+  // 1. جلب الخدمات أولاً من قاعدة البيانات
   loadServices();
 
-  // ✅ Flatpickr במקום input רגיל
+  // 2. إعداد مكتبة تحديد التاريخ Flatpickr
   flatpickr(dateInput, {
     locale: "he",
     dateFormat: "Y-m-d",
     minDate: "today",
-    defaultDate: "today", // בוחר אוטומטית היום
+    defaultDate: "today", 
     disableMobile: true,
     onReady: function(selectedDates, dateStr) {
       if (dateStr) {
-        loadAvailableTimes(); // ✅ טוען שעות ישר
+        loadAvailableTimes(); 
       }
     },
-
     onChange: function(selectedDates, dateStr) {
       if (dateStr) {
         loadAvailableTimes();
@@ -38,14 +38,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  serviceSelect.addEventListener("change", showServicePrice);
-  bookingForm.addEventListener("submit", submitBooking);
+  // 3. أحداث التغيير والإرسال
+  serviceSelect.addEventListener("change", () => {
+    showServicePrice();
+    loadAvailableTimes(); // ✅ جلب الساعات فور اختيار الخدمة أو تغييرها
+  });
+
+  if (bookingForm) {
+    bookingForm.addEventListener("submit", submitBooking);
+ }
 });
 
 /* ===============================
    LOAD SERVICES FROM DATABASE
 =================================*/
-
 async function loadServices() {
   try {
     const res = await fetch(`${API_URL}/services`);
@@ -70,9 +76,10 @@ async function loadServices() {
 /* ===============================
    SHOW PRICE WHEN SERVICE SELECTED
 =================================*/
-
 function showServicePrice() {
   const selected = serviceSelect.options[serviceSelect.selectedIndex];
+  if (!selected) return;
+  
   const price = selected.dataset.price;
 
   if (price) {
@@ -85,25 +92,22 @@ function showServicePrice() {
 /* ===============================
    LOAD AVAILABLE TIMES
 =================================*/
-
 async function loadAvailableTimes() {
-
   const date = dateInput.value;
   const service = serviceSelect.value;
 
+  // إذا لم يتم تحديد التاريخ والخدمة معاً، انتظر ولا تفعل شيئاً
   if (!date || !service) return;
 
   timeSelect.disabled = true;
   timeSelect.innerHTML = "<option>טוען...</option>";
 
   try {
-
     const res = await fetch(
-      `${API_URL}/appointments/available/${date}?service=${service}`
+      `${API_URL}/appointments/available/${date}?service=${encodeURIComponent(service)}`
     );
 
     const data = await res.json();
-
     timeSelect.innerHTML = "";
 
     if (!data.availableSlots || data.availableSlots.length === 0) {
@@ -124,13 +128,13 @@ async function loadAvailableTimes() {
 
   } catch (error) {
     console.error("Error loading available times:", error);
+    timeSelect.innerHTML = "<option>שגיאה בטעינת השעות</option>";
   }
 }
 
 /* ===============================
    SUBMIT BOOKING
 =================================*/
-
 async function submitBooking(e) {
   e.preventDefault();
 
@@ -143,7 +147,7 @@ async function submitBooking(e) {
   };
 
   if (!data.customerName || !data.customerPhone || !data.service || !data.date || !data.time) {
-    showMessage("יש למלא את כל השדות", "error");
+    showMessage("יש למלא את كل השדות", "error");
     return;
   }
 
@@ -156,19 +160,28 @@ async function submitBooking(e) {
       body: JSON.stringify(data)
     });
 
-    const result = await res.json();
-
     if (res.ok) {
-      localStorage.setItem("bookingSuccess", "✅ התור שלך נקבע בהצלחה! נתראה בקרוב 💈");
-      bookingForm.reset();
-      priceDisplay.textContent = "";
-      timeSelect.disabled = true;
-      window.location.href = "/gallery.html";
-       } else {
+      localStorage.setItem("bookingSuccess", "✅ התור שלך נקבע בהצלحة! נתראה בקרוב 💈");
+      
+      if (bookingForm) bookingForm.reset();
+      if (priceDisplay) priceDisplay.textContent = "";
+      if (timeSelect) timeSelect.disabled = true;
+
+      console.log("Booking successful! Redirecting...");
+
+// 🔹 هذا السطر يقرأ الرابط الحالي الذي تقف عليه الصفحة ويستبدل فقط اسم الملف بـ gallery.html
+// مما يضمن عمله محلياً بـ serve وعلى GitHub Pages بشكل ديناميكي 100%
+const currentPath = window.location.pathname;
+const newPath = currentPath.substring(0, currentPath.lastIndexOf('/')) + '/gallery.html';
+window.location.href = window.location.origin + newPath;
+      
+    } else {
+      const result = await res.json().catch(() => ({}));
       showMessage(result.error || "שגיאה בקביעת תור", "error");
     }
 
   } catch (error) {
+    console.error("An error occurred during booking:", error);
     showMessage("שגיאת חיבור לשרת", "error");
   }
 }
@@ -176,7 +189,6 @@ async function submitBooking(e) {
 /* ===============================
    MESSAGE HELPER
 =================================*/
-
 function showMessage(text, type) {
   messageBox.textContent = text;
   messageBox.className = type;
