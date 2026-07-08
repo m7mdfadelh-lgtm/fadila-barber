@@ -1,5 +1,5 @@
 // ✅ تم التحديث ليرتبط بسيرفر Railway الجديد 24/7
-const API_URL = "https://fadila-barber-production.up.railway.app/api";
+const API_URL = "railway-deploy-production-adc6.up.railway.app/api";
 
 /* ===============================
    DOM ELEMENTS
@@ -44,9 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
     loadAvailableTimes(); // ✅ جلب الساعات فور اختيار الخدمة أو تغييرها
   });
 
-  if (bookingForm) {
-    bookingForm.addEventListener("submit", submitBooking);
- }
+//   if (bookingForm) {
+//     bookingForm.addEventListener("submit", submitBooking);
+//  }
 });
 
 /* ===============================
@@ -136,7 +136,7 @@ async function loadAvailableTimes() {
    SUBMIT BOOKING
 =================================*/
 async function submitBooking(e) {
-  e.preventDefault();
+  if(e) e.preventDefault();
 
   const data = {
     customerName: document.getElementById("name").value.trim(),
