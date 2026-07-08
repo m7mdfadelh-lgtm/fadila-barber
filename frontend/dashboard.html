@@ -283,8 +283,8 @@ tr:hover{
 </div>
 
 <script>
-const API_URL = "railway-deploy-production-adc6.up.railway.app/api";
-const token=localStorage.getItem("token");
+// تعديل السطر ليكون هكذا:
+const API_URL = "https://railway-deploy-production-adc6.up.railway.app/api";const token=localStorage.getItem("token");
 if(!token) window.location.href="admin.html";
 
 document.addEventListener("DOMContentLoaded", () => {

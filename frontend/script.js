@@ -1,5 +1,5 @@
 // ✅ تم التحديث ليرتبط بسيرفر Railway الجديد 24/7
-const API_URL = "railway-deploy-production-adc6.up.railway.app/api";
+const API_URL = "https://railway-deploy-production-adc6.up.railway.app/api";
 
 /* ===============================
    DOM ELEMENTS
@@ -20,39 +20,45 @@ document.addEventListener("DOMContentLoaded", () => {
   loadServices();
 
   // 2. إعداد مكتبة تحديد التاريخ Flatpickr
-  flatpickr(dateInput, {
-    locale: "he",
-    dateFormat: "Y-m-d",
-    minDate: "today",
-    defaultDate: "today", 
-    disableMobile: true,
-    onReady: function(selectedDates, dateStr) {
-      if (dateStr) {
-        loadAvailableTimes(); 
+  if (typeof flatpickr !== "undefined" && dateInput) {
+    flatpickr(dateInput, {
+      locale: "he",
+      dateFormat: "Y-m-d",
+      minDate: "today",
+      defaultDate: "today", 
+      disableMobile: true,
+      onReady: function(selectedDates, dateStr) {
+        if (dateStr) {
+          loadAvailableTimes(); 
+        }
+      },
+      onChange: function(selectedDates, dateStr) {
+        if (dateStr) {
+          loadAvailableTimes();
+        }
       }
-    },
-    onChange: function(selectedDates, dateStr) {
-      if (dateStr) {
-        loadAvailableTimes();
-      }
-    }
-  });
+    });
+  }
 
-  // 3. أحداث التغيير والإرسال
-  serviceSelect.addEventListener("change", () => {
-    showServicePrice();
-    loadAvailableTimes(); // ✅ جلب الساعات فور اختيار الخدمة أو تغييرها
-  });
+  // 3. أحداث التغيير وإرسال الفورم
+  if (serviceSelect) {
+    serviceSelect.addEventListener("change", () => {
+      showServicePrice();
+      loadAvailableTimes(); // ✅ جلب الساعات فور اختيار الخدمة أو تغييرها
+    });
+  }
 
-//   if (bookingForm) {
-//     bookingForm.addEventListener("submit", submitBooking);
-//  }
+  // תמיכה בשני המצבים: גם אם הכפתור הוא type="submit" וגם אם קוראים לו ישירות מה-HTML
+  if (bookingForm) {
+    bookingForm.addEventListener("submit", submitBooking);
+  }
 });
 
 /* ===============================
    LOAD SERVICES FROM DATABASE
 =================================*/
 async function loadServices() {
+  if (!serviceSelect) return;
   try {
     const res = await fetch(`${API_URL}/services`);
     const services = await res.json();
@@ -77,6 +83,7 @@ async function loadServices() {
    SHOW PRICE WHEN SERVICE SELECTED
 =================================*/
 function showServicePrice() {
+  if (!serviceSelect || !priceDisplay) return;
   const selected = serviceSelect.options[serviceSelect.selectedIndex];
   if (!selected) return;
   
@@ -93,6 +100,8 @@ function showServicePrice() {
    LOAD AVAILABLE TIMES
 =================================*/
 async function loadAvailableTimes() {
+  if (!dateInput || !serviceSelect || !timeSelect) return;
+  
   const date = dateInput.value;
   const service = serviceSelect.value;
 
@@ -136,19 +145,46 @@ async function loadAvailableTimes() {
    SUBMIT BOOKING
 =================================*/
 async function submitBooking(e) {
-  if(e) e.preventDefault();
+  // منع السلوك الافتراضي للفورم إذا تم استدعاؤه كـ submit event
+  if (e && typeof e.preventDefault === 'function') {
+    e.preventDefault();
+  }
+
+  const nameEl = document.getElementById("name");
+  const phoneEl = document.getElementById("phone");
+
+  if (!nameEl || !phoneEl || !serviceSelect || !dateInput || !timeSelect) {
+    console.error("Required form elements are missing from the DOM.");
+    return;
+  }
 
   const data = {
-    customerName: document.getElementById("name").value.trim(),
-    customerPhone: document.getElementById("phone").value.trim(),
+    customerName: nameEl.value.trim(),
+    customerPhone: phoneEl.value.trim(),
     service: serviceSelect.value,
     date: dateInput.value,
     time: timeSelect.value
   };
 
   if (!data.customerName || !data.customerPhone || !data.service || !data.date || !data.time) {
-    showMessage("יש למלא את كل השדות", "error");
+    showMessage("יש למלא את כל השדות", "error");
     return;
+  }
+
+  // ⏳ إعدادات زر الإرسال لإظهار حالة التحميل للمستخدم فوراً
+  let submitBtn = null;
+  let originalText = "קבע תור";
+  
+  if (e && e.target && e.target.tagName === 'BUTTON') {
+    submitBtn = e.target;
+  } else if (bookingForm) {
+    submitBtn = bookingForm.querySelector("button");
+  }
+
+  if (submitBtn) {
+    originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "שומר תור... ⏳";
   }
 
   try {
@@ -167,20 +203,26 @@ async function submitBooking(e) {
       if (priceDisplay) priceDisplay.textContent = "";
       if (timeSelect) timeSelect.disabled = true;
 
-      console.log("Booking successful! Redirecting...");
+      console.log("Booking successful! Redirecting to Gallery...");
 
-// 🔹 هذا السطر يقرأ الرابط الحالي الذي تقف عليه الصفحة ويستبدل فقط اسم الملف بـ gallery.html
-// مما يضمن عمله محلياً بـ serve وعلى GitHub Pages بشكل ديناميكي 100%
-const currentPath = window.location.pathname;
-const newPath = currentPath.substring(0, currentPath.lastIndexOf('/')) + '/gallery.html';
-window.location.href = window.location.origin + newPath;
-      
+      // 🔹 الحل القاطع والسريع: التوجيه المباشر باسم الملف بدون حسابات معقدة للمسار
+      window.location.href = "./gallery.html";      
     } else {
+      // إعادة الزر لوضعه الطبيعي في حال وجود خطأ في البيانات
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
       const result = await res.json().catch(() => ({}));
       showMessage(result.error || "שגיאה בקביעת תור", "error");
     }
 
   } catch (error) {
+    // إعادة الزر لوضعه الطبيعي في حال فشل الاتصال بالشبكة
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    }
     console.error("An error occurred during booking:", error);
     showMessage("שגיאת חיבור לשרת", "error");
   }
@@ -190,6 +232,10 @@ window.location.href = window.location.origin + newPath;
    MESSAGE HELPER
 =================================*/
 function showMessage(text, type) {
+  if (!messageBox) {
+    alert(text);
+    return;
+  }
   messageBox.textContent = text;
   messageBox.className = type;
 }

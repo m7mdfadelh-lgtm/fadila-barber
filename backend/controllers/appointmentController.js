@@ -17,7 +17,15 @@ exports.createAppointment = async (req, res) => {
         error: "כל השדות הם חובה"
       });
     }
-const serviceDoc = await Service.findOne({ name: service });
+
+    const serviceDoc = await Service.findOne({ name: service });
+    if (!serviceDoc) {
+      return res.status(400).json({
+        success: false,
+        error: "השירות המבוקש לא נמצא"
+      });
+    }
+
     const phoneRegex = /^05\d{8}$/;
     if (!phoneRegex.test(customerPhone)) {
       return res.status(400).json({
@@ -55,40 +63,52 @@ const serviceDoc = await Service.findOne({ name: service });
       customerName,
       customerPhone,
       service,
-      duration: serviceDoc.duration,   // ✅ חדש
+      duration: serviceDoc.duration || 30,   
       date: appointmentDateTime,
       time,
       status: "confirmed",
       upcomingEmailSent: false
     });
 
-    // ✅ WhatsApp אישור
-    await whatsappService.sendMessage(
-      appointment.customerPhone,
-      `שלום ${appointment.customerName} 👋
-
-התור שלך נקבע בהצלחה ✅
-📅 ${appointmentDateTime.toLocaleDateString("he-IL")}
-🕐 ${appointment.time}
-✂️/💆‍♂️ ${appointment.service}
-
-מחכים לך 💈`
-    );
-
-    // ✅ מייל לבעל העסק
-    await emailService.sendNewAppointmentEmail(appointment);
-
+    // 🚀 הצעד המכריע: מחזירים תשובה מיידית לחלוטין ללקוח בפרלי שניות!
     res.status(201).json({
       success: true,
       message: "התור נקבע בהצלחה!"
     });
 
+    // 🔄 כל השירותים האיטיים רצים עכשיו ברקע בנפרד, מבלי לתקוע את ה-Response
+    (async () => {
+      try {
+        // ✅ WhatsApp אישור (ללא await שיעכב את המשתמש)
+        if (whatsappService && typeof whatsappService.sendMessage === 'function') {
+          await whatsappService.sendMessage(
+            appointment.customerPhone,
+            `שלום ${appointment.customerName} 👋\n\nהתור שלך נקבע בהצלחה ✅\n📅 ${appointmentDateTime.toLocaleDateString("he-IL")}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nמחכים לך 💈`
+          );
+        }
+      } catch (wsErr) {
+        console.error("שגיאה שליחת ווטסאפ ברקע:", wsErr.message);
+      }
+
+      try {
+        // ✅ מייל לבעל העסק (ברקע)
+        if (emailService && typeof emailService.sendNewAppointmentEmail === 'function') {
+          await emailService.sendNewAppointmentEmail(appointment);
+        }
+      } catch (mailErr) {
+        console.error("שגיאה שליחת מייל ברקע:", mailErr.message);
+      }
+    })();
+
   } catch (error) {
     console.error("שגיאה ביצירת תור:", error);
-    res.status(500).json({
-      success: false,
-      error: "שגיאת שרת פנימית"
-    });
+    // הגנה למקרה שהשגיאה קרתה לפני שליחת ה-res
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        error: "שגיאת שרת פנימית"
+      });
+    }
   }
 };
 
