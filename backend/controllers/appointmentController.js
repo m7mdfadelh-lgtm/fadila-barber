@@ -83,7 +83,7 @@ exports.createAppointment = async (req, res) => {
         if (whatsappService && typeof whatsappService.sendMessage === 'function') {
           await whatsappService.sendMessage(
             appointment.customerPhone,
-            `שלום ${appointment.customerName} 👋\n\nהתור שלך נקבע בהצלחה ✅\n📅 ${appointmentDateTime.toLocaleDateString("he-IL")}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nמחכים לך 💈`
+            `שלום ${appointment.customerName} 👋\n\nהתור שלך נקבע בהצלחה ✅\n📅 ${appointmentDateTime.toLocaleDateString("he-IL")}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nמחכים לך 💈\nhttps://fadila-barber.netlify.app/`
           );
         }
       } catch (wsErr) {

@@ -51,7 +51,8 @@ const appointments = await Appointment.find({
 🕐 ${appointment.time}
 ✂️/💆‍♂️ ${appointment.service}
 
-מחכים לך 💈`
+מחכים לך 💈
+https://fadila-barber.netlify.app/`
         );
 
         /* =========================
