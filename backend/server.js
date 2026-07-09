@@ -2,8 +2,6 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
 const connectDB = require('./config/db');
 
 const appointmentRoutes = require('./routes/appointmentRoutes');
@@ -22,7 +20,7 @@ const app = express();
    MIDDLEWARE
 ======================== */
 app.use(cors({
-  origin: '*',
+  origin: process.env.FRONTEND_URL || '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
@@ -56,39 +54,15 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-/* ========================
-   SERVE FRONTEND FILES
-======================== */
-const frontendCandidates = [
-  path.resolve(__dirname, '../frontend'),
-  path.resolve(process.cwd(), 'frontend'),
-  path.resolve(process.cwd(), '../frontend')
-];
-
-const frontendPath = frontendCandidates.find((p) => fs.existsSync(p));
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Fadila Barber backend is running. Use the Netlify URL for the frontend.',
+    health: '/api/health'
+  });
+});
 
 app.get('/favicon.ico', (req, res) => res.status(204).end());
-
-if (frontendPath) {
-  console.log(`✅ Serving frontend from: ${frontendPath}`);
-
-  app.use(express.static(frontendPath));
-
-  app.get('/', (req, res, next) => {
-    res.sendFile(path.join(frontendPath, 'index.html'), (err) => {
-      if (err) next(err);
-    });
-  });
-
-  app.get('/:page.html', (req, res, next) => {
-    res.sendFile(path.join(frontendPath, `${req.params.page}.html`), (err) => {
-      if (err) next();
-    });
-  });
-} else {
-  console.warn('⚠️ Frontend folder was not found. API routes will still work.');
-  console.warn(`Checked paths: ${frontendCandidates.join(', ')}`);
-}
 
 /* ========================
    ERROR HANDLING
@@ -143,7 +117,7 @@ async function ensureSettings() {
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
-  console.log(`\n💈 Fadila Barber Server Running on port ${PORT}`);
+  console.log(`\n💈 Fadila Barber Backend API running on port ${PORT}`);
 
   connectDB()
     .then(async () => {
