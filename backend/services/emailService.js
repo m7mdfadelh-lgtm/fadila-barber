@@ -77,8 +77,91 @@ async function sendMail(options) {
   return info;
 }
 
-async function sendNewAppointmentEmail(appointment) { return sendMail({ to: getRecipients(false), subject: '📅 תור חדש נקבע!', html: '<div>New Appointment</div>'}); }
-async function sendWhatsAppFailureEmail(data) { return sendMail({ to: getRecipients(true), subject: '⚠️ כשל בשליחת WhatsApp', html: '<div>WhatsApp Failure</div>'}); }
+/* ===============================
+   New appointment notification
+================================= */
+async function sendNewAppointmentEmail(appointment) {
+  try {
+    const recipients = getRecipients(false);
+    const appointmentDate = new Date(appointment.date);
+
+    await sendMail({
+      to: recipients,
+      subject: '📅 תור חדש נקבע!',
+      html: `
+        <div dir="rtl" style="font-family:Arial,sans-serif;line-height:1.7;max-width:620px;margin:auto">
+          <div style="background:#111827;color:#ffffff;padding:18px 22px;border-radius:12px 12px 0 0">
+            <h2 style="margin:0">תור חדש נקבע ✅</h2>
+          </div>
+
+          <div style="border:1px solid #e5e7eb;border-top:none;padding:22px;border-radius:0 0 12px 12px">
+            <p><b>שם לקוח:</b> ${escapeHtml(appointment.customerName)}</p>
+            <p><b>טלפון:</b> ${escapeHtml(appointment.customerPhone)}</p>
+            <p><b>שירות:</b> ${escapeHtml(appointment.service)}</p>
+            <p><b>תאריך:</b> ${escapeHtml(appointmentDate.toLocaleDateString('he-IL'))}</p>
+            <p><b>שעה:</b> ${escapeHtml(appointment.time)}</p>
+            <p><b>סטטוס:</b> ${escapeHtml(appointment.status || 'confirmed')}</p>
+
+            <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0">
+            <p style="color:#6b7280;font-size:13px;margin:0">
+              ההודעה נשלחה אוטומטית ממערכת Fadila Barber.
+            </p>
+          </div>
+        </div>
+      `
+    });
+
+    console.log('✅ New appointment notification email sent');
+    return { success: true };
+  } catch (error) {
+    console.error('❌ New appointment email failed:', error.message);
+    throw error;
+  }
+}
+
+/* ===============================
+   WhatsApp failure notification
+================================= */
+async function sendWhatsAppFailureEmail(data) {
+  try {
+    const recipients = getRecipients(true);
+
+    await sendMail({
+      to: recipients,
+      subject: '⚠️ כשל בשליחת WhatsApp',
+      html: `
+        <div dir="rtl" style="font-family:Arial,sans-serif;line-height:1.7;max-width:620px;margin:auto">
+          <div style="background:#991b1b;color:#ffffff;padding:18px 22px;border-radius:12px 12px 0 0">
+            <h2 style="margin:0">שליחת הודעת WhatsApp נכשלה</h2>
+          </div>
+
+          <div style="border:1px solid #fecaca;border-top:none;padding:22px;border-radius:0 0 12px 12px">
+            <p><b>טלפון:</b> ${escapeHtml(data.phone)}</p>
+
+            <p><b>תוכן ההודעה:</b></p>
+            <pre style="white-space:pre-wrap;background:#f9fafb;border:1px solid #e5e7eb;padding:14px;border-radius:8px;font-family:Arial,sans-serif">${escapeHtml(data.message)}</pre>
+
+            <p><b>פרטי השגיאה:</b></p>
+            <pre style="white-space:pre-wrap;background:#fef2f2;border:1px solid #fecaca;padding:14px;border-radius:8px;font-family:Arial,sans-serif;color:#991b1b">${escapeHtml(data.error)}</pre>
+
+            <p><b>זמן:</b> ${escapeHtml(new Date().toLocaleString('he-IL'))}</p>
+
+            <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0">
+            <p style="color:#6b7280;font-size:13px;margin:0">
+              יש לבדוק את חיבור WAHA ואת הגדרות הסשן.
+            </p>
+          </div>
+        </div>
+      `
+    });
+
+    console.log('✅ WhatsApp failure notification email sent');
+    return { success: true };
+  } catch (error) {
+    console.error('❌ WhatsApp failure email failed:', error.message);
+    throw error;
+  }
+}
 
 module.exports = {
   verifyConnection,
