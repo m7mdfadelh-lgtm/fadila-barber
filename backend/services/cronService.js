@@ -21,7 +21,7 @@ class CronService {
       return;
     }
 
-    console.log('⏰ WhatsApp reminder cron started (every minute, Asia/Jerusalem)');
+    console.log('⏰ WhatsApp reminder and retry cron started (every minute, Asia/Jerusalem)');
 
     this.task = cron.schedule('* * * * *', async () => {
       await this.checkReminders();
@@ -30,7 +30,7 @@ class CronService {
     });
 
     this.checkReminders().catch((error) => {
-      console.error('❌ Initial reminder check failed:', error.message);
+      console.error('❌ Initial reminder/retry check failed:', error.message);
     });
   }
 
@@ -51,6 +51,14 @@ class CronService {
     this.isChecking = true;
 
     try {
+      const retryResult = await whatsappService.processPendingQueue();
+
+      if (retryResult.processed > 0) {
+        console.log(
+          `🔁 WhatsApp retry queue processed: ${retryResult.processed}, sent: ${retryResult.sent}`
+        );
+      }
+
       const now = new Date();
 
       const appointments = await Appointment.find({
@@ -87,7 +95,7 @@ class CronService {
         }
       }
     } catch (error) {
-      console.error('❌ Reminder cron error:', error.message);
+      console.error('❌ Reminder/retry cron error:', error.message);
     } finally {
       this.isChecking = false;
     }
@@ -99,7 +107,7 @@ class CronService {
     );
 
     try {
-      await whatsappService.sendMessage(appointment.customerPhone, message);
+      const result = await whatsappService.sendMessage(appointment.customerPhone, message);
 
       await Appointment.updateOne(
         { _id: appointment._id, clientReminderSent: { $ne: true } },
@@ -112,12 +120,12 @@ class CronService {
       );
 
       console.log(
-        `✅ Client reminder sent for ${appointment.customerName}; ` +
-        `${minutesLeft} minutes left; appointment=${appointmentInstant.toISOString()}`
+        `${result.queued ? '📥 Client reminder queued' : '✅ Client reminder sent'} for ` +
+        `${appointment.customerName}; ${minutesLeft} minutes left`
       );
     } catch (error) {
       console.error(
-        `❌ Client reminder failed for ${appointment.customerName}:`,
+        `❌ Client reminder could not be sent or queued for ${appointment.customerName}:`,
         error.message
       );
     }
@@ -129,7 +137,7 @@ class CronService {
     );
 
     try {
-      await whatsappService.sendMessage(OWNER_WHATSAPP_PHONE, message);
+      const result = await whatsappService.sendMessage(OWNER_WHATSAPP_PHONE, message);
 
       await Appointment.updateOne(
         { _id: appointment._id, ownerReminderSent: { $ne: true } },
@@ -137,12 +145,12 @@ class CronService {
       );
 
       console.log(
-        `✅ Owner reminder sent for ${appointment.customerName}; ` +
-        `${minutesLeft} minutes left; appointment=${appointmentInstant.toISOString()}`
+        `${result.queued ? '📥 Owner reminder queued' : '✅ Owner reminder sent'} for ` +
+        `${appointment.customerName}; ${minutesLeft} minutes left`
       );
     } catch (error) {
       console.error(
-        `❌ Owner reminder failed for ${appointment.customerName}:`,
+        `❌ Owner reminder could not be sent or queued for ${appointment.customerName}:`,
         error.message
       );
     }
