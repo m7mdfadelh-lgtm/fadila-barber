@@ -2,13 +2,14 @@ const Appointment = require('../models/Appointment');
 const Service = require('../models/Service');
 const BusinessSettings = require('../models/BusinessSettings');
 
+const BUSINESS_TIME_ZONE = 'Asia/Jerusalem';
 const SLOT_INTERVAL_MINUTES = 5;
 
 function formatTime(date) {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
-function roundUpToInterval(date, intervalMinutes) {
+function roundUpToInterval(date, intervalMinutes = SLOT_INTERVAL_MINUTES) {
   const rounded = new Date(date);
   rounded.setSeconds(0, 0);
 
@@ -129,10 +130,10 @@ exports.getAvailableSlots = async (req, res) => {
     let current = new Date(workStart);
 
     if (isToday && current <= now) {
-      current = roundUpToInterval(now, SLOT_INTERVAL_MINUTES);
+      current = roundUpToInterval(now);
     }
 
-    while (current <= workEnd) {
+    while (current < workEnd) {
       const slotStart = new Date(current);
       const slotEnd = new Date(slotStart);
       slotEnd.setMinutes(slotEnd.getMinutes() + requestedDuration);
@@ -154,11 +155,11 @@ exports.getAvailableSlots = async (req, res) => {
 
     return res.json({
       success: true,
-      intervalMinutes: SLOT_INTERVAL_MINUTES,
-      availableSlots
+      availableSlots,
+      timeZone: BUSINESS_TIME_ZONE
     });
   } catch (error) {
-    console.error('Error in 5-minute availability generation:', error);
+    console.error('Error in duration-based availability:', error);
     return res.status(500).json({
       success: false,
       error: 'שגיאה בבדיקת זמינות'
