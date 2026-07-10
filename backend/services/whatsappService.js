@@ -1,5 +1,4 @@
 const axios = require('axios');
-const emailService = require('./emailService');
 const Settings = require('../models/Settings');
 
 function normalizePhone(phone) {
@@ -24,6 +23,14 @@ async function sendMessage(phone, message) {
       throw new Error('WAHA URL not found in DB');
     }
 
+    if (!process.env.WAHA_SESSION) {
+      throw new Error('WAHA_SESSION is missing');
+    }
+
+    if (!process.env.WAHA_API_KEY) {
+      throw new Error('WAHA_API_KEY is missing');
+    }
+
     const normalized = normalizePhone(phone);
 
     const response = await axios.post(
@@ -42,30 +49,16 @@ async function sendMessage(phone, message) {
       }
     );
 
-    console.log('✅ WhatsApp sent using:', config.url);
+    console.log(`✅ WhatsApp sent to ${normalized} using: ${config.url}`);
     return { success: true, data: response.data };
   } catch (error) {
     const errorMessage = error.response?.data
       ? JSON.stringify(error.response.data)
       : error.message;
 
-    console.error('❌ WhatsApp failed:', errorMessage);
-
-    try {
-      await emailService.sendWhatsAppFailureEmail({
-        phone,
-        message,
-        error: errorMessage
-      });
-    } catch (emailError) {
-      console.error(
-        '❌ Could not send WhatsApp failure notification email:',
-        emailError.message
-      );
-    }
-
+    console.error(`❌ WhatsApp failed for ${phone}:`, errorMessage);
     throw error;
   }
 }
 
-module.exports = { sendMessage };
+module.exports = { sendMessage, normalizePhone };
