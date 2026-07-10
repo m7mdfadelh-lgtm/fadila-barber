@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const whatsappService = require('../services/whatsappService');
+const { withWhatsAppFooter } = require('../utils/whatsappMessage');
 
 const OWNER_WHATSAPP_PHONE = process.env.OWNER_WHATSAPP_PHONE || '0503172506';
 
@@ -65,7 +66,6 @@ const appointmentSchema = new mongoose.Schema({
     default: false
   },
 
-  // Kept for compatibility with old records/code.
   newAppointmentEmailSent: {
     type: Boolean,
     default: false
@@ -106,13 +106,16 @@ appointmentSchema.pre('save', function(next) {
   next();
 });
 
-// The controller already sends the customer booking confirmation.
-// This hook sends only the owner's immediate WhatsApp notification.
 appointmentSchema.post('save', function(appointment) {
   if (!appointment.$locals.wasNew) return;
 
-  const formattedDate = new Date(appointment.date).toLocaleDateString('he-IL');
-  const ownerMessage = `📅 נקבע תור חדש\n\n👤 שם: ${appointment.customerName}\n📞 טלפון: ${appointment.customerPhone}\n✂️/💆‍♂️ שירות: ${appointment.service}\n📅 תאריך: ${formattedDate}\n🕐 שעה: ${appointment.time}`;
+  const formattedDate = new Date(appointment.date).toLocaleDateString('he-IL', {
+    timeZone: 'Asia/Jerusalem'
+  });
+
+  const ownerMessage = withWhatsAppFooter(
+    `📅 נקבע תור חדש\n\n👤 שם: ${appointment.customerName}\n📞 טלפון: ${appointment.customerPhone}\n✂️/💆‍♂️ שירות: ${appointment.service}\n📅 תאריך: ${formattedDate}\n🕐 שעה: ${appointment.time}`
+  );
 
   whatsappService.sendMessage(OWNER_WHATSAPP_PHONE, ownerMessage)
     .then(() => Appointment.updateOne(
