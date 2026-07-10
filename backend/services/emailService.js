@@ -1,4 +1,3 @@
-const axios = require('axios');
 const nodemailer = require('nodemailer');
 
 function escapeHtml(value) {
@@ -20,95 +19,39 @@ function getRecipients(includeAdminAlert = false) {
   return [...new Set(recipients.filter(Boolean))];
 }
 
-function getEmailProvider() {
-  if (process.env.RESEND_API_KEY) return 'resend';
-  return 'smtp';
-}
-
 function getMissingEmailEnv() {
-  const commonRequired = ['BUSINESS_OWNER_EMAIL'];
-
-  if (getEmailProvider() === 'resend') {
-    return [...commonRequired, 'RESEND_API_KEY', 'EMAIL_FROM']
-      .filter((key) => !process.env[key]);
-  }
-
-  return [...commonRequired, 'EMAIL_USER', 'EMAIL_APP_PASSWORD']
-    .filter((key) => !process.env[key]);
+  return [
+    'EMAIL_USER',
+    'EMAIL_APP_PASSWORD',
+    'BUSINESS_OWNER_EMAIL'
+  ].filter((key) => !process.env[key]);
 }
-
-const smtpPort = Number(process.env.SMTP_PORT || 465);
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: smtpPort,
-  secure: smtpPort === 465,
+  service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_APP_PASSWORD
-  },
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 20000
+  }
 });
 
 async function verifyConnection() {
   const missing = getMissingEmailEnv();
-  const provider = getEmailProvider();
 
   if (missing.length > 0) {
     const message = `Missing email environment variables: ${missing.join(', ')}`;
     console.error(`❌ ${message}`);
-    return { success: false, error: message, provider };
-  }
-
-  if (provider === 'resend') {
-    console.log('✅ Resend email API is configured');
-    return { success: true, provider };
+    return { success: false, error: message };
   }
 
   try {
     await transporter.verify();
-    console.log('✅ Email SMTP connection verified successfully');
-    return { success: true, provider };
+    console.log('✅ Gmail email connection verified successfully');
+    return { success: true };
   } catch (error) {
-    console.error('❌ Email SMTP verification failed:', error.message);
-    console.error('ℹ️ Add RESEND_API_KEY and EMAIL_FROM to use HTTPS email delivery instead of SMTP.');
-    return { success: false, error: error.message, provider };
+    console.error('❌ Gmail email verification failed:', error.message);
+    return { success: false, error: error.message };
   }
-}
-
-async function sendWithResend(options) {
-  const response = await axios.post(
-    'https://api.resend.com/emails',
-    {
-      from: process.env.EMAIL_FROM,
-      to: Array.isArray(options.to) ? options.to : [options.to],
-      subject: options.subject,
-      html: options.html
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      timeout: 15000
-    }
-  );
-
-  console.log(`✅ Email sent successfully with Resend: ${response.data.id}`);
-  return response.data;
-}
-
-async function sendWithSmtp(options) {
-  const info = await transporter.sendMail({
-    from: `"Fadila Barber System" <${process.env.EMAIL_USER}>`,
-    ...options,
-    to: Array.isArray(options.to) ? options.to.join(', ') : options.to
-  });
-
-  console.log(`✅ Email sent successfully with SMTP: ${info.messageId}`);
-  return info;
 }
 
 async function sendMail(options) {
@@ -118,11 +61,14 @@ async function sendMail(options) {
     throw new Error(`Missing email environment variables: ${missing.join(', ')}`);
   }
 
-  if (getEmailProvider() === 'resend') {
-    return sendWithResend(options);
-  }
+  const info = await transporter.sendMail({
+    from: `"Fadila Barber System" <${process.env.EMAIL_USER}>`,
+    ...options,
+    to: Array.isArray(options.to) ? options.to.join(', ') : options.to
+  });
 
-  return sendWithSmtp(options);
+  console.log(`✅ Email sent successfully with Gmail: ${info.messageId}`);
+  return info;
 }
 
 /* ===============================
@@ -150,11 +96,7 @@ async function sendNewAppointmentEmail(appointment) {
     console.log('✅ New appointment notification email sent');
     return { success: true };
   } catch (error) {
-    const details = error.response?.data
-      ? JSON.stringify(error.response.data)
-      : error.message;
-
-    console.error('❌ New appointment email failed:', details);
+    console.error('❌ New appointment email failed:', error.message);
     throw error;
   }
 }
@@ -185,11 +127,7 @@ async function sendWhatsAppFailureEmail(data) {
     console.log('✅ WhatsApp failure notification email sent');
     return { success: true };
   } catch (error) {
-    const details = error.response?.data
-      ? JSON.stringify(error.response.data)
-      : error.message;
-
-    console.error('❌ WhatsApp failure email failed:', details);
+    console.error('❌ WhatsApp failure email failed:', error.message);
     throw error;
   }
 }
