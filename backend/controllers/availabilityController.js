@@ -1,12 +1,22 @@
 const Appointment = require('../models/Appointment');
 const Service = require('../models/Service');
 const BusinessSettings = require('../models/BusinessSettings');
+const {
+  BUSINESS_TIME_ZONE,
+  jerusalemDateTimeToUtc,
+  getJerusalemDateString,
+  getAppointmentInstant
+} = require('../utils/timeZone');
 
-const BUSINESS_TIME_ZONE = 'Asia/Jerusalem';
 const SLOT_INTERVAL_MINUTES = 5;
 
-function formatTime(date) {
-  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+function formatJerusalemTime(date) {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: BUSINESS_TIME_ZONE,
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23'
+  }).format(date);
 }
 
 function roundUpToInterval(date, intervalMinutes = SLOT_INTERVAL_MINUTES) {
@@ -21,12 +31,28 @@ function roundUpToInterval(date, intervalMinutes = SLOT_INTERVAL_MINUTES) {
   return rounded;
 }
 
+function getDayKey(dateString) {
+  const dayMap = [
+    'sunday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday'
+  ];
+
+  // Noon UTC safely represents the requested calendar date for weekday lookup.
+  const calendarDate = new Date(`${dateString}T12:00:00Z`);
+  return dayMap[calendarDate.getUTCDay()];
+}
+
 exports.getAvailableSlots = async (req, res) => {
   try {
-    const date = new Date(req.params.date);
+    const dateString = String(req.params.date || '').slice(0, 10);
     const serviceName = req.query.service;
 
-    if (Number.isNaN(date.getTime())) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
       return res.status(400).json({
         success: false,
         error: 'Invalid date'
@@ -59,17 +85,7 @@ exports.getAvailableSlots = async (req, res) => {
       });
     }
 
-    const dayMap = [
-      'sunday',
-      'monday',
-      'tuesday',
-      'wednesday',
-      'thursday',
-      'friday',
-      'saturday'
-    ];
-
-    const daySettings = settings.workingHours[dayMap[date.getDay()]];
+    const daySettings = settings.workingHours[getDayKey(dateString)];
 
     if (!daySettings || !daySettings.enabled) {
       return res.json({
@@ -78,53 +94,50 @@ exports.getAvailableSlots = async (req, res) => {
       });
     }
 
-    const [workStartHour, workStartMinute] = daySettings.start.split(':').map(Number);
-    const [workEndHour, workEndMinute] = daySettings.end.split(':').map(Number);
+    const workStart = jerusalemDateTimeToUtc(dateString, daySettings.start);
+    const workEnd = jerusalemDateTimeToUtc(dateString, daySettings.end);
+    const startOfDay = jerusalemDateTimeToUtc(dateString, '00:00');
+    const endOfDay = jerusalemDateTimeToUtc(dateString, '23:59');
+    endOfDay.setSeconds(59, 999);
 
-    const workStart = new Date(date);
-    workStart.setHours(workStartHour, workStartMinute, 0, 0);
-
-    const workEnd = new Date(date);
-    workEnd.setHours(workEndHour, workEndMinute, 0, 0);
-
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
+    if ([workStart, workEnd, startOfDay, endOfDay].some((value) => Number.isNaN(value.getTime()))) {
+      return res.status(500).json({
+        success: false,
+        error: 'Invalid business-hours configuration'
+      });
+    }
 
     const existingAppointments = await Appointment.find({
       date: { $gte: startOfDay, $lte: endOfDay },
       status: { $ne: 'cancelled' }
     }).sort({ date: 1 });
 
-    const appointmentRanges = existingAppointments.map((appointment) => {
-      const start = new Date(appointment.date);
-      const end = new Date(start);
-      end.setMinutes(end.getMinutes() + (Number(appointment.duration) || 30));
-      return { start, end };
-    });
+    const appointmentRanges = existingAppointments
+      .map((appointment) => {
+        // Rebuild the real appointment instant from its calendar date + stored time.
+        // This also handles older records that were saved with the UTC offset wrong.
+        const start = getAppointmentInstant(appointment);
+        const end = new Date(start);
+        end.setMinutes(end.getMinutes() + (Number(appointment.duration) || 30));
+        return { start, end };
+      })
+      .filter((range) => !Number.isNaN(range.start.getTime()));
 
-    const breakRanges = (daySettings.breaks || []).map((breakItem) => {
-      const start = new Date(date);
-      const end = new Date(date);
-
-      const [breakStartHour, breakStartMinute] = breakItem.start.split(':').map(Number);
-      const [breakEndHour, breakEndMinute] = breakItem.end.split(':').map(Number);
-
-      start.setHours(breakStartHour, breakStartMinute, 0, 0);
-      end.setHours(breakEndHour, breakEndMinute, 0, 0);
-
-      return { start, end };
-    });
+    const breakRanges = (daySettings.breaks || [])
+      .map((breakItem) => ({
+        start: jerusalemDateTimeToUtc(dateString, breakItem.start),
+        end: jerusalemDateTimeToUtc(dateString, breakItem.end)
+      }))
+      .filter((range) =>
+        !Number.isNaN(range.start.getTime()) &&
+        !Number.isNaN(range.end.getTime())
+      );
 
     const blockedRanges = [...appointmentRanges, ...breakRanges]
       .sort((a, b) => a.start.getTime() - b.start.getTime());
 
     const now = new Date();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const isToday = startOfDay.getTime() === today.getTime();
+    const isToday = dateString === getJerusalemDateString(now);
 
     const availableSlots = [];
     let current = new Date(workStart);
@@ -147,7 +160,7 @@ exports.getAvailableSlots = async (req, res) => {
       );
 
       if (!conflict) {
-        availableSlots.push(formatTime(slotStart));
+        availableSlots.push(formatJerusalemTime(slotStart));
       }
 
       current.setMinutes(current.getMinutes() + SLOT_INTERVAL_MINUTES);
@@ -156,10 +169,16 @@ exports.getAvailableSlots = async (req, res) => {
     return res.json({
       success: true,
       availableSlots,
-      timeZone: BUSINESS_TIME_ZONE
+      timeZone: BUSINESS_TIME_ZONE,
+      serverNow: now.toISOString(),
+      businessNow: new Intl.DateTimeFormat('he-IL', {
+        timeZone: BUSINESS_TIME_ZONE,
+        dateStyle: 'short',
+        timeStyle: 'medium'
+      }).format(now)
     });
   } catch (error) {
-    console.error('Error in duration-based availability:', error);
+    console.error('Error in Jerusalem-time availability:', error);
     return res.status(500).json({
       success: false,
       error: 'שגיאה בבדיקת זמינות'
