@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const Appointment = require('../models/Appointment');
 const whatsappService = require('./whatsappService');
+const { withWhatsAppFooter } = require('../utils/whatsappMessage');
 const {
   getAppointmentInstant,
   formatJerusalemDate
@@ -52,9 +53,6 @@ class CronService {
     try {
       const now = new Date();
 
-      // Fetch a broad range, then calculate the real appointment instant from
-      // the saved calendar date + the explicit HH:mm field in Jerusalem time.
-      // This also fixes older records that were saved as if local time were UTC.
       const appointments = await Appointment.find({
         status: 'confirmed',
         date: {
@@ -96,7 +94,9 @@ class CronService {
   }
 
   async sendClientReminder(appointment, appointmentInstant, minutesLeft) {
-    const message = `שלום ${appointment.customerName} 👋\n\nרק תזכורת ⏰\nהתור שלך מתחיל בעוד כשעה או פחות (${Math.max(0, minutesLeft)} דקות).\n\n📅 ${formatJerusalemDate(appointmentInstant)}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nמחכים לך 💈\nhttps://fadila-barber.netlify.app/`;
+    const message = withWhatsAppFooter(
+      `שלום ${appointment.customerName} 👋\n\nרק תזכורת ⏰\nהתור שלך מתחיל בעוד כשעה או פחות (${Math.max(0, minutesLeft)} דקות).\n\n📅 ${formatJerusalemDate(appointmentInstant)}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nמחכים לך 💈`
+    );
 
     try {
       await whatsappService.sendMessage(appointment.customerPhone, message);
@@ -124,7 +124,9 @@ class CronService {
   }
 
   async sendOwnerReminder(appointment, appointmentInstant, minutesLeft) {
-    const message = `⏰ תזכורת לבעל העסק\n\nהתור הבא מתחיל בעוד ${Math.max(0, minutesLeft)} דקות.\n\n👤 שם: ${appointment.customerName}\n📞 טלפון: ${appointment.customerPhone}\n✂️/💆‍♂️ שירות: ${appointment.service}\n📅 תאריך: ${formatJerusalemDate(appointmentInstant)}\n🕐 שעה: ${appointment.time}`;
+    const message = withWhatsAppFooter(
+      `⏰ תזכורת לבעל העסק\n\nהתור הבא מתחיל בעוד ${Math.max(0, minutesLeft)} דקות.\n\n👤 שם: ${appointment.customerName}\n📞 טלפון: ${appointment.customerPhone}\n✂️/💆‍♂️ שירות: ${appointment.service}\n📅 תאריך: ${formatJerusalemDate(appointmentInstant)}\n🕐 שעה: ${appointment.time}`
+    );
 
     try {
       await whatsappService.sendMessage(OWNER_WHATSAPP_PHONE, message);
