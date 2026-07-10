@@ -3,7 +3,8 @@ const Service = require('../models/Service');
 const whatsappService = require('../services/whatsappService');
 const {
   jerusalemDateTimeToUtc,
-  formatJerusalemDate
+  formatJerusalemDate,
+  getAppointmentInstant
 } = require('../utils/timeZone');
 
 exports.createAppointment = async (req, res) => {
@@ -52,15 +53,16 @@ exports.createAppointment = async (req, res) => {
     const requestedEnd = new Date(appointmentDateTime.getTime() + duration * 60000);
 
     const dayStart = jerusalemDateTimeToUtc(date, '00:00');
-    const nextDay = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+    const dayEnd = jerusalemDateTimeToUtc(date, '23:59');
+    dayEnd.setSeconds(59, 999);
 
     const existingAppointments = await Appointment.find({
-      date: { $gte: dayStart, $lt: nextDay },
+      date: { $gte: dayStart, $lte: dayEnd },
       status: { $ne: 'cancelled' }
     });
 
     const hasConflict = existingAppointments.some((existing) => {
-      const existingStart = new Date(existing.date);
+      const existingStart = getAppointmentInstant(existing);
       const existingEnd = new Date(
         existingStart.getTime() + (Number(existing.duration) || 30) * 60000
       );
