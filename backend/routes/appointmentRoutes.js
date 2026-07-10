@@ -4,7 +4,6 @@ const router = express.Router();
 const {
   getAllAppointments,
   getAppointment,
-  updateAppointment,
   deleteAppointment
 } = require("../controllers/appointmentController");
 
@@ -15,6 +14,10 @@ const {
 const {
   getAvailableSlots
 } = require("../controllers/availabilityController");
+
+const {
+  updateAppointment
+} = require("../controllers/appointmentEditController");
 
 router.post("/", createAppointment);
 router.get("/available/:date", getAvailableSlots);
