@@ -106,34 +106,25 @@ appointmentSchema.pre('save', function(next) {
   next();
 });
 
+// The controller already sends the customer booking confirmation.
+// This hook sends only the owner's immediate WhatsApp notification.
 appointmentSchema.post('save', function(appointment) {
   if (!appointment.$locals.wasNew) return;
 
   const formattedDate = new Date(appointment.date).toLocaleDateString('he-IL');
-
-  const clientMessage = `שלום ${appointment.customerName} 👋\n\nהתור שלך נקבע בהצלחה ✅\n📅 ${formattedDate}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nמחכים לך 💈\nhttps://fadila-barber.netlify.app/`;
-
   const ownerMessage = `📅 נקבע תור חדש\n\n👤 שם: ${appointment.customerName}\n📞 טלפון: ${appointment.customerPhone}\n✂️/💆‍♂️ שירות: ${appointment.service}\n📅 תאריך: ${formattedDate}\n🕐 שעה: ${appointment.time}`;
 
-  Promise.allSettled([
-    whatsappService.sendMessage(appointment.customerPhone, clientMessage)
-      .then(() => Appointment.updateOne(
-        { _id: appointment._id },
-        { $set: { clientBookingNotificationSent: true } }
-      )),
-    whatsappService.sendMessage(OWNER_WHATSAPP_PHONE, ownerMessage)
-      .then(() => Appointment.updateOne(
-        { _id: appointment._id },
-        { $set: { ownerBookingNotificationSent: true } }
-      ))
-  ]).then((results) => {
-    results.forEach((result, index) => {
-      if (result.status === 'rejected') {
-        const target = index === 0 ? 'client' : 'owner';
-        console.error(`❌ Failed to send new appointment WhatsApp to ${target}:`, result.reason?.message || result.reason);
-      }
+  whatsappService.sendMessage(OWNER_WHATSAPP_PHONE, ownerMessage)
+    .then(() => Appointment.updateOne(
+      { _id: appointment._id },
+      { $set: { ownerBookingNotificationSent: true } }
+    ))
+    .catch((error) => {
+      console.error(
+        '❌ Failed to send new appointment WhatsApp to owner:',
+        error.message
+      );
     });
-  });
 });
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);
