@@ -2,12 +2,15 @@ const express = require("express");
 const router = express.Router();
 
 const {
-  createAppointment,
   getAllAppointments,
   getAppointment,
   updateAppointment,
   deleteAppointment
 } = require("../controllers/appointmentController");
+
+const {
+  createAppointment
+} = require("../controllers/bookingController");
 
 const {
   getAvailableSlots
