@@ -125,11 +125,14 @@ exports.getAvailableSlots = async (req, res) => {
       current = roundUpToInterval(now);
     }
 
-    // A booking may start before closing even if its duration ends after closing.
-    // Example: closing at 23:59 allows a 23:55 start.
     while (current < workEnd) {
       const slotStart = new Date(current);
       const slotEnd = new Date(slotStart.getTime() + requestedDuration * 60000);
+
+      // The complete service must finish before or exactly at closing time.
+      if (slotEnd > workEnd) {
+        break;
+      }
 
       const conflict = blockedRanges.find(
         (range) => slotStart < range.end && slotEnd > range.start
