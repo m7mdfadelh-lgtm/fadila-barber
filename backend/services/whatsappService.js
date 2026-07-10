@@ -128,7 +128,30 @@ async function sendMessage(phone, message) {
   }
 }
 
+async function recoverStuckMessages() {
+  const staleBefore = new Date(Date.now() - 5 * 60 * 1000);
+
+  const result = await WhatsAppQueue.updateMany(
+    {
+      status: 'processing',
+      lastAttemptAt: { $lte: staleBefore }
+    },
+    {
+      $set: {
+        status: 'pending',
+        nextAttemptAt: new Date()
+      }
+    }
+  );
+
+  if (result.modifiedCount > 0) {
+    console.log(`♻️ Recovered ${result.modifiedCount} stuck WhatsApp queue message(s)`);
+  }
+}
+
 async function processPendingQueue(limit = 20) {
+  await recoverStuckMessages();
+
   const now = new Date();
 
   const pendingMessages = await WhatsAppQueue.find({
