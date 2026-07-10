@@ -3,12 +3,15 @@ const router = express.Router();
 
 const {
   createAppointment,
-  getAvailableSlots,
   getAllAppointments,
   getAppointment,
   updateAppointment,
   deleteAppointment
 } = require("../controllers/appointmentController");
+
+const {
+  getAvailableSlots
+} = require("../controllers/availabilityController");
 
 router.post("/", createAppointment);
 router.get("/available/:date", getAvailableSlots);
