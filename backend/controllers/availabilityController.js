@@ -2,8 +2,22 @@ const Appointment = require('../models/Appointment');
 const Service = require('../models/Service');
 const BusinessSettings = require('../models/BusinessSettings');
 
+const SLOT_INTERVAL_MINUTES = 5;
+
 function formatTime(date) {
   return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+}
+
+function roundUpToInterval(date, intervalMinutes) {
+  const rounded = new Date(date);
+  rounded.setSeconds(0, 0);
+
+  const remainder = rounded.getMinutes() % intervalMinutes;
+  if (remainder !== 0) {
+    rounded.setMinutes(rounded.getMinutes() + (intervalMinutes - remainder));
+  }
+
+  return rounded;
 }
 
 exports.getAvailableSlots = async (req, res) => {
@@ -114,12 +128,11 @@ exports.getAvailableSlots = async (req, res) => {
     const availableSlots = [];
     let current = new Date(workStart);
 
-    while (current < workEnd) {
-      if (isToday && current <= now) {
-        current = new Date(now);
-        current.setSeconds(0, 0);
-      }
+    if (isToday && current <= now) {
+      current = roundUpToInterval(now, SLOT_INTERVAL_MINUTES);
+    }
 
+    while (current <= workEnd) {
       const slotStart = new Date(current);
       const slotEnd = new Date(slotStart);
       slotEnd.setMinutes(slotEnd.getMinutes() + requestedDuration);
@@ -132,25 +145,20 @@ exports.getAvailableSlots = async (req, res) => {
         (range) => slotStart < range.end && slotEnd > range.start
       );
 
-      if (conflict) {
-        // Move directly to the exact ending time of the blocking appointment.
-        // Example: 13:30 + 40 minutes => next candidate starts at 14:10.
-        current = new Date(conflict.end);
-        continue;
+      if (!conflict) {
+        availableSlots.push(formatTime(slotStart));
       }
 
-      availableSlots.push(formatTime(slotStart));
-
-      // The next available candidate follows the selected service duration.
-      current = new Date(slotEnd);
+      current.setMinutes(current.getMinutes() + SLOT_INTERVAL_MINUTES);
     }
 
     return res.json({
       success: true,
+      intervalMinutes: SLOT_INTERVAL_MINUTES,
       availableSlots
     });
   } catch (error) {
-    console.error('Error in duration-based availability:', error);
+    console.error('Error in 5-minute availability generation:', error);
     return res.status(500).json({
       success: false,
       error: 'שגיאה בבדיקת זמינות'
