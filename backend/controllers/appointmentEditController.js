@@ -1,12 +1,52 @@
 const Appointment = require('../models/Appointment');
 const Service = require('../models/Service');
+const whatsappService = require('../services/whatsappService');
 const {
   jerusalemDateTimeToUtc,
   getAppointmentInstant,
-  getJerusalemDateString
+  getJerusalemDateString,
+  formatJerusalemDate
 } = require('../utils/timeZone');
 
 const ALLOWED_STATUSES = ['pending', 'confirmed', 'cancelled', 'completed', 'no-show'];
+
+function buildChangeList(previous, next) {
+  const changes = [];
+
+  if (previous.customerName !== next.customerName) {
+    changes.push(`👤 שם: ${next.customerName}`);
+  }
+
+  if (previous.service !== next.service) {
+    changes.push(`✂️/💆‍♂️ שירות: ${next.service}`);
+  }
+
+  if (previous.date !== next.date) {
+    changes.push(`📅 תאריך: ${next.formattedDate}`);
+  }
+
+  if (previous.time !== next.time) {
+    changes.push(`🕐 שעה: ${next.time}`);
+  }
+
+  if (Number(previous.duration) !== Number(next.duration)) {
+    changes.push(`⏳ משך: ${next.duration} דקות`);
+  }
+
+  if (previous.status !== next.status) {
+    changes.push(`📌 סטטוס: ${next.status}`);
+  }
+
+  return changes;
+}
+
+function buildClientUpdateMessage(appointment, changes) {
+  if (appointment.status === 'cancelled') {
+    return `שלום ${appointment.customerName} 👋\n\nהתור שלך בוטל.\n\n📅 ${formatJerusalemDate(new Date(appointment.date))}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nלפרטים נוספים ניתן ליצור קשר עם העסק.`;
+  }
+
+  return `שלום ${appointment.customerName} 👋\n\nבוצע עדכון בתור שלך ✏️\n\n${changes.join('\n')}\n\nפרטי התור המעודכנים:\n📅 ${formatJerusalemDate(new Date(appointment.date))}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n⏳ ${appointment.duration} דקות\n📌 ${appointment.status}\n\nמחכים לך 💈\nhttps://fadila-barber.netlify.app/`;
+}
 
 exports.updateAppointment = async (req, res) => {
   try {
@@ -15,6 +55,17 @@ exports.updateAppointment = async (req, res) => {
     if (!appointment) {
       return res.status(404).json({ success: false, error: 'התור לא נמצא' });
     }
+
+    const previous = {
+      customerName: appointment.customerName,
+      customerPhone: appointment.customerPhone,
+      service: appointment.service,
+      date: getJerusalemDateString(new Date(appointment.date)),
+      time: appointment.time,
+      duration: Number(appointment.duration),
+      status: appointment.status,
+      notes: appointment.notes || ''
+    };
 
     const customerName = String(req.body.customerName ?? appointment.customerName).trim();
     const customerPhone = String(req.body.customerPhone ?? appointment.customerPhone).replace(/\D/g, '');
@@ -28,7 +79,7 @@ exports.updateAppointment = async (req, res) => {
       dateString = getJerusalemDateString(new Date(appointment.date));
     }
 
-    let duration = Number(req.body.duration ?? appointment.duration);
+    const duration = Number(req.body.duration ?? appointment.duration);
 
     if (!customerName || !/^05\d{8}$/.test(customerPhone)) {
       return res.status(400).json({ success: false, error: 'שם או מספר טלפון לא תקינים' });
@@ -82,10 +133,27 @@ exports.updateAppointment = async (req, res) => {
       }
     }
 
+    const next = {
+      customerName,
+      customerPhone,
+      service,
+      date: dateString,
+      formattedDate: formatJerusalemDate(newStart),
+      time,
+      duration,
+      status,
+      notes: notes || ''
+    };
+
+    const changes = buildChangeList(previous, next);
+    const phoneChanged = previous.customerPhone !== customerPhone;
+    const notesChanged = previous.notes !== next.notes;
+    const hasMeaningfulChanges = changes.length > 0 || phoneChanged || notesChanged;
+
     const scheduleChanged =
-      appointment.time !== time ||
-      Number(appointment.duration) !== duration ||
-      getJerusalemDateString(new Date(appointment.date)) !== dateString;
+      previous.time !== time ||
+      previous.duration !== duration ||
+      previous.date !== dateString;
 
     appointment.customerName = customerName;
     appointment.customerPhone = customerPhone;
@@ -104,7 +172,37 @@ exports.updateAppointment = async (req, res) => {
 
     await appointment.save();
 
-    return res.json({ success: true, data: appointment });
+    let whatsappNotificationSent = false;
+    let whatsappNotificationError = null;
+
+    if (hasMeaningfulChanges) {
+      try {
+        const messageChanges = changes.length > 0
+          ? changes
+          : ['ℹ️ פרטי התור עודכנו על ידי העסק'];
+
+        await whatsappService.sendMessage(
+          appointment.customerPhone,
+          buildClientUpdateMessage(appointment, messageChanges)
+        );
+
+        whatsappNotificationSent = true;
+        console.log(`✅ Appointment update WhatsApp sent to ${appointment.customerName}`);
+      } catch (error) {
+        whatsappNotificationError = error.message;
+        console.error(
+          `❌ Appointment update WhatsApp failed for ${appointment.customerName}:`,
+          error.message
+        );
+      }
+    }
+
+    return res.json({
+      success: true,
+      data: appointment,
+      whatsappNotificationSent,
+      whatsappNotificationError
+    });
   } catch (error) {
     console.error('Appointment update error:', error);
     return res.status(500).json({ success: false, error: 'שגיאה בעדכון התור' });
