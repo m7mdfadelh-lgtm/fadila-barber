@@ -1,20 +1,16 @@
-const axios = require("axios");
-const emailService = require("./emailService");
-const Settings = require("../models/Settings");
-
-const WAHA_URL = process.env.WAHA_URL;
-const WAHA_API_KEY = process.env.WAHA_API_KEY;
-const SESSION_NAME = process.env.WAHA_SESSION;
+const axios = require('axios');
+const emailService = require('./emailService');
+const Settings = require('../models/Settings');
 
 function normalizePhone(phone) {
-  let cleaned = phone.replace(/\D/g, "");
+  let cleaned = String(phone || '').replace(/\D/g, '');
 
-  if (cleaned.startsWith("0")) {
-    cleaned = "972" + cleaned.substring(1);
+  if (cleaned.startsWith('0')) {
+    cleaned = `972${cleaned.substring(1)}`;
   }
 
-  if (!cleaned.startsWith("972")) {
-    cleaned = "972" + cleaned;
+  if (!cleaned.startsWith('972')) {
+    cleaned = `972${cleaned}`;
   }
 
   return cleaned;
@@ -22,44 +18,53 @@ function normalizePhone(phone) {
 
 async function sendMessage(phone, message) {
   try {
-
-    // ✅ מושך את ה־WAHA URL מהקולקשן settings
-    const config = await Settings.findById("waha_live_url");
+    const config = await Settings.findById('waha_live_url');
 
     if (!config || !config.url) {
-      throw new Error("WAHA URL not found in DB");
+      throw new Error('WAHA URL not found in DB');
     }
-
-    const WAHA_URL = config.url;
 
     const normalized = normalizePhone(phone);
 
-await axios.post(
-  `${WAHA_URL}/api/sendText`,
-  {
-    chatId: `${normalized}@c.us`,
-    text: message,
-    session: process.env.WAHA_SESSION
-  },
-  {
-    headers: {
-      "x-api-key": process.env.WAHA_API_KEY,   // ✅ זה הנכון
-      "Content-Type": "application/json"
-    }
-  }
-);
+    const response = await axios.post(
+      `${config.url}/api/sendText`,
+      {
+        chatId: `${normalized}@c.us`,
+        text: message,
+        session: process.env.WAHA_SESSION
+      },
+      {
+        headers: {
+          'x-api-key': process.env.WAHA_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        timeout: 15000
+      }
+    );
 
-    console.log("✅ WhatsApp sent using:", WAHA_URL);
-
+    console.log('✅ WhatsApp sent using:', config.url);
+    return { success: true, data: response.data };
   } catch (error) {
+    const errorMessage = error.response?.data
+      ? JSON.stringify(error.response.data)
+      : error.message;
 
-    console.error("❌ WhatsApp failed:", error.message);
+    console.error('❌ WhatsApp failed:', errorMessage);
 
-    await emailService.sendWhatsAppFailureEmail({
-      phone,
-      message,
-      error: error.message
-    });
+    try {
+      await emailService.sendWhatsAppFailureEmail({
+        phone,
+        message,
+        error: errorMessage
+      });
+    } catch (emailError) {
+      console.error(
+        '❌ Could not send WhatsApp failure notification email:',
+        emailError.message
+      );
+    }
+
+    throw error;
   }
 }
 
