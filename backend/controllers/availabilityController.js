@@ -42,7 +42,6 @@ function getDayKey(dateString) {
     'saturday'
   ];
 
-  // Noon UTC safely represents the requested calendar date for weekday lookup.
   const calendarDate = new Date(`${dateString}T12:00:00Z`);
   return dayMap[calendarDate.getUTCDay()];
 }
@@ -53,45 +52,28 @@ exports.getAvailableSlots = async (req, res) => {
     const serviceName = req.query.service;
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Invalid date'
-      });
+      return res.status(400).json({ success: false, error: 'Invalid date' });
     }
 
     if (!serviceName) {
-      return res.status(400).json({
-        success: false,
-        error: 'Service is required'
-      });
+      return res.status(400).json({ success: false, error: 'Service is required' });
     }
 
     const service = await Service.findOne({ name: serviceName });
-
     if (!service) {
-      return res.json({
-        success: true,
-        availableSlots: []
-      });
+      return res.json({ success: true, availableSlots: [] });
     }
 
     const requestedDuration = Number(service.duration) || 30;
     const settings = await BusinessSettings.findOne();
 
     if (!settings || !settings.workingHours) {
-      return res.json({
-        success: true,
-        availableSlots: []
-      });
+      return res.json({ success: true, availableSlots: [] });
     }
 
     const daySettings = settings.workingHours[getDayKey(dateString)];
-
     if (!daySettings || !daySettings.enabled) {
-      return res.json({
-        success: true,
-        availableSlots: []
-      });
+      return res.json({ success: true, availableSlots: [] });
     }
 
     const workStart = jerusalemDateTimeToUtc(dateString, daySettings.start);
@@ -114,11 +96,8 @@ exports.getAvailableSlots = async (req, res) => {
 
     const appointmentRanges = existingAppointments
       .map((appointment) => {
-        // Rebuild the real appointment instant from its calendar date + stored time.
-        // This also handles older records that were saved with the UTC offset wrong.
         const start = getAppointmentInstant(appointment);
-        const end = new Date(start);
-        end.setMinutes(end.getMinutes() + (Number(appointment.duration) || 30));
+        const end = new Date(start.getTime() + (Number(appointment.duration) || 30) * 60000);
         return { start, end };
       })
       .filter((range) => !Number.isNaN(range.start.getTime()));
@@ -146,14 +125,11 @@ exports.getAvailableSlots = async (req, res) => {
       current = roundUpToInterval(now);
     }
 
+    // A booking may start before closing even if its duration ends after closing.
+    // Example: closing at 23:59 allows a 23:55 start.
     while (current < workEnd) {
       const slotStart = new Date(current);
-      const slotEnd = new Date(slotStart);
-      slotEnd.setMinutes(slotEnd.getMinutes() + requestedDuration);
-
-      if (slotEnd > workEnd) {
-        break;
-      }
+      const slotEnd = new Date(slotStart.getTime() + requestedDuration * 60000);
 
       const conflict = blockedRanges.find(
         (range) => slotStart < range.end && slotEnd > range.start
