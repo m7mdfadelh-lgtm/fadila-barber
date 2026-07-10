@@ -12,6 +12,7 @@ const settingsRoutes = require('./routes/settingsRoutes');
 
 const adminController = require('./controllers/adminController');
 const cronService = require('./services/cronService');
+const emailService = require('./services/emailService');
 const BusinessSettings = require('./models/BusinessSettings');
 
 const app = express();
@@ -118,6 +119,10 @@ const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
   console.log(`\n💈 Fadila Barber Backend API running on port ${PORT}`);
+
+  emailService.verifyConnection().catch((err) => {
+    console.error('❌ Unexpected email verification error:', err.message);
+  });
 
   connectDB()
     .then(async () => {
