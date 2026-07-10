@@ -1,6 +1,10 @@
 const cron = require('node-cron');
 const Appointment = require('../models/Appointment');
 const whatsappService = require('./whatsappService');
+const {
+  getAppointmentInstant,
+  formatJerusalemDate
+} = require('../utils/timeZone');
 
 const OWNER_WHATSAPP_PHONE = process.env.OWNER_WHATSAPP_PHONE || '0503172506';
 
@@ -16,13 +20,14 @@ class CronService {
       return;
     }
 
-    console.log('⏰ WhatsApp reminder cron started (every minute)');
+    console.log('⏰ WhatsApp reminder cron started (every minute, Asia/Jerusalem)');
 
     this.task = cron.schedule('* * * * *', async () => {
       await this.checkReminders();
+    }, {
+      timezone: 'Asia/Jerusalem'
     });
 
-    // Check once immediately after startup too.
     this.checkReminders().catch((error) => {
       console.error('❌ Initial reminder check failed:', error.message);
     });
@@ -46,11 +51,43 @@ class CronService {
 
     try {
       const now = new Date();
-      const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-      const fifteenMinutesLater = new Date(now.getTime() + 15 * 60 * 1000);
 
-      await this.sendClientReminders(now, oneHourLater);
-      await this.sendOwnerReminders(now, fifteenMinutesLater);
+      // Fetch a broad range, then calculate the real appointment instant from
+      // the saved calendar date + the explicit HH:mm field in Jerusalem time.
+      // This also fixes older records that were saved as if local time were UTC.
+      const appointments = await Appointment.find({
+        status: 'confirmed',
+        date: {
+          $gte: new Date(now.getTime() - 24 * 60 * 60 * 1000),
+          $lte: new Date(now.getTime() + 48 * 60 * 60 * 1000)
+        }
+      }).sort({ date: 1 });
+
+      for (const appointment of appointments) {
+        const appointmentInstant = getAppointmentInstant(appointment);
+
+        if (Number.isNaN(appointmentInstant.getTime())) {
+          console.error(`❌ Invalid appointment time for ${appointment.customerName}`);
+          continue;
+        }
+
+        const millisecondsLeft = appointmentInstant.getTime() - now.getTime();
+        const minutesLeft = Math.ceil(millisecondsLeft / 60000);
+
+        if (millisecondsLeft < 0) continue;
+
+        if (
+          minutesLeft <= 60 &&
+          appointment.clientReminderSent !== true &&
+          appointment.upcomingEmailSent !== true
+        ) {
+          await this.sendClientReminder(appointment, appointmentInstant, minutesLeft);
+        }
+
+        if (minutesLeft <= 15 && appointment.ownerReminderSent !== true) {
+          await this.sendOwnerReminder(appointment, appointmentInstant, minutesLeft);
+        }
+      }
     } catch (error) {
       console.error('❌ Reminder cron error:', error.message);
     } finally {
@@ -58,75 +95,54 @@ class CronService {
     }
   }
 
-  async sendClientReminders(now, oneHourLater) {
-    const appointments = await Appointment.find({
-      status: 'confirmed',
-      clientReminderSent: { $ne: true },
-      upcomingEmailSent: { $ne: true },
-      date: {
-        $gte: now,
-        $lte: oneHourLater
-      }
-    }).sort({ date: 1 });
+  async sendClientReminder(appointment, appointmentInstant, minutesLeft) {
+    const message = `שלום ${appointment.customerName} 👋\n\nרק תזכורת ⏰\nהתור שלך מתחיל בעוד כשעה או פחות (${Math.max(0, minutesLeft)} דקות).\n\n📅 ${formatJerusalemDate(appointmentInstant)}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nמחכים לך 💈\nhttps://fadila-barber.netlify.app/`;
 
-    for (const appointment of appointments) {
-      const formattedDate = new Date(appointment.date).toLocaleDateString('he-IL');
-      const minutesLeft = Math.max(
-        0,
-        Math.ceil((new Date(appointment.date).getTime() - now.getTime()) / 60000)
+    try {
+      await whatsappService.sendMessage(appointment.customerPhone, message);
+
+      await Appointment.updateOne(
+        { _id: appointment._id, clientReminderSent: { $ne: true } },
+        {
+          $set: {
+            clientReminderSent: true,
+            upcomingEmailSent: true
+          }
+        }
       );
 
-      const message = `שלום ${appointment.customerName} 👋\n\nרק תזכורת ⏰\nהתור שלך מתחיל בעוד כשעה או פחות (${minutesLeft} דקות).\n\n📅 ${formattedDate}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nמחכים לך 💈\nhttps://fadila-barber.netlify.app/`;
-
-      try {
-        await whatsappService.sendMessage(appointment.customerPhone, message);
-
-        appointment.clientReminderSent = true;
-        appointment.upcomingEmailSent = true;
-        await appointment.save();
-
-        console.log(`✅ Client reminder sent for: ${appointment.customerName}`);
-      } catch (error) {
-        console.error(
-          `❌ Client reminder failed for ${appointment.customerName}:`,
-          error.message
-        );
-      }
+      console.log(
+        `✅ Client reminder sent for ${appointment.customerName}; ` +
+        `${minutesLeft} minutes left; appointment=${appointmentInstant.toISOString()}`
+      );
+    } catch (error) {
+      console.error(
+        `❌ Client reminder failed for ${appointment.customerName}:`,
+        error.message
+      );
     }
   }
 
-  async sendOwnerReminders(now, fifteenMinutesLater) {
-    const appointments = await Appointment.find({
-      status: 'confirmed',
-      ownerReminderSent: { $ne: true },
-      date: {
-        $gte: now,
-        $lte: fifteenMinutesLater
-      }
-    }).sort({ date: 1 });
+  async sendOwnerReminder(appointment, appointmentInstant, minutesLeft) {
+    const message = `⏰ תזכורת לבעל העסק\n\nהתור הבא מתחיל בעוד ${Math.max(0, minutesLeft)} דקות.\n\n👤 שם: ${appointment.customerName}\n📞 טלפון: ${appointment.customerPhone}\n✂️/💆‍♂️ שירות: ${appointment.service}\n📅 תאריך: ${formatJerusalemDate(appointmentInstant)}\n🕐 שעה: ${appointment.time}`;
 
-    for (const appointment of appointments) {
-      const formattedDate = new Date(appointment.date).toLocaleDateString('he-IL');
-      const minutesLeft = Math.max(
-        0,
-        Math.ceil((new Date(appointment.date).getTime() - now.getTime()) / 60000)
+    try {
+      await whatsappService.sendMessage(OWNER_WHATSAPP_PHONE, message);
+
+      await Appointment.updateOne(
+        { _id: appointment._id, ownerReminderSent: { $ne: true } },
+        { $set: { ownerReminderSent: true } }
       );
 
-      const message = `⏰ תזכורת לבעל העסק\n\nהתור הבא מתחיל בעוד ${minutesLeft} דקות.\n\n👤 שם: ${appointment.customerName}\n📞 טלפון: ${appointment.customerPhone}\n✂️/💆‍♂️ שירות: ${appointment.service}\n📅 תאריך: ${formattedDate}\n🕐 שעה: ${appointment.time}`;
-
-      try {
-        await whatsappService.sendMessage(OWNER_WHATSAPP_PHONE, message);
-
-        appointment.ownerReminderSent = true;
-        await appointment.save();
-
-        console.log(`✅ Owner reminder sent for: ${appointment.customerName}`);
-      } catch (error) {
-        console.error(
-          `❌ Owner reminder failed for ${appointment.customerName}:`,
-          error.message
-        );
-      }
+      console.log(
+        `✅ Owner reminder sent for ${appointment.customerName}; ` +
+        `${minutesLeft} minutes left; appointment=${appointmentInstant.toISOString()}`
+      );
+    } catch (error) {
+      console.error(
+        `❌ Owner reminder failed for ${appointment.customerName}:`,
+        error.message
+      );
     }
   }
 }
