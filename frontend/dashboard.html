@@ -4,560 +4,113 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Owner Dashboard</title>
-
 <style>
-
-/* ===========================
-   DASHBOARD – LUXURY EDITION
-=========================== */
-
-:root {
-  --bg: #0d0d0d;
-  --card: #151515;
-  --gold: #d4af37;
-  --gold-soft: rgba(212,175,55,0.2);
-  --text: #ffffff;
-  --muted: #888;
-  --radius: 12px;
-}
-
-*{
-  box-sizing: border-box;
-}
-
-body{
-  margin:0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* ================= HEADER ================= */
-
-header{
-  background: #111;
-  padding:20px 30px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid var(--gold-soft);
-}
-
-header h1{
-  margin:0;
-  font-weight:500;
-  letter-spacing:2px;
-  color: var(--gold);
-}
-
-.logout{
-  background:transparent;
-  border:1px solid var(--gold);
-  padding:8px 18px;
-  color:var(--gold);
-  cursor:pointer;
-  border-radius: var(--radius);
-  transition:0.3s ease;
-}
-
-.logout:hover{
-  background: var(--gold);
-  color:black;
-}
-
-/* ================= CONTAINER ================= */
-
-.container{
-  padding:30px;
-  max-width:1200px;
-  margin:auto;
-}
-
-/* ================= SECTIONS ================= */
-
-section{
-  background: var(--card);
-  padding:25px;
-  margin-bottom:25px;
-  border-radius: var(--radius);
-  border:1px solid var(--gold-soft);
-}
-
-section h2{
-  margin-top:0;
-  margin-bottom:15px;
-  font-weight:500;
-  color: var(--gold);
-  letter-spacing:1px;
-}
-
-/* ================= INPUTS ================= */
-
-input, select{
-  padding:10px;
-  margin:5px 5px 10px 0;
-  border-radius:6px;
-  border:1px solid #222;
-  background:#101010;
-  color:white;
-}
-
-input:focus, select:focus{
-  outline:none;
-  border-color: var(--gold);
-}
-
-/* ================= BUTTONS ================= */
-
-button{
-  padding:8px 14px;
-  margin:5px;
-  cursor:pointer;
-  border-radius:6px;
-  border:none;
-  font-weight:500;
-  transition:0.3s ease;
-}
-
-/* Primary gold button */
-button:not(.logout){
-  background: var(--gold);
-  color:black;
-}
-
-button:not(.logout):hover{
-  background:#e6c04a;
-}
-
-/* Delete button */
-button.delete-btn{
-  background:#2a0f0f;
-  color:#f44336;
-  border:1px solid #f44336;
-}
-
-button.delete-btn:hover{
-  background:#f44336;
-  color:black;
-}
-
-/* ================= TABLE ================= */
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:15px;
-  font-size:14px;
-}
-
-th{
-  text-align:center;
-  padding:12px;
-  background:#111;
-  color: var(--gold);
-  border-bottom:1px solid var(--gold-soft);
-}
-
-td{
-  padding:10px;
-  text-align:center;
-  border-bottom:1px solid #222;
-}
-
-tr:hover{
-  background:#1c1c1c;
-}
-
-/* ================= GALLERY ================= */
-
-#galleryContainer{
-  display:flex;
-  flex-wrap:wrap;
-  gap:15px;
-  margin-top:15px;
-}
-
-#galleryContainer div{
-  background:#111;
-  padding:8px;
-  border-radius:8px;
-  border:1px solid var(--gold-soft);
-  text-align:center;
-}
-
-#galleryContainer img{
-  width:140px;
-  height:140px;
-  object-fit:cover;
-  border-radius:6px;
-  transition:0.3s ease;
-}
-
-#galleryContainer img:hover{
-  transform:scale(1.05);
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media(max-width:768px){
-
-  .container{
-    padding:20px;
-  }
-
-  table{
-    font-size:12px;
-  }
-
-  #galleryContainer img{
-    width:100px;
-    height:100px;
-  }
-}
-
+:root{--bg:#0d0d0d;--card:#151515;--gold:#d4af37;--gold-soft:rgba(212,175,55,.2);--text:#fff;--muted:#999;--danger:#f44336}
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}header{background:#111;padding:20px 30px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--gold-soft)}header h1{margin:0;color:var(--gold)}.container{padding:25px;max-width:1200px;margin:auto}section{background:var(--card);padding:22px;margin-bottom:22px;border-radius:12px;border:1px solid var(--gold-soft)}h2{margin-top:0;color:var(--gold)}input,select{padding:11px;margin:5px;border-radius:7px;border:1px solid #333;background:#101010;color:white;min-width:150px}button{padding:10px 15px;margin:5px;border:0;border-radius:7px;background:var(--gold);color:#111;font-weight:600;cursor:pointer}.logout{background:transparent;color:var(--gold);border:1px solid var(--gold)}.delete-btn{background:#2a0f0f;color:var(--danger);border:1px solid var(--danger)}.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;align-items:end}.form-field{display:flex;flex-direction:column}.form-field label{color:#ccc;font-size:13px;margin:0 6px 2px}.form-field input,.form-field select{width:100%;margin:0}.contact-note{color:var(--muted);font-size:13px;margin:8px 5px}.message{display:none;margin-top:12px;padding:10px;border-radius:8px}.message.success{display:block;background:#12351a;color:#75e28a}.message.error{display:block;background:#381313;color:#ff8a8a}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;margin-top:15px;font-size:14px}th,td{padding:11px;text-align:center;border-bottom:1px solid #292929}th{background:#111;color:var(--gold)}tr:hover{background:#1c1c1c}#galleryContainer{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}#galleryContainer div{background:#111;padding:8px;border-radius:8px;text-align:center}#galleryContainer img{width:140px;height:140px;object-fit:cover;border-radius:7px}@media(max-width:700px){header{padding:15px}.container{padding:12px}section{padding:15px}input,select{min-width:0}}
 </style>
 </head>
 <body>
-
-<header>
-<h1>💈 Owner Dashboard</h1>
-<button class="logout" onclick="logout()">Logout</button>
-</header>
-
+<header><h1>💈 Owner Dashboard</h1><button class="logout" onclick="logout()">Logout</button></header>
 <div class="container">
+
 <section>
-  <h2>שעות פעילות</h2>
-  <div id="workingHoursContainer"></div>
-  <button onclick="saveWorkingHours()">שמור שינויים</button>
+<h2>שעות פעילות</h2>
+<div id="workingHoursContainer"></div>
+<button onclick="saveWorkingHours()">שמור שינויים</button>
 </section>
-<!-- SERVICES -->
+
 <section>
 <h2>שירותים</h2>
-
-<input id="serviceNameInput" placeholder="שם שירות">
-<input id="servicePriceInput" type="number" placeholder="מחיר">
-<input id="serviceDurationInput" type="number" placeholder="משך בדקות">
-<button onclick="addService()">הוסף שירות</button>
-
-<table id="servicesTable">
-<thead>
-<tr>
-<th>שם</th>
-<th>מחיר</th>
-<th>מחיקה</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
+<div class="form-grid">
+<div class="form-field"><label>שם שירות</label><input id="serviceNameInput"></div>
+<div class="form-field"><label>מחיר</label><input id="servicePriceInput" type="number"></div>
+<div class="form-field"><label>משך בדקות</label><input id="serviceDurationInput" type="number" min="1"></div>
+<div><button onclick="addService()">הוסף שירות</button></div>
+</div>
+<div class="table-wrap"><table id="servicesTable"><thead><tr><th>שם</th><th>מחיר</th><th>משך</th><th>מחיקה</th></tr></thead><tbody></tbody></table></div>
 </section>
 
-<!-- APPOINTMENTS -->
+<section>
+<h2>➕ קביעת תור ידנית</h2>
+<div class="form-grid">
+<div class="form-field"><label>שם לקוח</label><input id="manualName" placeholder="שם מלא"></div>
+<div class="form-field"><label>טלפון</label><input id="manualPhone" inputmode="tel" placeholder="05XXXXXXXX"></div>
+<div class="form-field"><label>שירות</label><select id="manualService"><option value="">בחר שירות</option></select></div>
+<div class="form-field"><label>תאריך</label><input id="manualDate" type="date"></div>
+<div class="form-field"><label>שעה</label><select id="manualTime"><option value="">בחר תאריך ושירות</option></select></div>
+</div>
+<button id="contactPickerBtn" onclick="pickContact()">📱 בחר מאנשי קשר</button>
+<button onclick="createManualAppointment()">✅ קבע תור</button>
+<div class="contact-note">בחירת אנשי קשר נתמכת בעיקר ב-Chrome/Android. במכשירים אחרים ניתן להזין שם וטלפון ידנית.</div>
+<div id="manualMessage" class="message"></div>
+</section>
+
 <section>
 <h2>תורים</h2>
-<table id="appointmentsTable">
-<thead>
-<tr>
-<th>שם</th>
-<th>טלפון</th>
-<th>שירות</th>
-<th>תאריך</th>
-<th>שעה</th>
-<th>סטטוס</th>
-<th>פעולות</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
+<div class="table-wrap"><table id="appointmentsTable"><thead><tr><th>שם</th><th>טלפון</th><th>שירות</th><th>משך</th><th>תאריך</th><th>שעה</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody></tbody></table></div>
 </section>
 
-<!-- GALLERY -->
 <section>
 <h2>גלריה</h2>
-
-<input type="file" id="imageInput">
-<button onclick="uploadImage()">העלה</button>
-
+<input type="file" id="imageInput"><button onclick="uploadImage()">העלה</button>
 <div id="galleryContainer"></div>
 </section>
-
 </div>
 
 <script>
-// تعديل السطر ليكون هكذا:
-const API_URL = "https://railway-deploy-production-adc6.up.railway.app/api";const token=localStorage.getItem("token");
-if(!token) window.location.href="admin.html";
+const API_URL='https://railway-deploy-production-adc6.up.railway.app/api';
+const token=localStorage.getItem('token');
+if(!token) location.href='admin.html';
+let servicesCache=[];
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadServices();
-  loadAppointments();
-  loadGallery();
-  loadWorkingHours();
+document.addEventListener('DOMContentLoaded',()=>{
+ loadServices();loadAppointments();loadGallery();loadWorkingHours();
+ document.getElementById('manualDate').min=new Date().toISOString().split('T')[0];
+ document.getElementById('manualDate').addEventListener('change',loadManualSlots);
+ document.getElementById('manualService').addEventListener('change',loadManualSlots);
+ if(!('contacts' in navigator)) document.getElementById('contactPickerBtn').style.display='none';
 });
 
 async function loadWorkingHours(){
-  const res = await fetch(`${API_URL}/settings`);
-  const data = await res.json();
-
-  const container = document.getElementById("workingHoursContainer");
-  container.innerHTML = "";
-
-  const daysMap = {
-    sunday: "ראשון",
-    monday: "שני",
-    tuesday: "שלישי",
-    wednesday: "רביעי",
-    thursday: "חמישי",
-    friday: "שישי",
-    saturday: "שבת"
-  };
-
-  for(const day in data.workingHours){
-
-    const d = data.workingHours[day];
-    d.breaks = d.breaks || [];
-
-    let breaksHTML = "";
-
-    d.breaks.forEach((br, index) => {
-      breaksHTML += `
-        <div style="margin-bottom:5px;">
-          <input type="time" value="${br.start || ""}" id="${day}_breakStart_${index}">
-          -
-          <input type="time" value="${br.end || ""}" id="${day}_breakEnd_${index}">
-          <button onclick="removeBreak('${day}', ${index})">❌</button>
-        </div>
-      `;
-    });
-
-    container.innerHTML += `
-      <div style="margin-bottom:25px; padding:15px; border:1px solid #333; border-radius:10px;">
-        <strong>${daysMap[day]}</strong><br><br>
-
-        פתיחה:
-        <input type="time" value="${d.start || ""}" id="${day}_start">
-
-        סגירה:
-        <input type="time" value="${d.end || ""}" id="${day}_end">
-
-        <br><br>
-
-        <div id="${day}_breaks">
-          ${breaksHTML}
-        </div>
-
-        <button onclick="addBreak('${day}')">➕ הוסף הפסקה</button>
-
-        <br><br>
-
-        <label>
-          <input type="checkbox" ${d.enabled ? "checked":""} id="${day}_enabled">
-          פתוח
-        </label>
-      </div>
-    `;
-  }
+ const res=await fetch(`${API_URL}/settings`);const data=await res.json();const c=document.getElementById('workingHoursContainer');c.innerHTML='';
+ const names={sunday:'ראשון',monday:'שני',tuesday:'שלישי',wednesday:'רביעי',thursday:'חמישי',friday:'שישי',saturday:'שבת'};
+ for(const day in data.workingHours){const d=data.workingHours[day];d.breaks=d.breaks||[];let b='';d.breaks.forEach((x,i)=>b+=`<div><input type="time" value="${x.start||''}" id="${day}_breakStart_${i}"> - <input type="time" value="${x.end||''}" id="${day}_breakEnd_${i}"><button onclick="removeBreak('${day}',${i})">❌</button></div>`);c.innerHTML+=`<div style="margin:12px 0;padding:12px;border:1px solid #333;border-radius:9px"><strong>${names[day]}</strong><br>פתיחה <input type="time" value="${d.start||''}" id="${day}_start"> סגירה <input type="time" value="${d.end||''}" id="${day}_end"><div id="${day}_breaks">${b}</div><button onclick="addBreak('${day}')">➕ הפסקה</button><label><input type="checkbox" ${d.enabled?'checked':''} id="${day}_enabled"> פתוח</label></div>`}
 }
-
-async function saveWorkingHours(){
-
-  const workingHours = {};
-  const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-
-  days.forEach(day=>{
-
-    const breaks = [];
-    let index = 0;
-
-    while(document.getElementById(`${day}_breakStart_${index}`)){
-      breaks.push({
-        start: document.getElementById(`${day}_breakStart_${index}`).value,
-        end: document.getElementById(`${day}_breakEnd_${index}`).value
-      });
-      index++;
-    }
-
-    workingHours[day] = {
-      start: document.getElementById(`${day}_start`).value,
-      end: document.getElementById(`${day}_end`).value,
-      breaks: breaks,  // ✅ חשוב
-      enabled: document.getElementById(`${day}_enabled`).checked
-    };
-
-  });
-
-  await fetch(`${API_URL}/settings`,{
-    method:"PUT",
-    headers:{
-      "Content-Type":"application/json",
-      Authorization:`Bearer ${token}`
-    },
-    body:JSON.stringify({ workingHours })
-  });
-
-  alert("✅ נשמר בהצלחה");
-
-  loadWorkingHours();
-}
-/* SERVICES */
+async function saveWorkingHours(){const out={};for(const day of ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']){const breaks=[];document.querySelectorAll(`[id^="${day}_breakStart_"]`).forEach(el=>{const i=el.id.split('_').pop();breaks.push({start:el.value,end:document.getElementById(`${day}_breakEnd_${i}`).value})});out[day]={start:document.getElementById(`${day}_start`).value,end:document.getElementById(`${day}_end`).value,breaks,enabled:document.getElementById(`${day}_enabled`).checked}}await fetch(`${API_URL}/settings`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({workingHours:out})});alert('✅ נשמר בהצלחה')}
+function addBreak(day){const c=document.getElementById(`${day}_breaks`);const i=Date.now();c.insertAdjacentHTML('beforeend',`<div><input type="time" id="${day}_breakStart_${i}"> - <input type="time" id="${day}_breakEnd_${i}"><button onclick="this.parentElement.remove()">❌</button></div>`)}
+function removeBreak(day,i){document.getElementById(`${day}_breakStart_${i}`)?.parentElement.remove()}
 
 async function loadServices(){
-  const res=await fetch(`${API_URL}/services`);
-  const data=await res.json();
-  const tbody=document.querySelector("#servicesTable tbody");
-  tbody.innerHTML="";
-  data.forEach(s=>{
-    tbody.innerHTML+=`
-    <tr>
-      <td>${s.name}</td>
-      <td>
-        <input type="number" value="${s.price}" 
-        onchange="updateService('${s._id}',this.value)">
-      </td>
-      <td>
-        <button onclick="deleteService('${s._id}')">❌</button>
-      </td>
-    </tr>`;
-  });
+ const res=await fetch(`${API_URL}/services`);servicesCache=await res.json();
+ const tbody=document.querySelector('#servicesTable tbody');const select=document.getElementById('manualService');tbody.innerHTML='';select.innerHTML='<option value="">בחר שירות</option>';
+ servicesCache.forEach(s=>{tbody.innerHTML+=`<tr><td>${escapeHtml(s.name)}</td><td><input type="number" value="${s.price}" onchange="updateService('${s._id}',this.value,document.getElementById('dur_${s._id}').value)"></td><td><input id="dur_${s._id}" type="number" min="1" value="${s.duration||30}" onchange="updateService('${s._id}',document.getElementById('price_${s._id}')?.value||${s.price},this.value)"> דקות</td><td><button class="delete-btn" onclick="deleteService('${s._id}')">❌</button></td></tr>`;select.innerHTML+=`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)} — ${s.duration||30} דקות</option>`});
 }
+async function addService(){const name=serviceNameInput.value.trim(),price=Number(servicePriceInput.value),duration=Number(serviceDurationInput.value);if(!name||!duration)return alert('יש להזין שם ומשך');await fetch(`${API_URL}/services`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({name,price,duration})});serviceNameInput.value=servicePriceInput.value=serviceDurationInput.value='';loadServices()}
+async function updateService(id,price,duration){await fetch(`${API_URL}/services/${id}`,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({price:Number(price),duration:Number(duration)})});loadServices()}
+async function deleteService(id){if(!confirm('למחוק שירות?'))return;await fetch(`${API_URL}/services/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});loadServices()}
 
-async function addService(){
-  const name = document.getElementById("serviceNameInput").value;
-  const price = document.getElementById("servicePriceInput").value;
-  const duration = document.getElementById("serviceDurationInput").value;
-
-  await fetch(`${API_URL}/services`,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      Authorization:`Bearer ${token}`
-    },
-    body:JSON.stringify({ name, price, duration })
-  });
-
-  loadServices();
+async function pickContact(){
+ try{const list=await navigator.contacts.select(['name','tel'],{multiple:false});if(!list.length)return;const c=list[0];manualName.value=(c.name&&c.name[0])||'';manualPhone.value=normalizeIsraeliPhone((c.tel&&c.tel[0])||'')}catch(e){showManual('לא ניתן לפתוח אנשי קשר במכשיר זה','error')}
 }
-
-async function deleteService(id){
-  await fetch(`${API_URL}/services/${id}`,{
-    method:"DELETE",
-    headers:{Authorization:`Bearer ${token}`}
-  });
-  loadServices();
+function normalizeIsraeliPhone(v){let p=String(v).replace(/\D/g,'');if(p.startsWith('972'))p='0'+p.slice(3);return p}
+async function loadManualSlots(){const date=manualDate.value,service=manualService.value;manualTime.innerHTML='<option value="">טוען...</option>';if(!date||!service){manualTime.innerHTML='<option value="">בחר תאריך ושירות</option>';return}const res=await fetch(`${API_URL}/appointments/available/${date}?service=${encodeURIComponent(service)}`);const data=await res.json();manualTime.innerHTML='<option value="">בחר שעה</option>';for(const t of data.availableSlots||[])manualTime.innerHTML+=`<option value="${t}">${t}</option>`}
+async function createManualAppointment(){
+ const payload={customerName:manualName.value.trim(),customerPhone:normalizeIsraeliPhone(manualPhone.value),service:manualService.value,date:manualDate.value,time:manualTime.value};
+ if(!payload.customerName||!payload.customerPhone||!payload.service||!payload.date||!payload.time)return showManual('יש למלא את כל השדות','error');
+ const res=await fetch(`${API_URL}/appointments`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(payload)});const data=await res.json();
+ if(!res.ok)return showManual(data.error||'שגיאה בקביעת התור','error');
+ showManual('✅ התור נקבע והודעת WhatsApp נשלחת ללקוח','success');manualName.value=manualPhone.value=manualDate.value='';manualService.value='';manualTime.innerHTML='<option value="">בחר תאריך ושירות</option>';loadAppointments();
 }
+function showManual(text,type){const el=document.getElementById('manualMessage');el.textContent=text;el.className=`message ${type}`}
 
-async function updateService(id,price,duration){
-  await fetch(`${API_URL}/services/${id}`,{
-    method:"PUT",
-    headers:{
-      "Content-Type":"application/json",
-      Authorization:`Bearer ${token}`
-    },
-    body:JSON.stringify({price, duration})
-  });
-}
+async function loadAppointments(){const res=await fetch(`${API_URL}/appointments`);const data=await res.json();const tbody=document.querySelector('#appointmentsTable tbody');tbody.innerHTML='';(data.data||[]).forEach(a=>tbody.innerHTML+=`<tr><td>${escapeHtml(a.customerName)}</td><td>${escapeHtml(a.customerPhone)}</td><td>${escapeHtml(a.service)}</td><td>${a.duration||30} דקות</td><td>${new Date(a.date).toLocaleDateString('he-IL')}</td><td>${a.time}</td><td>${a.status}</td><td><button class="delete-btn" onclick="deleteAppointment('${a._id}')">❌</button></td></tr>`)}
+async function deleteAppointment(id){if(!confirm('למחוק תור?'))return;await fetch(`${API_URL}/appointments/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});loadAppointments()}
 
-/* APPOINTMENTS */
-
-async function loadAppointments(){
-  const res=await fetch(`${API_URL}/appointments`);
-  const data=await res.json();
-  const tbody=document.querySelector("#appointmentsTable tbody");
-  tbody.innerHTML="";
-  data.data.forEach(a=>{
-    tbody.innerHTML+=`
-    <tr>
-      <td>${a.customerName}</td>
-      <td>${a.customerPhone}</td>
-      <td>${a.service}</td>
-      <td>${new Date(a.date).toLocaleDateString()}</td>
-      <td>${a.time}</td>
-      <td>${a.status}</td>
-      <td>
-        <button onclick="deleteAppointment('${a._id}')">❌</button>
-      </td>
-    </tr>`;
-  });
-}
-
-async function deleteAppointment(id){
-  await fetch(`${API_URL}/appointments/${id}`,{
-    method:"DELETE",
-    headers:{Authorization:`Bearer ${token}`}
-  });
-  loadAppointments();
-}
-
-/* GALLERY */
-
-async function loadGallery(){
-  const res = await fetch(`${API_URL}/gallery`);
-  const images = await res.json();
-
-  const container = document.getElementById("galleryContainer");
-  container.innerHTML = "";
-
-  images.forEach(img => {
-    container.innerHTML += `
-      <div style="display:inline-block; margin:10px; text-align:center;">
-        <img 
-          src="${img.image}" 
-          style="width:140px; height:140px; object-fit:cover; border-radius:8px;"
-        >
-        <br>
-        <button onclick="deleteImage('${img._id}')">❌ מחק</button>
-      </div>
-    `;
-  });
-}
-
-async function uploadImage(){
-  const file=document.getElementById("imageInput").files[0];
-  const formData=new FormData();
-  formData.append("image",file);
-
-  await fetch(`${API_URL}/gallery`,{
-    method:"POST",
-    headers:{Authorization:`Bearer ${token}`},
-    body:formData
-  });
-
-  loadGallery();
-}
-
-async function deleteImage(id){
-  await fetch(`${API_URL}/gallery/${id}`,{
-    method:"DELETE",
-    headers:{Authorization:`Bearer ${token}`}
-  });
-  loadGallery();
-}
-
-function logout(){
-  localStorage.removeItem("token");
-  window.location.href="admin.html";
-}
-function addBreak(day){
-  const breaksContainer = document.getElementById(`${day}_breaks`);
-  const index = breaksContainer.children.length;
-
-  const div = document.createElement("div");
-  div.innerHTML = `
-    <input type="time" id="${day}_breakStart_${index}">
-    -
-    <input type="time" id="${day}_breakEnd_${index}">
-    <button onclick="removeBreak('${day}', ${index})">❌</button>
-  `;
-
-  breaksContainer.appendChild(div);
-}
-function removeBreak(day, index){
-  const startInput = document.getElementById(`${day}_breakStart_${index}`);
-  if(startInput){
-    const wrapper = startInput.closest("div");
-    if(wrapper) wrapper.remove();
-  }
-}
+async function loadGallery(){const res=await fetch(`${API_URL}/gallery`);const images=await res.json();galleryContainer.innerHTML='';images.forEach(img=>galleryContainer.innerHTML+=`<div><img src="${img.image}"><br><button class="delete-btn" onclick="deleteImage('${img._id}')">❌ מחק</button></div>`)}
+async function uploadImage(){const file=imageInput.files[0];if(!file)return;const f=new FormData();f.append('image',file);await fetch(`${API_URL}/gallery`,{method:'POST',headers:{Authorization:`Bearer ${token}`},body:f});loadGallery()}
+async function deleteImage(id){await fetch(`${API_URL}/gallery/${id}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});loadGallery()}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function logout(){localStorage.removeItem('token');location.href='admin.html'}
 </script>
-
 </body>
 </html>
