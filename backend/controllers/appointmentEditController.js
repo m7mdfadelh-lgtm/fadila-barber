@@ -40,12 +40,24 @@ function buildChangeList(previous, next) {
   return changes;
 }
 
-function buildClientUpdateMessage(appointment, changes) {
-  if (appointment.status === 'cancelled') {
-    return `שלום ${appointment.customerName} 👋\n\nהתור שלך בוטל.\n\n📅 ${formatJerusalemDate(new Date(appointment.date))}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nלפרטים נוספים ניתן ליצור קשר עם העסק.`;
+function buildOwnerNoteSection(notes) {
+  const cleanNote = String(notes || '').trim();
+
+  if (!cleanNote) {
+    return '';
   }
 
-  return `שלום ${appointment.customerName} 👋\n\nבוצע עדכון בתור שלך ✏️\n\n${changes.join('\n')}\n\nפרטי התור המעודכנים:\n📅 ${formatJerusalemDate(new Date(appointment.date))}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n⏳ ${appointment.duration} דקות\n📌 ${appointment.status}\n\nמחכים לך 💈\nhttps://fadila-barber.netlify.app/`;
+  return `\n\n📝 הודעה מבעל העסק:\n${cleanNote}`;
+}
+
+function buildClientUpdateMessage(appointment, changes) {
+  const noteSection = buildOwnerNoteSection(appointment.notes);
+
+  if (appointment.status === 'cancelled') {
+    return `שלום ${appointment.customerName} 👋\n\nהתור שלך בוטל על ידי העסק.\n\n📅 ${formatJerusalemDate(new Date(appointment.date))}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}${noteSection}\n\nלפרטים נוספים ניתן ליצור קשר עם העסק.`;
+  }
+
+  return `שלום ${appointment.customerName} 👋\n\nבעל העסק עדכן את התור שלך ✏️\n\nהשינויים שבוצעו:\n${changes.join('\n')}\n\nפרטי התור המעודכנים:\n📅 ${formatJerusalemDate(new Date(appointment.date))}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n⏳ ${appointment.duration} דקות\n📌 ${appointment.status}${noteSection}\n\nמחכים לך 💈\nhttps://fadila-barber.netlify.app/`;
 }
 
 exports.updateAppointment = async (req, res) => {
@@ -72,7 +84,7 @@ exports.updateAppointment = async (req, res) => {
     const service = String(req.body.service ?? appointment.service).trim();
     const time = String(req.body.time ?? appointment.time).trim();
     const status = String(req.body.status ?? appointment.status);
-    const notes = req.body.notes ?? appointment.notes;
+    const notes = String(req.body.notes ?? appointment.notes ?? '').trim();
 
     let dateString = req.body.date;
     if (!dateString) {
@@ -95,6 +107,10 @@ exports.updateAppointment = async (req, res) => {
 
     if (!Number.isFinite(duration) || duration < 5 || duration > 480) {
       return res.status(400).json({ success: false, error: 'משך התור חייב להיות בין 5 ל-480 דקות' });
+    }
+
+    if (notes.length > 500) {
+      return res.status(400).json({ success: false, error: 'ההערה ארוכה מדי' });
     }
 
     const serviceDoc = await Service.findOne({ name: service });
@@ -142,7 +158,7 @@ exports.updateAppointment = async (req, res) => {
       time,
       duration,
       status,
-      notes: notes || ''
+      notes
     };
 
     const changes = buildChangeList(previous, next);
