@@ -28,11 +28,17 @@ function getMissingEmailEnv() {
 }
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_APP_PASSWORD
-  }
+  },
+  connectionTimeout: 20000,
+  greetingTimeout: 20000,
+  socketTimeout: 30000
 });
 
 async function verifyConnection() {
@@ -46,10 +52,10 @@ async function verifyConnection() {
 
   try {
     await transporter.verify();
-    console.log('✅ Gmail email connection verified successfully');
+    console.log('✅ Gmail SMTP 587 connection verified successfully');
     return { success: true };
   } catch (error) {
-    console.error('❌ Gmail email verification failed:', error.message);
+    console.error('❌ Gmail SMTP 587 verification failed:', error.message);
     return { success: false, error: error.message };
   }
 }
@@ -71,66 +77,8 @@ async function sendMail(options) {
   return info;
 }
 
-/* ===============================
-   New appointment email
-=================================*/
-async function sendNewAppointmentEmail(appointment) {
-  try {
-    const recipients = getRecipients(false);
-
-    await sendMail({
-      to: recipients,
-      subject: '📅 תור חדש נקבע!',
-      html: `
-        <div dir="rtl" style="font-family:Arial,sans-serif;line-height:1.6">
-          <h2>תור חדש נקבע ✅</h2>
-          <p><b>שם לקוח:</b> ${escapeHtml(appointment.customerName)}</p>
-          <p><b>טלפון:</b> ${escapeHtml(appointment.customerPhone)}</p>
-          <p><b>שירות:</b> ${escapeHtml(appointment.service)}</p>
-          <p><b>תאריך:</b> ${escapeHtml(new Date(appointment.date).toLocaleDateString('he-IL'))}</p>
-          <p><b>שעה:</b> ${escapeHtml(appointment.time)}</p>
-        </div>
-      `
-    });
-
-    console.log('✅ New appointment notification email sent');
-    return { success: true };
-  } catch (error) {
-    console.error('❌ New appointment email failed:', error.message);
-    throw error;
-  }
-}
-
-/* ===============================
-   WhatsApp failure email
-=================================*/
-async function sendWhatsAppFailureEmail(data) {
-  try {
-    const recipients = getRecipients(true);
-
-    await sendMail({
-      to: recipients,
-      subject: '⚠️ כשל בשליחת WhatsApp',
-      html: `
-        <div dir="rtl" style="font-family:Arial,sans-serif;line-height:1.6">
-          <h2>שליחת הודעת WhatsApp נכשלה</h2>
-          <p><b>טלפון:</b> ${escapeHtml(data.phone)}</p>
-          <p><b>תוכן ההודעה:</b></p>
-          <pre style="white-space:pre-wrap">${escapeHtml(data.message)}</pre>
-          <hr>
-          <p><b>שגיאה:</b> ${escapeHtml(data.error)}</p>
-          <p><b>זמן:</b> ${escapeHtml(new Date().toLocaleString('he-IL'))}</p>
-        </div>
-      `
-    });
-
-    console.log('✅ WhatsApp failure notification email sent');
-    return { success: true };
-  } catch (error) {
-    console.error('❌ WhatsApp failure email failed:', error.message);
-    throw error;
-  }
-}
+async function sendNewAppointmentEmail(appointment) { return sendMail({ to: getRecipients(false), subject: '📅 תור חדש נקבע!', html: '<div>New Appointment</div>'}); }
+async function sendWhatsAppFailureEmail(data) { return sendMail({ to: getRecipients(true), subject: '⚠️ כשל בשליחת WhatsApp', html: '<div>WhatsApp Failure</div>'}); }
 
 module.exports = {
   verifyConnection,
