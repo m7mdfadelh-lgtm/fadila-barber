@@ -1,6 +1,7 @@
 const Appointment = require('../models/Appointment');
 const Service = require('../models/Service');
 const whatsappService = require('../services/whatsappService');
+const { withWhatsAppFooter } = require('../utils/whatsappMessage');
 const {
   jerusalemDateTimeToUtc,
   getAppointmentInstant,
@@ -54,10 +55,14 @@ function buildClientUpdateMessage(appointment, changes) {
   const noteSection = buildOwnerNoteSection(appointment.notes);
 
   if (appointment.status === 'cancelled') {
-    return `שלום ${appointment.customerName} 👋\n\n*התור שלך בוטל על ידי פדילה ברבר*.\n\n📅 ${formatJerusalemDate(new Date(appointment.date))}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}${noteSection}\n\nלפרטים נוספים ניתן ליצור קשר עם העסק.`;
+    return withWhatsAppFooter(
+      `שלום ${appointment.customerName} 👋\n\n*התור שלך בוטל על ידי פדילה ברבר*.\n\n📅 ${formatJerusalemDate(new Date(appointment.date))}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}${noteSection}\n\nלפרטים נוספים ניתן ליצור קשר עם העסק.`
+    );
   }
 
-  return `שלום ${appointment.customerName} 👋\n\n*פדילה ברבר עדכן את התור שלך* ✏️\n\nהשינויים שבוצעו:\n${changes.join('\n')}\n\nפרטי התור המעודכנים:\n📅 ${formatJerusalemDate(new Date(appointment.date))}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n⏳ ${appointment.duration} דקות\n📌 ${appointment.status}${noteSection}\n\nמחכים לך 💈\nhttps://fadila-barber.netlify.app/`;
+  return withWhatsAppFooter(
+    `שלום ${appointment.customerName} 👋\n\n*פדילה ברבר עדכן את התור שלך* ✏️\n\nהשינויים שבוצעו:\n${changes.join('\n')}\n\nפרטי התור המעודכנים:\n📅 ${formatJerusalemDate(new Date(appointment.date))}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n⏳ ${appointment.duration} דקות\n📌 ${appointment.status}${noteSection}\n\nמחכים לך 💈`
+  );
 }
 
 exports.updateAppointment = async (req, res) => {
