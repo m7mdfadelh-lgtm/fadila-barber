@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const Appointment = require('../models/Appointment');
 const Service = require('../models/Service');
 const BusinessSettings = require('../models/BusinessSettings');
@@ -8,6 +9,9 @@ const {
   formatJerusalemDate,
   getAppointmentInstant
 } = require('../utils/timeZone');
+
+const OWNER_WHATSAPP_PHONE = process.env.OWNER_WHATSAPP_PHONE || '0503172506';
+const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
 function getDayKey(dateString) {
   const dayMap = [
@@ -22,6 +26,26 @@ function getDayKey(dateString) {
 
   const calendarDate = new Date(`${dateString}T12:00:00Z`);
   return dayMap[calendarDate.getUTCDay()];
+}
+
+function isAuthenticatedAdmin(req) {
+  try {
+    const authorization = String(req.headers.authorization || '');
+    if (!authorization.startsWith('Bearer ')) return false;
+
+    const token = authorization.slice(7).trim();
+    if (!token) return false;
+
+    jwt.verify(token, JWT_SECRET);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function sendAndTrack(phone, message) {
+  const result = await whatsappService.sendMessage(phone, message);
+  return result?.success === true;
 }
 
 exports.createAppointment = async (req, res) => {
@@ -127,14 +151,21 @@ exports.createAppointment = async (req, res) => {
       });
     }
 
+    const createdByAdmin = isAuthenticatedAdmin(req);
+    const initialStatus = createdByAdmin ? 'confirmed' : 'pending';
+    const now = new Date();
+
     const appointment = await Appointment.create({
-      customerName,
+      customerName: String(customerName).trim(),
       customerPhone,
       service,
       duration,
       date: appointmentDateTime,
       time,
-      status: 'confirmed',
+      status: initialStatus,
+      approvalRequestedAt: createdByAdmin ? null : now,
+      approvalDecisionAt: createdByAdmin ? now : null,
+      approvalDecision: createdByAdmin ? 'approved' : null,
       clientReminderSent: false,
       ownerReminderSent: false,
       upcomingEmailSent: false
@@ -142,19 +173,52 @@ exports.createAppointment = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'התור נקבע בהצלחה!',
+      message: createdByAdmin
+        ? 'התור נקבע ואושר בהצלחה!'
+        : 'בקשת התור נשלחה וממתינה לאישור בעל העסק',
       data: appointment
     });
 
-    const confirmationMessage = withWhatsAppFooter(
-      `שלום ${appointment.customerName} 👋\n\nהתור שלך נקבע בהצלחה ✅\n📅 ${formatJerusalemDate(appointmentDateTime)}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n\nמחכים לך 💈`
+    if (createdByAdmin) {
+      const confirmationMessage = withWhatsAppFooter(
+        `שלום ${appointment.customerName} 👋\n\nהתור שלך נקבע ואושר בהצלחה ✅\n📅 ${formatJerusalemDate(appointmentDateTime)}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n⏳ ${appointment.duration} דקות\n\nמחכים לך 💈`
+      );
+
+      sendAndTrack(appointment.customerPhone, confirmationMessage)
+        .then((sent) => sent && Appointment.updateOne(
+          { _id: appointment._id },
+          { $set: { clientBookingNotificationSent: true } }
+        ))
+        .catch((error) => {
+          console.error('❌ Manual booking confirmation WhatsApp failed:', error.message);
+        });
+
+      return;
+    }
+
+    const requestCode = String(appointment._id).slice(-6).toUpperCase();
+
+    const waitingMessage = withWhatsAppFooter(
+      `שלום ${appointment.customerName} 👋\n\nבקשת התור שלך התקבלה וממתינה לאישור בעל העסק ⏳\n\n📅 ${formatJerusalemDate(appointmentDateTime)}\n🕐 ${appointment.time}\n✂️/💆‍♂️ ${appointment.service}\n⏳ ${appointment.duration} דקות\n\nנשלח אליך עדכון מיד לאחר שבעל העסק יאשר או ידחה את הבקשה.`
     );
 
-    whatsappService.sendMessage(
-      appointment.customerPhone,
-      confirmationMessage
-    ).catch((error) => {
-      console.error('❌ Background booking confirmation WhatsApp failed:', error.message);
+    const ownerApprovalMessage = withWhatsAppFooter(
+      `📅 בקשת תור חדשה ממתינה לאישור\n\n🔢 מספר בקשה: ${requestCode}\n👤 שם: ${appointment.customerName}\n📞 טלפון: ${appointment.customerPhone}\n✂️/💆‍♂️ שירות: ${appointment.service}\n⏳ משך: ${appointment.duration} דקות\n📅 תאריך: ${formatJerusalemDate(appointmentDateTime)}\n🕐 שעה: ${appointment.time}\n\nהשב 1 כדי לאשר את התור ✅\nהשב 2 כדי לדחות את התור ❌\n\nהתגובה תחול על בקשת התור הממתינה הוותיקה ביותר.`
+    );
+
+    Promise.all([
+      sendAndTrack(appointment.customerPhone, waitingMessage)
+        .then((sent) => sent && Appointment.updateOne(
+          { _id: appointment._id },
+          { $set: { clientBookingNotificationSent: true } }
+        )),
+      sendAndTrack(OWNER_WHATSAPP_PHONE, ownerApprovalMessage)
+        .then((sent) => sent && Appointment.updateOne(
+          { _id: appointment._id },
+          { $set: { ownerBookingNotificationSent: true } }
+        ))
+    ]).catch((error) => {
+      console.error('❌ Booking approval notification failed:', error.message);
     });
   } catch (error) {
     console.error('שגיאה ביצירת תור:', error);
