@@ -3,168 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
-
 <title>Owner Login</title>
-
 <style>
-
-* {
-  box-sizing: border-box;
+:root{
+  --blue:#1769aa;
+  --blue-dark:#0d4f87;
+  --blue-soft:#eaf5ff;
+  --text:#17324d;
+  --muted:#668199;
+  --danger:#c62828;
+  --success:#1b7f3a;
 }
-
+*{box-sizing:border-box}
 body{
   margin:0;
-  font-family:Arial;
-  background:linear-gradient(135deg,#111,#333);
-  color:white;
+  min-height:100vh;
+  font-family:"Segoe UI",Arial,sans-serif;
+  color:var(--text);
+  background:#fff;
+  padding:28px 48px 48px 28px;
+  position:relative;
 }
-/* ================= LOGIN WRAPPER ================= */
-
-.login-wrapper{
-  display:flex;
-  justify-content:center;
-  margin-top:40px;
+body::after{
+  content:"";
+  position:fixed;
+  top:0;
+  right:0;
+  width:18px;
+  height:100vh;
+  z-index:20;
+  background:repeating-linear-gradient(-35deg,#d62828 0 20px,#fff 20px 40px,#1769aa 40px 60px,#fff 60px 80px);
+  box-shadow:-3px 0 12px rgba(23,105,170,.24);
 }
-
-/* ================= LOGIN BOX ================= */
-
+.main-header{text-align:center;margin-bottom:10px}
+.logo-link{display:inline-block}
+.logo-img{height:210px;max-width:85vw;object-fit:contain;transition:.25s ease}
+.logo-img:hover{transform:scale(1.03)}
+.login-wrapper{display:flex;justify-content:center;align-items:flex-start}
 .login-box{
-  background:#1e1e1e;
-  padding:40px;
-  border-radius:10px;
-  width:320px;
+  width:min(390px,100%);
+  background:#fff;
+  padding:36px;
+  border-radius:20px;
   text-align:center;
-  box-shadow:0 0 20px rgba(0,0,0,0.6);
+  border:1px solid #cfe7fb;
+  box-shadow:0 18px 50px rgba(23,105,170,.24),0 0 0 5px rgba(23,105,170,.05);
 }
-
-h2{
-  margin-bottom:20px;
-}
-
-/* ================= INPUTS & BUTTON ================= */
-
-input,
-button{
+h2{margin:0 0 24px;color:var(--blue-dark);font-size:27px}
+input,button{
   width:100%;
-  padding:12px;
-  margin:10px 0;
-  border-radius:6px;
-  font-size:14px;
+  padding:13px 15px;
+  margin:8px 0;
+  border-radius:11px;
+  font-size:15px;
 }
-
 input{
-  border:none;
+  background:#fff;
+  color:var(--text);
+  border:1px solid #bfd8ec;
+  outline:none;
+  transition:.2s ease;
 }
-
+input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(23,105,170,.12)}
 button{
   border:none;
-  background:#c8a97e;
-  color:black;
-  font-weight:bold;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dark));
+  color:#fff;
+  font-weight:700;
   cursor:pointer;
-  transition:0.3s ease;
+  box-shadow:0 10px 22px rgba(23,105,170,.23);
+  transition:.2s ease;
 }
-
-button:hover{
-  background:#d4af37;
-}
-
-/* ================= MESSAGE ================= */
-
-.message{
-  margin-top:15px;
-  padding:8px;
-  border-radius:5px;
-  font-size:14px;
-  display:none;
-}
-
-.message.error{
-  background:#2a0f0f;
-  color:#f44336;
-  border:1px solid #f44336;
-}
-
-.message.success{
-  background:#0f2a14;
-  color:#4caf50;
-  border:1px solid #4caf50;
-}
-
+button:hover{transform:translateY(-2px);box-shadow:0 14px 26px rgba(23,105,170,.3)}
+.message{margin-top:14px;padding:10px;border-radius:9px;font-size:14px;display:none}
+.message.error{background:#fff0f0;color:var(--danger);border:1px solid #efb3b3}
+.message.success{background:#effbf2;color:var(--success);border:1px solid #b8e0c1}
+@media(max-width:600px){body{padding:18px 32px 30px 14px}.logo-img{height:165px}.login-box{padding:26px 20px;border-radius:16px}body::after{width:12px}}
 </style>
 </head>
-
 <body>
-
 <header class="main-header">
   <a href="index.html" class="logo-link">
     <img src="images/logo.png" alt="Fadila Barber Logo" class="logo-img">
   </a>
 </header>
-
 <div class="login-wrapper">
   <div class="login-box">
     <h2>🔐 Owner Login</h2>
-
     <input id="username" placeholder="Username">
     <input id="password" type="password" placeholder="Password">
-
     <button onclick="login()">Login</button>
-
     <div id="loginMessage" class="message"></div>
   </div>
 </div>
-
 <script>
-// تعديل السطر ليكون هكذا:
-const API_URL = "https://railway-deploy-production-adc6.up.railway.app/api";async function login(){
-
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const messageBox = document.getElementById("loginMessage");
-
-  messageBox.style.display = "none"; 
-  messageBox.className = "message";
-
-  if(!username || !password){
-    showMessage("יש להזין שם משתמש וסיסמה", "error");
-    return;
-  }
-
+const API_URL = "https://railway-deploy-production-adc6.up.railway.app/api";
+async function login(){
+  const username=document.getElementById("username").value.trim();
+  const password=document.getElementById("password").value.trim();
+  const messageBox=document.getElementById("loginMessage");
+  messageBox.style.display="none";
+  messageBox.className="message";
+  if(!username||!password){showMessage("יש להזין שם משתמש וסיסמה","error");return}
   try{
-    const res = await fetch(`${API_URL}/admin/login`,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({username,password})
-    });
-
-    const data = await res.json();
-
-    if(res.ok && data.token){
-      showMessage("✅ התחברות מוצלחת", "success");
-      localStorage.setItem("token",data.token);
-
-      setTimeout(()=>{
-        window.location.href="dashboard.html";
-      },1000);
-
-    } else {
-      showMessage("❌ שם משתמש או סיסמה שגויים", "error");
-    }
-
-  }catch(err){
-    showMessage("שגיאת חיבור לשרת", "error");
-  }
+    const res=await fetch(`${API_URL}/admin/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,password})});
+    const data=await res.json();
+    if(res.ok&&data.token){showMessage("✅ התחברות מוצלחת","success");localStorage.setItem("token",data.token);setTimeout(()=>{window.location.href="dashboard.html"},1000)}
+    else{showMessage("❌ שם משתמש או סיסמה שגויים","error")}
+  }catch(err){showMessage("שגיאת חיבור לשרת","error")}
 }
-
-function showMessage(text,type){
-  const messageBox = document.getElementById("loginMessage");
-  messageBox.textContent = text;
-  messageBox.classList.add(type);
-  messageBox.style.display = "block";
-}
+function showMessage(text,type){const messageBox=document.getElementById("loginMessage");messageBox.textContent=text;messageBox.classList.add(type);messageBox.style.display="block"}
 </script>
-
 </body>
 </html>
