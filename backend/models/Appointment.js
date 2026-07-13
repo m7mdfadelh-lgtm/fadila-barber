@@ -1,8 +1,4 @@
 const mongoose = require('mongoose');
-const whatsappService = require('../services/whatsappService');
-const { withWhatsAppFooter } = require('../utils/whatsappMessage');
-
-const OWNER_WHATSAPP_PHONE = process.env.OWNER_WHATSAPP_PHONE || '0503172506';
 
 const appointmentSchema = new mongoose.Schema({
   customerName: {
@@ -43,7 +39,23 @@ const appointmentSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'cancelled', 'completed', 'no-show'],
-    default: 'confirmed'
+    default: 'pending'
+  },
+
+  approvalRequestedAt: {
+    type: Date,
+    default: null
+  },
+
+  approvalDecisionAt: {
+    type: Date,
+    default: null
+  },
+
+  approvalDecision: {
+    type: String,
+    enum: ['approved', 'rejected', null],
+    default: null
   },
 
   clientReminderSent: {
@@ -87,6 +99,7 @@ const appointmentSchema = new mongoose.Schema({
 appointmentSchema.index({ date: 1, time: 1 });
 appointmentSchema.index({ status: 1 });
 appointmentSchema.index({ customerPhone: 1 });
+appointmentSchema.index({ status: 1, approvalRequestedAt: 1 });
 
 appointmentSchema.statics.findByDate = function(date) {
   const start = new Date(date);
@@ -100,35 +113,6 @@ appointmentSchema.statics.findByDate = function(date) {
     status: { $ne: 'cancelled' }
   }).sort({ time: 1 });
 };
-
-appointmentSchema.pre('save', function(next) {
-  this.$locals.wasNew = this.isNew;
-  next();
-});
-
-appointmentSchema.post('save', function(appointment) {
-  if (!appointment.$locals.wasNew) return;
-
-  const formattedDate = new Date(appointment.date).toLocaleDateString('he-IL', {
-    timeZone: 'Asia/Jerusalem'
-  });
-
-  const ownerMessage = withWhatsAppFooter(
-    `📅 נקבע תור חדש\n\n👤 שם: ${appointment.customerName}\n📞 טלפון: ${appointment.customerPhone}\n✂️/💆‍♂️ שירות: ${appointment.service}\n📅 תאריך: ${formattedDate}\n🕐 שעה: ${appointment.time}`
-  );
-
-  whatsappService.sendMessage(OWNER_WHATSAPP_PHONE, ownerMessage)
-    .then(() => Appointment.updateOne(
-      { _id: appointment._id },
-      { $set: { ownerBookingNotificationSent: true } }
-    ))
-    .catch((error) => {
-      console.error(
-        '❌ Failed to send new appointment WhatsApp to owner:',
-        error.message
-      );
-    });
-});
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
