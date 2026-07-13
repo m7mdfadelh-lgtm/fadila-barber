@@ -13,16 +13,20 @@
   --muted:#668199;
   --danger:#c62828;
   --success:#1b7f3a;
+  --border:#cfe4f5;
+  --shadow:0 18px 50px rgba(23,105,170,.24),0 0 0 5px rgba(23,105,170,.05);
 }
 *{box-sizing:border-box}
+html,body{min-height:100%}
 body{
   margin:0;
   min-height:100vh;
   font-family:"Segoe UI",Arial,sans-serif;
   color:var(--text);
   background:#fff;
-  padding:28px 48px 48px 28px;
+  padding:24px 42px 44px 24px;
   position:relative;
+  overflow-x:hidden;
 }
 body::after{
   content:"";
@@ -34,26 +38,88 @@ body::after{
   z-index:20;
   background:repeating-linear-gradient(-35deg,#d62828 0 20px,#fff 20px 40px,#1769aa 40px 60px,#fff 60px 80px);
   box-shadow:-3px 0 12px rgba(23,105,170,.24);
+  pointer-events:none;
 }
-.main-header{text-align:center;margin-bottom:10px}
-.logo-link{display:inline-block}
-.logo-img{height:350px;max-width:85vw;transition:.25s ease}
+.page-shell{
+  width:100%;
+  max-width:520px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.main-header{
+  width:300px;
+  height:300px;
+  margin:0 auto 8px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.logo-link{
+  display:inline-flex;
+  width:300px;
+  height:300px;
+  justify-content:center;
+  align-items:center;
+}
+.logo-img{
+  display:block;
+  width:300px;
+  height:300px;
+  max-width:none;
+  object-fit:contain;
+  transition:.25s ease;
+}
 .logo-img:hover{transform:scale(1.03)}
-.login-wrapper{justify-content:center;align-items:flex-start}
-.login-box{
-  width:min(390px,100%);
-  background:#fff;
-  padding:36px;
-  border-radius:20px;
-  text-align:center;
-  border:1px solid #cfe7fb;
-  box-shadow:0 18px 50px rgba(23,105,170,.24),0 0 0 5px rgba(23,105,170,.05);
+.login-wrapper{
+  width:100%;
+  display:flex;
+  justify-content:center;
 }
-h2{margin:0 0 24px;color:var(--blue-dark);font-size:27px}
+.login-box{
+  position:relative;
+  overflow:hidden;
+  width:min(400px,100%);
+  background:#fff;
+  padding:38px 34px 32px;
+  border-radius:20px;
+  text-align:right;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+.login-box::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:5px;
+  background:linear-gradient(90deg,var(--blue-dark),#2d8cff,var(--blue-dark));
+}
+h1{
+  margin:0 0 6px;
+  color:var(--blue-dark);
+  font-size:27px;
+  text-align:center;
+}
+.login-subtitle{
+  margin:0 0 24px;
+  color:var(--muted);
+  font-size:14px;
+  text-align:center;
+}
+.form-field{margin-bottom:16px}
+.form-field label{
+  display:block;
+  margin-bottom:7px;
+  color:#35536d;
+  font-size:14px;
+  font-weight:700;
+}
 input,button{
   width:100%;
   padding:13px 15px;
-  margin:8px 0;
   border-radius:11px;
   font-size:15px;
 }
@@ -64,8 +130,13 @@ input{
   outline:none;
   transition:.2s ease;
 }
-input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(23,105,170,.12)}
+input::placeholder{color:#9aacbb}
+input:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 4px rgba(23,105,170,.12)
+}
 button{
+  margin-top:4px;
   border:none;
   background:linear-gradient(135deg,var(--blue),var(--blue-dark));
   color:#fff;
@@ -74,45 +145,113 @@ button{
   box-shadow:0 10px 22px rgba(23,105,170,.23);
   transition:.2s ease;
 }
-button:hover{transform:translateY(-2px);box-shadow:0 14px 26px rgba(23,105,170,.3)}
-.message{margin-top:14px;padding:10px;border-radius:9px;font-size:14px;display:none}
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 26px rgba(23,105,170,.3)
+}
+.back-link{
+  display:block;
+  margin-top:18px;
+  color:var(--blue-dark);
+  text-align:center;
+  text-decoration:none;
+  font-size:14px;
+  font-weight:650;
+}
+.back-link:hover{text-decoration:underline}
+.message{
+  margin-top:14px;
+  padding:10px;
+  border-radius:9px;
+  font-size:14px;
+  text-align:center;
+  display:none
+}
 .message.error{background:#fff0f0;color:var(--danger);border:1px solid #efb3b3}
 .message.success{background:#effbf2;color:var(--success);border:1px solid #b8e0c1}
-@media(max-width:600px){body{padding:18px 32px 30px 14px}.logo-img{height:165px}.login-box{padding:26px 20px;border-radius:16px}body::after{width:12px}}
+@media(max-width:600px){
+  body{padding:16px 28px 30px 10px}
+  body::after{width:12px}
+  .login-box{padding:32px 20px 26px;border-radius:16px}
+}
 </style>
 </head>
 <body>
-<header class="main-header">
-  <a href="index.html" class="logo-link">
-    <img src="images/logo.png" alt="Fadila Barber Logo" class="logo-img">
-  </a>
-</header>
-<div class="login-wrapper">
-  <div class="login-box">
-    <h2>🔐 Owner Login</h2>
-    <input id="username" placeholder="Username">
-    <input id="password" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <div id="loginMessage" class="message"></div>
-  </div>
+<div class="page-shell">
+  <header class="main-header">
+    <a href="index.html" class="logo-link" aria-label="חזרה לאתר">
+      <img src="images/logo.png" alt="Fadila Barber Logo" class="logo-img">
+    </a>
+  </header>
+
+  <main class="login-wrapper">
+    <section class="login-box">
+      <h1>🔐 כניסת בעל העסק</h1>
+      <p class="login-subtitle">התחבר כדי לנהל תורים, שירותים ושעות פעילות</p>
+
+      <div class="form-field">
+        <label for="username">שם משתמש</label>
+        <input id="username" autocomplete="username" placeholder="הזן שם משתמש">
+      </div>
+
+      <div class="form-field">
+        <label for="password">סיסמה</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="הזן סיסמה">
+      </div>
+
+      <button type="button" onclick="login()">כניסה למערכת</button>
+      <div id="loginMessage" class="message"></div>
+      <a href="index.html" class="back-link">← חזרה לאתר</a>
+    </section>
+  </main>
 </div>
+
 <script>
 const API_URL = "https://railway-deploy-production-adc6.up.railway.app/api";
+
 async function login(){
   const username=document.getElementById("username").value.trim();
   const password=document.getElementById("password").value.trim();
   const messageBox=document.getElementById("loginMessage");
+
   messageBox.style.display="none";
   messageBox.className="message";
-  if(!username||!password){showMessage("יש להזין שם משתמש וסיסמה","error");return}
+
+  if(!username||!password){
+    showMessage("יש להזין שם משתמש וסיסמה","error");
+    return;
+  }
+
   try{
-    const res=await fetch(`${API_URL}/admin/login`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username,password})});
+    const res=await fetch(`${API_URL}/admin/login`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({username,password})
+    });
     const data=await res.json();
-    if(res.ok&&data.token){showMessage("✅ התחברות מוצלחת","success");localStorage.setItem("token",data.token);setTimeout(()=>{window.location.href="dashboard.html"},1000)}
-    else{showMessage("❌ שם משתמש או סיסמה שגויים","error")}
-  }catch(err){showMessage("שגיאת חיבור לשרת","error")}
+
+    if(res.ok&&data.token){
+      showMessage("✅ התחברות מוצלחת","success");
+      localStorage.setItem("token",data.token);
+      setTimeout(()=>{window.location.href="dashboard.html"},1000);
+    }else{
+      showMessage("❌ שם משתמש או סיסמה שגויים","error");
+    }
+  }catch(err){
+    showMessage("שגיאת חיבור לשרת","error");
+  }
 }
-function showMessage(text,type){const messageBox=document.getElementById("loginMessage");messageBox.textContent=text;messageBox.classList.add(type);messageBox.style.display="block"}
+
+function showMessage(text,type){
+  const messageBox=document.getElementById("loginMessage");
+  messageBox.textContent=text;
+  messageBox.classList.add(type);
+  messageBox.style.display="block";
+}
+
+document.addEventListener("keydown",(event)=>{
+  if(event.key==="Enter") login();
+});
 </script>
 </body>
 </html>
