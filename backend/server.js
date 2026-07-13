@@ -11,6 +11,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
 
 const adminController = require('./controllers/adminController');
 const cronService = require('./services/cronService');
@@ -45,6 +46,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/webhooks', webhookRoutes);
 
 /* ========================
    HEALTH CHECK
@@ -57,7 +59,8 @@ app.get('/api/health', (req, res) => {
     businessTime: new Date().toLocaleString('he-IL', {
       timeZone: 'Asia/Jerusalem'
     }),
-    timeZone: 'Asia/Jerusalem'
+    timeZone: 'Asia/Jerusalem',
+    wahaWebhook: '/api/webhooks/waha'
   });
 });
 
@@ -126,6 +129,7 @@ const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`\n💈 Fadila Barber Backend API running on port ${PORT}`);
   console.log(`🕒 Business timezone: ${process.env.TZ}`);
+  console.log('📨 WAHA approval webhook: /api/webhooks/waha');
 
   emailService.verifyConnection().catch((err) => {
     console.error('❌ Unexpected email verification error:', err.message);
