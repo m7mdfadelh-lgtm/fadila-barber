@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0f4ea8"><meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Fadila">
+  <title>Fadila — المواعيد</title>
+  <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=37">
+</head>
+<body class="customer-page">
+  <div id="installGate" class="gate hidden">
+    <div class="gate-card"><img src="images/Logo.png" alt="Fadila"><h1>تثبيت التطبيق</h1>
+      <p>للمتابعة، يجب إضافة Fadila إلى الشاشة الرئيسية.</p>
+      <button id="installButton" class="hidden">ثبّت الآن</button>
+      <div id="iosInstructions" class="install-guide hidden"><strong>iPhone / iPad</strong><ol><li>افتح الموقع في Safari.</li><li>اضغط زر المشاركة <b>□↑</b>.</li><li>اختر «إضافة إلى الشاشة الرئيسية» ثم «إضافة».</li></ol></div>
+      <div id="androidInstructions" class="install-guide hidden"><strong>Android</strong><ol><li>افتح الموقع في Chrome.</li><li>اضغط قائمة المتصفح <b>⋮</b>.</li><li>اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» ثم وافق.</li></ol></div>
+      <p class="muted">بعد التثبيت، افتح التطبيق من الأيقونة الجديدة.</p>
+    </div>
+  </div>
+  <main class="app-shell">
+    <section id="welcomeView" class="welcome-screen" aria-labelledby="welcomeTitle">
+      <div class="welcome-stage">
+        <h1 id="welcomeTitle" class="welcome-title">أهلاً وسهلاً بكم في FadilaBarber💈</h1>
+        <button id="enterButton" class="glass-entry" type="button">دخول</button>
+      </div>
+    </section>
+    <div id="appContent" class="hidden">
+    <header class="app-header"><button id="messagesButton" class="messages-button hidden" type="button" aria-label="فتح لوحة الرسائل"><span aria-hidden="true">✉</span><span>الرسائل</span><b id="messagesBadge" class="messages-badge hidden">0</b></button><button id="customerRefreshButton" class="data-refresh-button hidden" type="button" aria-label="تحديث البيانات"><span aria-hidden="true">↻</span><span>تحديث</span></button><img src="images/Logo.png" alt="Fadila"><div><h1>Fadila</h1><p>إدارة المواعيد</p></div></header>
+    <section id="loginView" class="card hidden">
+      <h2>تسجيل الدخول إلى التطبيق</h2><p class="muted">تم إنشاء حسابك من قِبل صاحب المحل.</p>
+      <label>اسم المستخدم<input id="username" autocomplete="username"></label>
+      <label>كلمة المرور<input id="password" type="password" autocomplete="current-password"></label>
+      <button id="loginButton">دخول</button><p id="loginMessage" class="message"></p>
+    </section>
+    <div id="customerView" class="hidden">
+      <section class="card row-between"><div><h2 id="welcome"></h2><p class="muted">منطقتك الشخصية</p></div><button class="secondary compact" id="logoutButton">تسجيل الخروج</button></section>
+      <section class="card"><h2>الإشعارات</h2><p id="notificationState" class="muted">لتلقي التحديثات والتذكيرات، يرجى السماح بالإشعارات.</p><div class="grid-two"><button id="enableNotifications">تفعيل الإشعارات</button><button id="testNotification" class="secondary">إرسال إشعار تجريبي</button></div></section>
+      <section class="card"><h2>حجز موعد</h2>
+        <label>الخدمة<select id="service"><option value="">اختر خدمة</option></select></label>
+        <label>التاريخ<input id="date" type="date"></label>
+        <label>الساعة<select id="time" disabled><option value="">اختر خدمة وتاريخاً</option></select></label>
+        <button id="bookButton">إرسال الطلب</button><p id="bookingMessage" class="message"></p>
+      </section>
+      <section class="card"><h2>مواعيدي</h2><div id="appointments" class="appointment-list"></div></section>
+      <a class="whatsapp-float" href="https://wa.me/972527533887" target="_blank" rel="noopener noreferrer" aria-label="فتح محادثة واتساب مع فاديلا"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3A13 13 0 0 0 4.8 22.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6c-2 0-3.9-.5-5.6-1.5l-.4-.2-3.9 1 1.1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.4.2-.7.1-1.9-1-3.2-1.8-4.5-4-.3-.6.3-.6.9-1.3.1-.2.2-.4.3-.6.1-.2 0-.4 0-.6-.1-.2-.7-1.7-1-2.3-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-1.1 1.1-1.6 2.4-1.5 3.8.2 1.7.9 3.4 2 4.7 1.8 2.6 4.2 4.6 7.1 5.6.9.3 2 .2 2.8-.2.8-.5 1.4-1.3 1.6-2.2.1-.4.1-.8 0-.9-.2-.2-.5-.3-.8-.4Z"/></svg><span>WhatsApp</span></a>
+    </div>
+    </div>
+  </main>
+  <div id="messagesPanel" class="messages-panel hidden" role="dialog" aria-modal="true" aria-labelledby="messagesTitle">
+    <div class="messages-panel-card"><div class="messages-panel-header"><h2 id="messagesTitle">رسائلي</h2><button id="closeMessages" class="secondary compact" type="button">إغلاق</button></div><div id="messagesList" class="messages-list"></div></div>
+  </div>
+  <script src="config.js?v=37"></script><script src="pwa.js?v=37"></script><script src="app.js?v=37"></script>
+</body></html>

@@ -1,0 +1,7 @@
+const CACHE = 'fadila-pwa-v37';
+const ASSETS = ['./','./index.html','./admin.html','./dashboard.html','./style.css','./app.css','./config.js','./pwa.js','./app.js','./dashboard.js','./images/Logo.png','./images/icon-192.png','./images/icon-512.png'];
+self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
+self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
+self.addEventListener('fetch', event => { if(event.request.method==='GET') event.respondWith(fetch(event.request).catch(() => caches.match(event.request))); });
+self.addEventListener('push', event => { const data=event.data?event.data.json():{}; event.waitUntil(Promise.all([self.registration.showNotification(data.title||'إشعار جديد',{body:data.body||'',icon:'./images/icon-192.png',badge:'./images/icon-192.png',tag:data.tag||'notification',data:{url:data.url||'./index.html'}}),clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>list.forEach(client=>client.postMessage({type:'fadila-message'})))])); });
+self.addEventListener('notificationclick', event => { event.notification.close(); event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{for(const client of list){if('focus'in client){client.navigate(event.notification.data.url);return client.focus();}}return clients.openWindow(event.notification.data.url);})); });

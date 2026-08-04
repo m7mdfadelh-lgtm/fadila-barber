@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>معرض الأعمال — Fadila Barber</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ===== Gallery Grid ===== */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .gallery-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius, 12px);
+      border: 1px solid rgba(212,175,55,0.2);
+      cursor: pointer;
+      height: 180px;
+      background: #111;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: 0.4s ease;
+      display: block;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.08);
+      filter: brightness(1.1);
+    }
+
+    .gallery-item::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        transparent 60%,
+        rgba(0,0,0,0.7) 100%
+      );
+      pointer-events: none;
+    }
+
+    /* ===== inline fallback ===== */
+    .success-banner {
+      background: #0f2a14;
+      color: #4caf50;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+      border: 1px solid #4caf50;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    /* ===== Modal ===== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: var(--radius, 12px);
+      border: 2px solid var(--gold, #d4af37);
+    }
+
+    .modal.active {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html" class="logo-link">
+    <img src="images/Logo.png" alt="Fadila Barber Logo" class="logo-img">
+  </a>
+</header>
+
+<div class="container">
+
+  <main>
+    
+    <div id="successMessage" class="success-banner" style="display: none;"></div>
+    
+    <h2 style="text-align:center; color:#d4af37; margin-bottom:20px;">
+      معرض أعمالنا
+    </h2>
+
+    <div class="gallery-grid" id="galleryGrid">
+      </div>
+
+  </main>
+
+</div>
+
+<footer>
+  © 2026 Fadila Barber
+</footer>
+
+<div class="modal" id="imageModal" onclick="closeModal()">
+  <img id="modalImage">
+</div>
+
+<script>
+const API_URL = "https://railway-deploy-production-adc6.up.railway.app/api";
+const grid = document.getElementById("galleryGrid");
+const modal = document.getElementById("imageModal");
+const modalImage = document.getElementById("modalImage");
+
+async function loadGallery() {
+  try {
+    const res = await fetch(`${API_URL}/gallery`);
+    if (!res.ok) throw new Error("تعذر تحميل المعرض");
+    
+    const images = await res.json();
+    if (!grid) return;
+    
+    grid.innerHTML = "";
+
+    images.forEach(img => {
+      const div = document.createElement("div");
+      div.className = "gallery-item";
+
+      div.innerHTML = `
+        <img src="${img.image}" alt="Fadila Barber Work" loading="lazy">
+      `;
+
+      div.addEventListener("click", () => {
+        modalImage.src = img.image;
+        modal.classList.add("active");
+      });
+
+      grid.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error("Gallery load error:", err);
+  }
+}
+
+function closeModal() {
+  if (modal) modal.classList.remove("active");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const message = localStorage.getItem("bookingSuccess");
+
+  if (message) {
+    const banner = document.getElementById("successMessage");
+    if (banner) {
+      banner.textContent = message;
+      banner.style.display = "block";
+      
+      localStorage.removeItem("bookingSuccess");
+
+      setTimeout(() => {
+        banner.style.display = "none";
+      }, 4000);
+    }
+  }
+
+  loadGallery();
+});
+</script>
+
+</body>
+</html>
