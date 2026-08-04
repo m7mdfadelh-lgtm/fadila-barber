@@ -40,10 +40,13 @@ exports.updateAppointment = async (req, res) => {
     let title = 'تم تحديث موعدك';
     if (status === 'cancelled') title = 'تم إلغاء موعدك';
     else if (previous.status === 'pending' && status === 'confirmed') title = 'تم تأكيد موعدك';
-    const pushResult = await pushService.sendToUser(appointment.customer, {
-      title, body: `${service}، ${formatJerusalemDate(start)} الساعة ${time}${appointment.notes ? ` — ${appointment.notes}` : ''}`,
-      url: './index.html', tag: `appointment-update-${appointment._id}-${Date.now()}`
-    });
+    const notifyCustomer = req.body.notifyCustomer !== false;
+    const pushResult = notifyCustomer
+      ? await pushService.sendToUser(appointment.customer, {
+        title, body: `${service}، ${formatJerusalemDate(start)} الساعة ${time}${appointment.notes ? ` — ${appointment.notes}` : ''}`,
+        url: './index.html', tag: `appointment-update-${appointment._id}-${Date.now()}`
+      })
+      : { sent: 0, failed: 0 };
     res.json({ success: true, data: appointment, pushNotificationSent: pushResult.sent > 0 });
   } catch (error) {
     console.error('Appointment update failed:', error);
