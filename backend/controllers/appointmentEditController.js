@@ -27,7 +27,7 @@ exports.updateAppointment = async (req, res) => {
     }
     Object.assign(appointment, { service, duration, date: start, time, status, notes: String(req.body.notes || '') });
     const scheduleChanged = previous.date !== date || previous.time !== time || previous.service !== service;
-    if (scheduleChanged) { appointment.clientReminderSent = false; appointment.ownerReminderSent = false; }
+    if (scheduleChanged) { appointment.clientReminderSent = false; appointment.ownerHourReminderSent = false; appointment.ownerReminderSent = false; }
     if (previous.status === 'pending' && ['confirmed', 'cancelled'].includes(status)) {
       appointment.approvalDecision = status === 'confirmed' ? 'approved' : 'rejected';
       appointment.approvalDecisionAt = new Date();
@@ -40,13 +40,10 @@ exports.updateAppointment = async (req, res) => {
     let title = 'تم تحديث موعدك';
     if (status === 'cancelled') title = 'تم إلغاء موعدك';
     else if (previous.status === 'pending' && status === 'confirmed') title = 'تم تأكيد موعدك';
-    const notifyCustomer = req.body.notifyCustomer !== false;
-    const pushResult = notifyCustomer
-      ? await pushService.sendToUser(appointment.customer, {
-        title, body: `${service}، ${formatJerusalemDate(start)} الساعة ${time}${appointment.notes ? ` — ${appointment.notes}` : ''}`,
-        url: './index.html', tag: `appointment-update-${appointment._id}-${Date.now()}`
-      })
-      : { sent: 0, failed: 0 };
+    const pushResult = await pushService.sendToUser(appointment.customer, {
+      title, body: `${service}، ${formatJerusalemDate(start)} الساعة ${time}${appointment.notes ? ` — ${appointment.notes}` : ''}`,
+      url: './index.html', tag: `appointment-update-${appointment._id}-${Date.now()}`
+    });
     res.json({ success: true, data: appointment, pushNotificationSent: pushResult.sent > 0 });
   } catch (error) {
     console.error('Appointment update failed:', error);

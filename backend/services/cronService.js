@@ -66,11 +66,21 @@ class CronService {
           });
           if (result.sent > 0) appointment.clientReminderSent = true;
         }
+        if (minutes >= 0 && minutes <= 60 && !appointment.ownerHourReminderSent) {
+          const result = await pushService.sendToOwners({
+            title: 'موعد بعد ساعة',
+            body: `${appointment.customerName} — ${appointment.service}, ${formatJerusalemDate(instant)} ${appointment.time}`,
+            url: './dashboard.html', tag: `owner-hour-reminder-${appointment._id}`,
+            appointmentId: appointment._id
+          });
+          if (result.sent > 0) appointment.ownerHourReminderSent = true;
+        }
         if (minutes >= 0 && minutes <= 15 && !appointment.ownerReminderSent) {
           const result = await pushService.sendToOwners({
             title: 'موعد بعد 15 دقيقة',
             body: `${appointment.customerName} — ${appointment.service}, ${formatJerusalemDate(instant)} ${appointment.time}`,
-            url: './dashboard.html', tag: `owner-reminder-${appointment._id}`
+            url: './dashboard.html', tag: `owner-reminder-${appointment._id}`,
+            appointmentId: appointment._id
           });
           if (result.sent > 0) appointment.ownerReminderSent = true;
         }

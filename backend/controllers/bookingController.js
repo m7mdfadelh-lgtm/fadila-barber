@@ -48,7 +48,7 @@ exports.createAppointment = async (req, res) => {
     });
     res.status(201).json({ success: true, data: appointment, message: status === 'pending' ? 'الطلب بانتظار الموافقة' : 'تم تحديد الموعد' });
     if (status === 'pending') {
-      pushService.sendToOwners({ title: 'طلب موعد جديد', body: `${customer.name} طلب موعد ${service} بتاريخ ${formatJerusalemDate(start)} الساعة ${time}`, url: './dashboard.html', tag: `new-${appointment._id}` });
+      pushService.sendToOwners({ title: 'طلب موعد جديد', body: `${customer.name} طلب موعد ${service} بتاريخ ${formatJerusalemDate(start)} الساعة ${time}`, url: './dashboard.html', tag: `new-${appointment._id}`, appointmentId: appointment._id });
     } else {
       pushService.sendToUser(customer._id, { title: 'تم تحديد موعد لك', body: `${service}، ${formatJerusalemDate(start)} الساعة ${time}`, url: './index.html', tag: `created-${appointment._id}` });
     }

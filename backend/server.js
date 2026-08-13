@@ -27,7 +27,7 @@ const app = express();
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   'https://fadila-barber.netlify.app',
-  'http://localhost:5001',
+  'http://localhost:5500',
   'http://localhost:8080',
   'http://localhost:8088',
   'http://127.0.0.1:5001',

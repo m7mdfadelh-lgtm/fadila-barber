@@ -71,7 +71,7 @@ exports.resolveChangeRequest = async (req, res) => {
       const nearby = await Appointment.find({ _id: { $ne: appointment._id }, status: { $ne: 'cancelled' }, date: { $gte: new Date(start - 86400000), $lte: new Date(start.getTime() + 86400000) } });
       const conflict = nearby.some((item) => { const otherStart = getAppointmentInstant(item); return start < new Date(otherStart.getTime() + item.duration * 60000) && end > otherStart; });
       if (conflict) return res.status(409).json({ success: false, requiresManualEdit: true, error: 'الوقت المطلوب يتعارض مع موعد آخر. يجب تعديل الموعد يدوياً' });
-      Object.assign(appointment, { service: serviceDoc.name, duration, date: start, time, notes: requestText || appointment.notes, clientReminderSent: false, ownerReminderSent: false });
+      Object.assign(appointment, { service: serviceDoc.name, duration, date: start, time, notes: requestText || appointment.notes, clientReminderSent: false, ownerHourReminderSent: false, ownerReminderSent: false });
     }
     appointment.changeRequest.status = decision;
     appointment.changeRequest.resolvedAt = new Date();
