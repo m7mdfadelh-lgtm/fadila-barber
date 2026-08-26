@@ -7,6 +7,7 @@ const {
   getJerusalemDateString,
   getAppointmentInstant
 } = require('../utils/timeZone');
+const { getScheduleForDate } = require('../utils/businessHours');
 
 const SLOT_INTERVAL_MINUTES = 5;
 
@@ -29,21 +30,6 @@ function roundUpToInterval(date, intervalMinutes = SLOT_INTERVAL_MINUTES) {
   }
 
   return rounded;
-}
-
-function getDayKey(dateString) {
-  const dayMap = [
-    'sunday',
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday'
-  ];
-
-  const calendarDate = new Date(`${dateString}T12:00:00Z`);
-  return dayMap[calendarDate.getUTCDay()];
 }
 
 exports.getAvailableSlots = async (req, res) => {
@@ -71,7 +57,7 @@ exports.getAvailableSlots = async (req, res) => {
       return res.json({ success: true, availableSlots: [] });
     }
 
-    const daySettings = settings.workingHours[getDayKey(dateString)];
+    const daySettings = getScheduleForDate(settings, dateString);
     if (!daySettings || !daySettings.enabled) {
       return res.json({ success: true, availableSlots: [] });
     }

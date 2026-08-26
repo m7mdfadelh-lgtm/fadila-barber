@@ -4,9 +4,7 @@ const User = require('../models/User');
 const BusinessSettings = require('../models/BusinessSettings');
 const pushService = require('../services/pushService');
 const { jerusalemDateTimeToUtc, getAppointmentInstant, formatJerusalemDate } = require('../utils/timeZone');
-
-const dayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-const dayKey = (date) => dayKeys[new Date(`${date}T12:00:00Z`).getUTCDay()];
+const { getScheduleForDate } = require('../utils/businessHours');
 
 exports.createAppointment = async (req, res) => {
   try {
@@ -23,7 +21,7 @@ exports.createAppointment = async (req, res) => {
     const duration = Number(serviceDoc.duration) || 30;
     const end = new Date(start.getTime() + duration * 60000);
     const settings = await BusinessSettings.findOne();
-    const hours = settings?.workingHours?.[dayKey(date)];
+    const hours = getScheduleForDate(settings, date);
     if (!hours?.enabled) return res.status(400).json({ success: false, error: 'المحل مغلق في اليوم المختار' });
     const workStart = jerusalemDateTimeToUtc(date, hours.start);
     const workEnd = jerusalemDateTimeToUtc(date, hours.end);

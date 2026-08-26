@@ -12,6 +12,14 @@ const daySchema = {
   enabled: Boolean
 };
 
+const dateOverrideSchema = new mongoose.Schema({
+  date: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/ },
+  start: String,
+  end: String,
+  breaks: [breakSchema],
+  enabled: { type: Boolean, default: true }
+}, { _id: false });
+
 const businessSettingsSchema = new mongoose.Schema({
   vapidPublicKey: { type: String, select: false },
   vapidPrivateKey: { type: String, select: false },
@@ -23,7 +31,8 @@ const businessSettingsSchema = new mongoose.Schema({
     thursday: daySchema,
     friday: daySchema,
     saturday: daySchema
-  }
+  },
+  dateOverrides: { type: [dateOverrideSchema], default: [] }
 });
 
 module.exports = mongoose.model("BusinessSettings", businessSettingsSchema);

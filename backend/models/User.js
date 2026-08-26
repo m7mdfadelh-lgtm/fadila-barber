@@ -21,7 +21,7 @@ userSchema.methods.comparePassword = function comparePassword(password) {
 };
 
 userSchema.methods.toSafeObject = function toSafeObject() {
-  return { id: this._id, username: this.username, role: this.role, name: this.name, phone: this.phone };
+  return { id: this._id, username: this.username, role: this.role, name: this.name, phone: this.phone, active: this.active };
 };
 
 module.exports = mongoose.model('User', userSchema);

@@ -40,12 +40,15 @@ function isAllowedOrigin(origin) {
 
   try {
     const url = new URL(normalizedOrigin);
+    const isLocalDevelopment =
+      ['localhost', '127.0.0.1', '::1'].includes(url.hostname) &&
+      ['http:', 'https:'].includes(url.protocol);
     const isSecureDevelopmentTunnel =
       url.protocol === 'https:' &&
       (url.hostname.endsWith('.devtunnels.ms') ||
        url.hostname.endsWith('.trycloudflare.com'));
 
-    return isSecureDevelopmentTunnel;
+    return isLocalDevelopment || isSecureDevelopmentTunnel;
   } catch {
     return false;
   }

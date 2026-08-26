@@ -18,6 +18,13 @@ router.put('/read-all', async (req, res) => {
   res.json({ success: true });
 });
 
+router.delete('/', async (req, res) => {
+  const ids = Array.isArray(req.body.ids) ? req.body.ids.map(String).filter((id) => /^[a-f\d]{24}$/i.test(id)) : [];
+  if (!ids.length) return res.status(400).json({ success: false, error: 'يرجى اختيار رسالة واحدة على الأقل' });
+  const result = await Message.deleteMany({ user: req.user._id, _id: { $in: ids } });
+  res.json({ success: true, deleted: result.deletedCount });
+});
+
 router.delete('/treated/all', async (req, res) => {
   const messages = await Message.find({
     user: req.user._id,

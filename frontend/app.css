@@ -779,11 +779,82 @@
 }
 
 .owner-page .message-item {
+  position: relative;
   padding: 15px;
   border: 1px solid #dce8f4;
   border-radius: 15px;
   background: #fff;
 }
+
+.owner-page .message-select {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: auto;
+  margin: 0;
+}
+
+.owner-page .message-select input { width: 20px; height: 20px; margin: 0; }
+.owner-page .message-item:has(.message-select) { padding-right: 45px; }
+
+.owner-page .message-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #dce8f4;
+}
+
+.owner-page .message-bulk-bar label { display: flex; align-items: center; gap: 7px; margin: 0; font-weight: 700; }
+.owner-page .message-bulk-bar input { width: 19px; height: 19px; margin: 0; }
+.owner-page .message-bulk-bar button { width: auto; margin-inline-start: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+.owner-page .customer-management-list { display: grid; gap: 12px; }
+.owner-page .customer-management-item { padding: 16px; border: 1px solid #dce8f4; border-radius: 14px; background: #fff; }
+.owner-page .customer-management-item.is-blocked { background: #f5f6f8; opacity: .82; }
+.owner-page .customer-management-summary strong,
+.owner-page .customer-management-summary span { display: block; }
+.owner-page .customer-management-summary span { margin-top: 4px; color: #718096; font-size: 13px; }
+.owner-page .customer-management-item label { margin: 12px 0; }
+.owner-page .customer-management-actions { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 8px; }
+
+.owner-page .working-hours-list { margin-bottom: 16px; border-top: 1px solid #dce8f4; }
+.owner-page .working-hours-row { display: grid; grid-template-columns: minmax(75px,.7fr) 1fr 1fr auto; align-items: end; gap: 14px; padding: 13px 4px; border-bottom: 1px solid #dce8f4; }
+.owner-page .working-hours-row strong { align-self: center; color: #183b66; }
+.owner-page .working-hours-row label { margin: 0; }
+.owner-page .inline-check { display: flex; align-items: center; gap: 7px; min-height: 48px; margin: 0; white-space: nowrap; }
+.owner-page .inline-check input { width: 19px; min-height: 19px; margin: 0; }
+.owner-page .date-hours-panel { margin-top: 26px; padding-top: 22px; border-top: 2px solid #cbdced; }
+.owner-page .date-hours-panel h3 { margin: 0 0 6px; color: #183b66; }
+.owner-page .date-hours-controls { display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; align-items: end; gap: 12px; }
+.owner-page .date-hours-actions { display: flex; gap: 10px; margin-top: 12px; }
+.owner-page .date-hours-actions button { width: auto; }
+.owner-page .date-overrides-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.owner-page .date-override-item { display: flex; flex-direction: column; width: auto; min-width: 135px; padding: 10px 14px; border: 1px solid #bfd3eb; background: #f8fbff; color: #164f97; box-shadow: none; }
+.owner-page .date-override-item span { margin-top: 3px; font-size: 12px; }
+
+.owner-page .timeline-appointment-buttons { display: flex; gap: 5px; margin-inline-start: auto; }
+.owner-page .timeline-appointment-buttons button { min-width: 0; padding: 5px 7px; font-size: 10px; }
+
+.owner-page .timeline-move-date-panel {
+  display: grid;
+  grid-template-columns: 1fr minmax(180px, .8fr) auto;
+  align-items: end;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 15px;
+  border: 1px solid #bfd3eb;
+  border-radius: 14px;
+  background: #f4f9ff;
+}
+
+.owner-page .timeline-move-date-panel > div:first-child strong,
+.owner-page .timeline-move-date-panel > div:first-child span { display: block; }
+.owner-page .timeline-move-date-panel > div:first-child span { margin-top: 4px; color: #718096; font-size: 13px; }
+.owner-page .timeline-move-date-panel label { margin: 0; }
+.owner-page .timeline-move-date-actions { display: flex; gap: 8px; }
+.owner-page .timeline-move-date-actions button { width: auto; white-space: nowrap; }
 
 .owner-page .message-item.unread {
   border-right: 4px solid #1768d1;
@@ -1087,6 +1158,16 @@
   .owner-page .change-request-actions {
     grid-template-columns: 1fr;
   }
+
+  .owner-page .customer-management-actions,
+  .owner-page .working-hours-row,
+  .owner-page .date-hours-controls { grid-template-columns: 1fr; }
+
+  .owner-page .working-hours-row { align-items: stretch; gap: 8px; padding: 16px 2px; }
+  .owner-page .timeline-move-date-panel { grid-template-columns: 1fr; align-items: stretch; }
+  .owner-page .date-hours-actions,
+  .owner-page .message-bulk-bar { flex-wrap: wrap; }
+  .owner-page .message-bulk-bar button { margin-inline-start: 0; }
 
   .owner-page .owner-messages-button {
     top: 4px;

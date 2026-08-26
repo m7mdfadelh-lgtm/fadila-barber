@@ -1,7 +1,9 @@
 const Appointment = require('../models/Appointment');
 const Service = require('../models/Service');
+const BusinessSettings = require('../models/BusinessSettings');
 const pushService = require('../services/pushService');
 const { jerusalemDateTimeToUtc, getAppointmentInstant, getJerusalemDateString, formatJerusalemDate } = require('../utils/timeZone');
+const { getScheduleForDate } = require('../utils/businessHours');
 
 const allowed = ['pending', 'confirmed', 'cancelled', 'completed', 'no-show'];
 
@@ -21,6 +23,18 @@ exports.updateAppointment = async (req, res) => {
     const duration = Number(req.body.duration || serviceDoc.duration);
     const start = jerusalemDateTimeToUtc(date, time);
     const end = new Date(start.getTime() + duration * 60000);
+    if (Number.isNaN(start.getTime())) return res.status(400).json({ success: false, error: 'التاريخ أو الساعة غير صالحين' });
+    if (status !== 'cancelled') {
+      const settings = await BusinessSettings.findOne();
+      const hours = getScheduleForDate(settings, date);
+      if (!hours?.enabled) return res.status(400).json({ success: false, error: 'المحل مغلق في اليوم المختار' });
+      const workStart = jerusalemDateTimeToUtc(date, hours.start);
+      const workEnd = jerusalemDateTimeToUtc(date, hours.end);
+      if (start < workStart || end > workEnd) return res.status(400).json({ success: false, error: 'الموعد خارج ساعات العمل' });
+      if ((hours.breaks || []).some((item) => start < jerusalemDateTimeToUtc(date, item.end) && end > jerusalemDateTimeToUtc(date, item.start))) {
+        return res.status(409).json({ success: false, error: 'الساعة المختارة تقع ضمن وقت الاستراحة' });
+      }
+    }
     const others = status === 'cancelled' ? [] : await Appointment.find({ _id: { $ne: appointment._id }, status: { $ne: 'cancelled' }, date: { $gte: new Date(start - 86400000), $lte: new Date(start.getTime() + 86400000) } });
     if (others.some((item) => { const s = getAppointmentInstant(item); return start < new Date(s.getTime() + item.duration * 60000) && end > s; })) {
       return res.status(409).json({ success: false, error: 'الموعد يتعارض مع موعد موجود' });

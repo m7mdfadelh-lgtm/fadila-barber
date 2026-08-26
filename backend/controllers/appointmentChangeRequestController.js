@@ -4,9 +4,7 @@ const Service = require('../models/Service');
 const BusinessSettings = require('../models/BusinessSettings');
 const Message = require('../models/Message');
 const { formatJerusalemDate, jerusalemDateTimeToUtc, getAppointmentInstant } = require('../utils/timeZone');
-
-const dayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-const dayKey = (date) => dayKeys[new Date(`${date}T12:00:00Z`).getUTCDay()];
+const { getScheduleForDate } = require('../utils/businessHours');
 
 exports.createChangeRequest = async (req, res) => {
   try {
@@ -62,7 +60,7 @@ exports.resolveChangeRequest = async (req, res) => {
       const duration = Number(serviceDoc.duration) || 30;
       const end = new Date(start.getTime() + duration * 60000);
       const settings = await BusinessSettings.findOne();
-      const hours = settings?.workingHours?.[dayKey(date)];
+      const hours = getScheduleForDate(settings, date);
       if (!hours?.enabled) return res.status(409).json({ success: false, requiresManualEdit: true, error: 'المحل مغلق في اليوم المطلوب. يجب تعديل الموعد يدوياً' });
       const workStart = jerusalemDateTimeToUtc(date, hours.start);
       const workEnd = jerusalemDateTimeToUtc(date, hours.end);

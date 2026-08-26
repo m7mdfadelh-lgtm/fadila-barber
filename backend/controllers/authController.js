@@ -40,8 +40,45 @@ exports.createCustomer = async (req, res) => {
 };
 
 exports.listCustomers = async (req, res) => {
-  const users = await User.find({ role: 'customer', active: true }).sort({ name: 1 });
+  const users = await User.find({ role: 'customer' }).sort({ active: -1, name: 1 });
   res.json({ success: true, data: users.map((user) => user.toSafeObject()) });
+};
+
+exports.updateCustomer = async (req, res) => {
+  try {
+    const username = String(req.body.username || '').trim().toLowerCase();
+    if (!username) return res.status(400).json({ success: false, error: 'اسم المستخدم مطلوب' });
+    const user = await User.findOne({ _id: req.params.id, role: 'customer' });
+    if (!user) return res.status(404).json({ success: false, error: 'لم يتم العثور على الزبون' });
+    user.username = username;
+    await user.save();
+    res.json({ success: true, user: user.toSafeObject() });
+  } catch (error) {
+    const message = error.code === 11000 ? 'اسم المستخدم موجود مسبقاً' : (error.message || 'تعذر تحديث اسم المستخدم');
+    res.status(400).json({ success: false, error: message });
+  }
+};
+
+exports.setCustomerStatus = async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id, role: 'customer' });
+  if (!user) return res.status(404).json({ success: false, error: 'لم يتم العثور على الزبون' });
+  user.active = req.body.active === true;
+  await user.save();
+  res.json({ success: true, user: user.toSafeObject() });
+};
+
+exports.deleteCustomer = async (req, res) => {
+  const PushSubscription = require('../models/PushSubscription');
+  const Message = require('../models/Message');
+  const user = await User.findOne({ _id: req.params.id, role: 'customer' });
+  if (!user) return res.status(404).json({ success: false, error: 'لم يتم العثور على الزبون' });
+  await Promise.all([
+    Appointment.updateMany({ customer: user._id }, { $set: { customer: null } }),
+    PushSubscription.deleteMany({ user: user._id }),
+    Message.deleteMany({ user: user._id })
+  ]);
+  await user.deleteOne();
+  res.json({ success: true });
 };
 
 exports.createOwner = async () => {

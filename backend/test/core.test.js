@@ -15,6 +15,7 @@ const User = require('../models/User');
 const pushService = require('../services/pushService');
 const { ownerOnly, protect } = require('../middleware/authMiddleware');
 const { jerusalemDateTimeToUtc, getJerusalemDateString } = require('../utils/timeZone');
+const { getScheduleForDate } = require('../utils/businessHours');
 
 test('Jerusalem time conversion preserves calendar date and handles DST', () => {
   const winter = jerusalemDateTimeToUtc('2026-01-15', '10:30');
@@ -22,6 +23,15 @@ test('Jerusalem time conversion preserves calendar date and handles DST', () => 
   assert.equal(winter.toISOString(), '2026-01-15T08:30:00.000Z');
   assert.equal(summer.toISOString(), '2026-08-01T07:30:00.000Z');
   assert.equal(getJerusalemDateString(summer), '2026-08-01');
+});
+
+test('date-specific business hours override the regular weekday schedule', () => {
+  const settings = {
+    workingHours: { wednesday: { start: '09:00', end: '19:00', enabled: true } },
+    dateOverrides: [{ date: '2026-08-26', start: '12:00', end: '16:00', enabled: true }]
+  };
+  assert.deepEqual(getScheduleForDate(settings, '2026-08-26'), settings.dateOverrides[0]);
+  assert.deepEqual(getScheduleForDate(settings, '2026-09-02'), settings.workingHours.wednesday);
 });
 
 test('appointment accepts the canonical no-show status', async () => {
