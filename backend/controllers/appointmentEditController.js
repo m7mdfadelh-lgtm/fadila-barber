@@ -41,7 +41,7 @@ exports.updateAppointment = async (req, res) => {
     }
     Object.assign(appointment, { service, duration, date: start, time, status, notes: String(req.body.notes || '') });
     const scheduleChanged = previous.date !== date || previous.time !== time || previous.service !== service;
-    if (scheduleChanged) { appointment.clientReminderSent = false; appointment.ownerHourReminderSent = false; appointment.ownerReminderSent = false; }
+    if (scheduleChanged) { appointment.clientReminderSent = false; appointment.client15MinuteReminderSent = false; appointment.ownerHourReminderSent = false; appointment.ownerReminderSent = false; }
     if (previous.status === 'pending' && ['confirmed', 'cancelled'].includes(status)) {
       appointment.approvalDecision = status === 'confirmed' ? 'approved' : 'rejected';
       appointment.approvalDecisionAt = new Date();
