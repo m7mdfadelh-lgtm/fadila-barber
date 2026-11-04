@@ -1425,3 +1425,31 @@
 /* Show the customer greeting without a card, aligned to the right. */
 .customer-page .customer-greeting { margin: 8px 0 14px; text-align: right; }
 .customer-page .customer-greeting h2 { margin: 0; color: #0f4ea8; font-size: 18px; }
+
+
+/* Customer feedback and owner moderation. */
+.customer-page .feedback-list,
+.owner-page .feedback-admin-list { display: grid; gap: 10px; margin-top: 14px; }
+.customer-page .feedback-item,
+.owner-page .feedback-admin-item { min-width: 0; padding: 13px 14px; border: 1px solid #dce8f4; border-radius: 14px; background: #f8fbff; }
+.customer-page .feedback-item-heading,
+.owner-page .feedback-item-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.customer-page .feedback-item-heading strong,
+.owner-page .feedback-item-heading strong { color: #17385f; }
+.customer-page .feedback-rating,
+.owner-page .feedback-rating { color: #d18a00; letter-spacing: .06em; white-space: nowrap; }
+.customer-page .feedback-item p,
+.owner-page .feedback-admin-item p { margin: 8px 0; color: #344054; white-space: pre-wrap; overflow-wrap: anywhere; }
+.customer-page .feedback-item time,
+.owner-page .feedback-admin-item time { color: #718096; font-size: 12px; }
+.owner-page .feedback-admin-item.pending { border-inline-start: 4px solid #d69200; }
+.owner-page .feedback-admin-item.published { border-inline-start: 4px solid #21864a; }
+.owner-page .feedback-admin-item.hidden { border-inline-start: 4px solid #98a2b3; opacity: .85; }
+.owner-page .feedback-status { display: block; margin-top: 3px; color: #718096; font-size: 12px; }
+.owner-page .feedback-admin-actions { display: flex; gap: 8px; margin-top: 10px; }
+.owner-page .feedback-admin-actions button { width: auto; min-height: 34px; padding: 6px 11px; font-size: 12px; }
+.customer-page .feedback-empty { margin: 12px 0 0; text-align: center; }
+@media (max-width: 420px) {
+  .customer-page .feedback-item-heading,
+  .owner-page .feedback-item-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+}
