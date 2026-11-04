@@ -1231,3 +1231,14 @@
     transition-duration: 0.01ms;
   }
 }
+
+/* Compact owner appointment editor and notification control. */
+.owner-page .appointment-schedule-edit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 12px; }
+.owner-page .appointment-date-time { grid-column: 1 / -1; margin: 0; }
+.owner-page .appointment-date-time .grid-two, .owner-page .appointment-secondary-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.owner-page .appointment-service-field { grid-column: 1; }
+.owner-page .appointment-secondary-fields { grid-column: 1 / -1; }
+.owner-page .appointment-schedule-edit label { min-width: 0; margin: 0; }
+.owner-page .notification-quick-action { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0; padding: 8px 10px; }
+.owner-page .notification-quick-action p { margin: 0; font-size: 12px; }
+.owner-page .notification-quick-action button { min-height: 34px; padding: 6px 10px; font-size: 12px; }
