@@ -1282,3 +1282,8 @@
   .owner-page .customer-password-reset { grid-template-columns: 1fr; }
   .owner-page .customer-password-actions button { flex: 1; }
 }
+
+/* One-off customers can be booked without creating an account. */
+.owner-page .manual-one-off-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 0 0 8px; padding: 10px; border: 1px solid #dce8f4; border-radius: 12px; background: #f8fbff; }
+.owner-page .manual-one-off-fields label { min-width: 0; margin: 0; font-size: 13px; }
+.owner-page .manual-one-off-fields input { min-height: 42px; margin-top: 5px; padding: 8px 10px; }
