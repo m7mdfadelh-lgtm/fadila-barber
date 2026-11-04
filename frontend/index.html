@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="FADILA BARBER">
   <title>FADILA BARBER — المواعيد</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=40">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=41">
 </head>
 <body class="customer-page">
   <div id="installGate" class="gate hidden">
@@ -36,10 +36,9 @@
     <div id="customerView" class="hidden">
       <section class="card row-between"><div><h2 id="welcome"></h2><p class="muted">منطقتك الشخصية</p></div><button class="secondary compact" id="logoutButton">تسجيل الخروج</button></section>
       <section class="card"><h2>الإشعارات</h2><p id="notificationState" class="muted">لتلقي التحديثات والتذكيرات، يرجى السماح بالإشعارات.</p><button id="enableNotifications">تفعيل الإشعارات</button></section>
-      <section class="card"><h2>حجز موعد</h2>
+      <section class="card customer-booking-form"><h2>حجز موعد</h2>
         <label>الخدمة<select id="service"><option value="">اختر خدمة</option></select></label>
-        <label>التاريخ<input id="date" type="date"></label>
-        <label>الساعة<select id="time" disabled><option value="">اختر خدمة وتاريخاً</option></select></label>
+        <div class="grid-two customer-booking-date-time"><label>التاريخ<input id="date" type="date"></label><label>الساعة<select id="time" disabled><option value="">اختر خدمة وتاريخاً</option></select></label></div>
         <label>ملاحظة (اختياري)<textarea id="bookingNotes" maxlength="500" rows="3" placeholder="أضف أي تفاصيل تساعدنا"></textarea></label>
         <button id="bookButton">إرسال الطلب</button><p id="bookingMessage" class="message"></p>
       </section>
