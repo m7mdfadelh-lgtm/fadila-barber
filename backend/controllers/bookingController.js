@@ -9,10 +9,29 @@ const { getScheduleForDate } = require('../utils/businessHours');
 exports.createAppointment = async (req, res) => {
   try {
     const { service, date, time } = req.body;
-    let customer = req.user;
-    if (req.user.role === 'owner') {
-      customer = await User.findOne({ _id: req.body.customerId, role: 'customer', active: true });
-      if (!customer) return res.status(400).json({ success: false, error: 'يرجى اختيار زبون موجود' });
+    const notes = String(req.body.notes || '').trim();
+    if (notes.length > 500) return res.status(400).json({ success: false, error: 'الملاحظة طويلة جداً' });
+    let customerId, customerName, customerPhone;
+    if (req.user.role === 'owner' && req.body.oneOff === true) {
+      customerName = String(req.body.customerName || '').trim();
+      customerPhone = String(req.body.customerPhone || '').replace(/\D/g, '');
+      if (customerName.length < 2 || customerName.length > 50) {
+        return res.status(400).json({ success: false, error: 'اسم العميل غير صالح' });
+      }
+      if (!/^05\d{8}$/.test(customerPhone)) {
+        return res.status(400).json({ success: false, error: 'رقم الهاتف غير صالح (05XXXXXXXX)' });
+      }
+      customerId = null;
+    } else if (req.user.role === 'owner') {
+      const customer = await User.findOne({ _id: req.body.customerId, role: 'customer', active: true });
+      if (!customer) return res.status(400).json({ success: false, error: 'يرجى اختيار زبون موجود أو عميل لمرة واحدة' });
+      customerId = customer._id;
+      customerName = customer.name;
+      customerPhone = customer.phone;
+    } else {
+      customerId = req.user._id;
+      customerName = req.user.name;
+      customerPhone = req.user.phone;
     }
     const serviceDoc = await Service.findOne({ name: service });
     if (!serviceDoc) return res.status(400).json({ success: false, error: 'لم يتم العثور على الخدمة' });
@@ -38,17 +57,17 @@ exports.createAppointment = async (req, res) => {
     if (conflict) return res.status(409).json({ success: false, error: 'الساعة المختارة غير متاحة' });
     const status = req.user.role === 'owner' ? 'confirmed' : 'pending';
     const appointment = await Appointment.create({
-      customer: customer._id, customerName: customer.name, customerPhone: customer.phone,
-      service, duration, date: start, time, status,
+      customer: customerId || null, customerName, customerPhone,
+      service, duration, date: start, time, notes, status,
       approvalRequestedAt: status === 'pending' ? new Date() : null,
       approvalDecisionAt: status === 'confirmed' ? new Date() : null,
       approvalDecision: status === 'confirmed' ? 'approved' : null
     });
     res.status(201).json({ success: true, data: appointment, message: status === 'pending' ? 'الطلب بانتظار الموافقة' : 'تم تحديد الموعد' });
     if (status === 'pending') {
-      pushService.sendToOwners({ title: 'طلب موعد جديد', body: `${customer.name} طلب موعد ${service} بتاريخ ${formatJerusalemDate(start)} الساعة ${time}`, url: './dashboard.html', tag: `new-${appointment._id}`, appointmentId: appointment._id });
-    } else {
-      pushService.sendToUser(customer._id, { title: 'تم تحديد موعد لك', body: `${service}، ${formatJerusalemDate(start)} الساعة ${time}`, url: './index.html', tag: `created-${appointment._id}` });
+      pushService.sendToOwners({ title: 'طلب موعد جديد', body: `${customerName} طلب موعد ${service} بتاريخ ${formatJerusalemDate(start)} الساعة ${time}`, url: './dashboard.html', tag: `new-${appointment._id}`, appointmentId: appointment._id });
+    } else if (customerId) {
+      pushService.sendToUser(customerId, { title: 'تم تحديد موعد لك', body: `${service}، ${formatJerusalemDate(start)} الساعة ${time}`, url: './index.html', tag: `created-${appointment._id}` });
     }
   } catch (error) {
     console.error('Appointment creation failed:', error);

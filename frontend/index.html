@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Fadila">
   <title>Fadila — المواعيد</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=38">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=39">
 </head>
 <body class="customer-page">
   <div id="installGate" class="gate hidden">
@@ -40,6 +40,7 @@
         <label>الخدمة<select id="service"><option value="">اختر خدمة</option></select></label>
         <label>التاريخ<input id="date" type="date"></label>
         <label>الساعة<select id="time" disabled><option value="">اختر خدمة وتاريخاً</option></select></label>
+        <label>ملاحظة (اختياري)<textarea id="bookingNotes" maxlength="500" rows="3" placeholder="أضف أي تفاصيل تساعدنا"></textarea></label>
         <button id="bookButton">إرسال الطلب</button><p id="bookingMessage" class="message"></p>
       </section>
       <section class="card"><h2>مواعيدي</h2><div id="appointments" class="appointment-list"></div></section>
@@ -50,5 +51,5 @@
   <div id="messagesPanel" class="messages-panel hidden" role="dialog" aria-modal="true" aria-labelledby="messagesTitle">
     <div class="messages-panel-card"><div class="messages-panel-header"><h2 id="messagesTitle">رسائلي</h2><button id="closeMessages" class="secondary compact" type="button">إغلاق</button></div><div id="messagesList" class="messages-list"></div></div>
   </div>
-  <script src="config.js?v=38"></script><script src="pwa.js?v=38"></script><script src="app.js?v=38"></script>
+  <script src="config.js?v=38"></script><script src="pwa.js?v=38"></script><script src="app.js?v=39"></script>
 </body></html>

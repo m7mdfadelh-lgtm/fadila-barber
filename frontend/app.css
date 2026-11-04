@@ -1231,3 +1231,71 @@
     transition-duration: 0.01ms;
   }
 }
+
+/* Compact owner appointment editor and notification control. */
+.owner-page .appointment-schedule-edit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 12px; }
+.owner-page .appointment-date-time { grid-column: 1 / -1; margin: 0; }
+.owner-page .appointment-date-time .grid-two, .owner-page .appointment-secondary-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.owner-page .appointment-service-field { grid-column: 1; }
+.owner-page .appointment-secondary-fields { grid-column: 1 / -1; }
+.owner-page .appointment-schedule-edit label { min-width: 0; margin: 0; }
+.owner-page .notification-quick-action { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0; padding: 8px 10px; }
+.owner-page .notification-quick-action p { margin: 0; font-size: 12px; }
+.owner-page .notification-quick-action button { min-height: 34px; padding: 6px 10px; font-size: 12px; }
+
+/* Timeline changes stay staged until the owner confirms sending notifications. */
+.owner-page .timeline-footer { position: sticky; bottom: 0; z-index: 4; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; padding: 9px 0 0; background: #fff; }
+.owner-page .timeline-footer .message { margin: 0; }
+.owner-page .timeline-footer button { flex: 0 0 auto; width: auto; min-height: 38px; padding: 8px 12px; font-size: 12px; }
+.owner-page .timeline-appointment { min-height: 30px; }
+.owner-page .timeline-appointment.has-pending-change { border-color: #dda62a; border-right-color: #c78300; background: linear-gradient(135deg, #fff8e6, #ffefc2); }
+.owner-page .timeline-appointment-text { flex: 1; }
+.owner-page .timeline-appointment-text strong { font-size: 11px; line-height: 1.15; font-weight: 650; }
+.owner-page .timeline-appointment-text span { font-size: 10px; line-height: 1.15; }
+.owner-page .timeline-appointment-buttons button { min-height: 24px; padding: 3px 6px; font-size: 10px; }
+.owner-page .timeline-resize-handle { position: absolute; right: 28%; bottom: 0; left: 28%; z-index: 3; height: 8px; cursor: ns-resize; touch-action: none; }
+.owner-page .timeline-resize-handle::after { content: ''; position: absolute; right: 50%; bottom: 2px; width: 24px; height: 2px; border-radius: 2px; background: #5f8fc4; transform: translateX(50%); }
+.owner-page .timeline-appointment.has-pending-change .timeline-resize-handle::after { background: #b97a00; }
+@media (max-width: 550px) {
+  .owner-page .timeline-footer { align-items: stretch; flex-direction: column; }
+  .owner-page .timeline-footer button { width: 100%; }
+  .owner-page .timeline-appointment-buttons button { padding: 2px 4px; font-size: 9px; }
+}
+
+/* Compact customer administration with details shown only after selection. */
+.owner-page .customer-management-list { gap: 7px; }
+.owner-page .customer-management-item { padding: 10px; border-radius: 12px; }
+.owner-page .customer-management-summary span { font-size: 11px; }
+.owner-page .customer-management-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.owner-page .customer-management-item label { min-width: 0; margin: 6px 0; font-size: 12px; }
+.owner-page .customer-management-item input { min-height: 38px; margin-top: 4px; padding: 7px 9px; font-size: 13px; }
+.owner-page .customer-management-actions { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 6px; margin-top: 4px; }
+.owner-page .customer-management-actions button,
+.owner-page .customer-password-actions button { min-height: 32px; padding: 5px 7px; font-size: 11px; }
+.owner-page .customer-password-reset { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 8px; margin-top: 7px; padding-top: 7px; border-top: 1px solid #e2eaf3; }
+.owner-page .customer-password-reset label { margin: 0; }
+.owner-page .customer-password-actions { display: flex; gap: 6px; }
+.owner-page .customer-password-actions button { width: auto; white-space: nowrap; }
+@media (max-width: 550px) {
+  .owner-page .customer-management-fields { grid-template-columns: 1fr 1fr; gap: 7px; }
+  .owner-page .customer-management-actions button { padding: 4px; font-size: 10px; }
+  .owner-page .customer-password-reset { grid-template-columns: 1fr; }
+  .owner-page .customer-password-actions button { flex: 1; }
+}
+
+/* One-off customers can be booked without creating an account. */
+.owner-page .manual-one-off-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 0 0 8px; padding: 10px; border: 1px solid #dce8f4; border-radius: 12px; background: #f8fbff; }
+.owner-page .manual-one-off-fields label { min-width: 0; margin: 0; font-size: 13px; }
+.owner-page .manual-one-off-fields input { min-height: 42px; margin-top: 5px; padding: 8px 10px; }
+
+/* Compact service controls and paired edit/delete actions. */
+.owner-page .service-management-item { gap: 8px; padding: 9px 11px; }
+.owner-page .service-management-actions { display: flex; flex: 0 0 auto; gap: 6px; }
+.owner-page .service-management-actions button { width: auto; min-height: 30px; padding: 4px 8px; font-size: 11px; }
+.owner-page .service-form-actions { display: flex; gap: 8px; }
+.owner-page .service-form-actions button { width: auto; min-height: 36px; padding: 7px 10px; font-size: 12px; }
+@media (max-width: 550px) {
+  .owner-page .service-management-item { align-items: flex-start; }
+  .owner-page .service-management-actions { align-items: center; }
+  .owner-page .service-management-actions button { min-height: 28px; padding: 3px 6px; font-size: 10px; }
+}
