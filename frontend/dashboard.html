@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#0f4ea8"><meta name="apple-mobile-web-app-capable" content="yes">
   <title>Fadila — الإدارة</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=49">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=50">
 </head>
 <body class="owner-page">
 <div id="installGate" class="gate hidden"><div class="gate-card"><img src="images/Logo.png"><h1>تثبيت التطبيق</h1><p>يجب إضافة التطبيق إلى الشاشة الرئيسية للمتابعة.</p><button id="installButton" class="hidden">ثبّت الآن</button><div id="iosInstructions" class="install-guide hidden"><strong>iPhone / iPad</strong><ol><li>افتح الموقع في Safari.</li><li>اضغط زر المشاركة <b>□↑</b>.</li><li>اختر «إضافة إلى الشاشة الرئيسية» ثم «إضافة».</li></ol></div><div id="androidInstructions" class="install-guide hidden"><strong>Android</strong><ol><li>افتح الموقع في Chrome.</li><li>اضغط قائمة المتصفح <b>⋮</b>.</li><li>اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» ثم وافق.</li></ol></div><p class="muted">بعد التثبيت، افتح Fadila من الأيقونة الجديدة.</p></div></div>
@@ -54,7 +54,7 @@
 
   <section class="card collapsible-card" data-section="working-hours">
     <div class="section-heading"><h2>ساعات العمل</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم ساعات العمل">−</button></div>
-    <div class="section-content"><div id="workingHours" class="working-hours-list"></div><button id="saveHours">حفظ الساعات</button><div class="date-hours-panel"><h3>ساعات خاصة لتاريخ محدد</h3><p class="muted">هذا الإعداد يتجاوز ساعات اليوم العادية، مثلاً في عطلة أو يوم بساعات مختلفة.</p><div class="date-hours-controls"><label>التاريخ<input id="overrideDate" type="date"></label><label>الفتح<input id="overrideStart" type="time" value="09:00"></label><label>الإغلاق<input id="overrideEnd" type="time" value="19:00"></label><label class="inline-check"><input id="overrideEnabled" type="checkbox" checked> مفتوح</label></div><div class="date-hours-actions"><button id="saveDateOverride" type="button">حفظ التاريخ</button><button id="removeDateOverride" class="secondary" type="button">إزالة الإعداد الخاص</button></div><div id="dateOverrides" class="date-overrides-list"></div><p id="dateOverrideMessage" class="message"></p></div></div>
+    <div class="section-content"><div id="workingHours" class="working-hours-list"></div><button id="saveHours">حفظ الساعات</button><div class="date-hours-panel"><h3>ساعات خاصة لفترة محددة</h3><p class="muted">اختر تاريخ البداية والنهاية؛ كلاهما مشمولان في الفترة. يمكنك استخدام اليوم نفسه لإعداد يوم واحد.</p><div class="date-hours-controls"><label>من التاريخ<input id="overrideStartDate" type="date"></label><label>حتى التاريخ<input id="overrideEndDate" type="date"></label><label>الفتح<input id="overrideStart" type="time" value="09:00"></label><label>الإغلاق<input id="overrideEnd" type="time" value="19:00"></label><label class="inline-check"><input id="overrideEnabled" type="checkbox" checked> مفتوح</label></div><div class="date-hours-actions"><button id="saveDateOverride" type="button">حفظ الفترة</button><button id="removeDateOverride" class="secondary" type="button">إزالة الإعداد الخاص</button></div><div id="dateOverrides" class="date-overrides-list"></div><p id="dateOverrideMessage" class="message"></p></div></div>
   </section>
 </main>
 <div id="timelineModal" class="timeline-modal hidden" role="dialog" aria-modal="true" aria-labelledby="timelineTitle">
@@ -67,5 +67,5 @@
   </div>
 </div>
 <div id="ownerMessagesPanel" class="owner-messages-panel hidden" role="dialog" aria-modal="true" aria-labelledby="ownerMessagesTitle"><div class="owner-messages-card"><div class="owner-messages-header"><h2 id="ownerMessagesTitle">رسائل صاحب المحل</h2><div class="owner-messages-header-actions"><button id="closeOwnerMessages" class="secondary compact" type="button">إغلاق</button></div></div><div id="messageBulkBar" class="message-bulk-bar hidden"><label><input id="selectAllMessages" type="checkbox"> اختيار الكل</label><span id="selectedMessagesCount">0 محددة</span><button id="deleteSelectedMessages" type="button" class="danger compact" disabled>حذف المحدد</button></div><div id="ownerMessagesList" class="messages-list"></div></div></div>
-<script src="config.js?v=43"></script><script src="pwa.js?v=43"></script><script src="dashboard.js?v=51"></script>
+<script src="config.js?v=43"></script><script src="pwa.js?v=43"></script><script src="dashboard.js?v=52"></script>
 </body></html>
