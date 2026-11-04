@@ -1380,3 +1380,14 @@
 @media (max-width: 360px) {
   .customer-page .customer-booking-date-time { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* Match the customer change request form to the compact booking form. */
+.customer-page .change-request-form { gap: 6px; padding-top: 10px; }
+.customer-page .change-request-form label { display: block; min-width: 0; margin: 6px 0; font-weight: 650; }
+.customer-page .change-request-form input,
+.customer-page .change-request-form select,
+.customer-page .change-request-form textarea { box-sizing: border-box; display: block; width: 100%; min-width: 0; max-width: 100%; margin-top: 4px; padding: 10px 12px; border: 1px solid #d8e1ee; border-radius: 12px; background: #fff; color: #172033; font: inherit; }
+.customer-page .change-request-form textarea { min-height: 82px; resize: vertical; }
+.customer-page .change-request-form .customer-booking-date-time input,
+.customer-page .change-request-form .customer-booking-date-time select { padding-inline: 7px; }
