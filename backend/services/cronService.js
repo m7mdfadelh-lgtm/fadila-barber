@@ -66,6 +66,14 @@ class CronService {
           });
           if (result.sent > 0) appointment.clientReminderSent = true;
         }
+        if (minutes >= 0 && minutes <= 15 && !appointment.client15MinuteReminderSent) {
+          const result = await pushService.sendToUser(appointment.customer, {
+            title: 'تذكير بموعدك بعد 15 دقيقة',
+            body: `موعدك لـ${appointment.service} اليوم الساعة ${appointment.time} بعد 15 دقيقة`,
+            url: './index.html', tag: `client-reminder-15-${appointment._id}`
+          });
+          if (result.sent > 0) appointment.client15MinuteReminderSent = true;
+        }
         if (minutes >= 0 && minutes <= 60 && !appointment.ownerHourReminderSent) {
           const result = await pushService.sendToOwners({
             title: 'موعد بعد ساعة',
