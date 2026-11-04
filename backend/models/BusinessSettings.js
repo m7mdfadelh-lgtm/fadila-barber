@@ -34,7 +34,8 @@ const businessSettingsSchema = new mongoose.Schema({
     friday: daySchema,
     saturday: daySchema
   },
-  dateOverrides: { type: [dateOverrideSchema], default: [] }
+  dateOverrides: { type: [dateOverrideSchema], default: [] },
+  feedbackEnabled: { type: Boolean, default: true }
 });
 
 module.exports = mongoose.model("BusinessSettings", businessSettingsSchema);
