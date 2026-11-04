@@ -1366,3 +1366,17 @@
 /* Reduce vertical spacing between service parameters. */
 .owner-page [data-section="services"] .section-content > .grid-two { row-gap: 4px; }
 .owner-page [data-section="services"] .section-content > .grid-two > label { margin: 4px 0; }
+
+
+/* Compact customer booking fields without letting date and time overlap. */
+.customer-page .customer-booking-form label { margin: 6px 0; }
+.customer-page .customer-booking-form input,
+.customer-page .customer-booking-form select,
+.customer-page .customer-booking-form textarea { margin-top: 4px; }
+.customer-page .customer-booking-date-time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 10px; width: 100%; margin: 6px 0; }
+.customer-page .customer-booking-date-time label { min-width: 0; }
+.customer-page .customer-booking-date-time input,
+.customer-page .customer-booking-date-time select { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; padding-inline: 7px; }
+@media (max-width: 360px) {
+  .customer-page .customer-booking-date-time { grid-template-columns: minmax(0, 1fr); }
+}
