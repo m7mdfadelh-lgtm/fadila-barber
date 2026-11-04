@@ -20,7 +20,13 @@ router.put("/", protect, ownerOnly, async (req,res)=>{
     if (item.date) return isIsoDate(item.date);
     return isIsoDate(item.startDate) && isIsoDate(item.endDate) && item.startDate <= item.endDate;
   });
-  if (!validOverrides) return res.status(400).json({ success: false, error: 'إعدادات التواريخ الخاصة غير صالحة' });
+  const ranges = dateOverrides.filter((item) => item.startDate && item.endDate);
+  const nonOverlappingRanges = ranges.every((range, index) =>
+    ranges.slice(index + 1).every((other) => range.endDate < other.startDate || other.endDate < range.startDate)
+  );
+  if (!validOverrides || !nonOverlappingRanges) {
+    return res.status(400).json({ success: false, error: 'إعدادات التواريخ الخاصة غير صالحة أو متداخلة' });
+  }
   const settings = await BusinessSettings.findOneAndUpdate(
     {},
     { workingHours: req.body.workingHours, dateOverrides },
