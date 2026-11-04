@@ -1287,3 +1287,15 @@
 .owner-page .manual-one-off-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin: 0 0 8px; padding: 10px; border: 1px solid #dce8f4; border-radius: 12px; background: #f8fbff; }
 .owner-page .manual-one-off-fields label { min-width: 0; margin: 0; font-size: 13px; }
 .owner-page .manual-one-off-fields input { min-height: 42px; margin-top: 5px; padding: 8px 10px; }
+
+/* Compact service controls and paired edit/delete actions. */
+.owner-page .service-management-item { gap: 8px; padding: 9px 11px; }
+.owner-page .service-management-actions { display: flex; flex: 0 0 auto; gap: 6px; }
+.owner-page .service-management-actions button { width: auto; min-height: 30px; padding: 4px 8px; font-size: 11px; }
+.owner-page .service-form-actions { display: flex; gap: 8px; }
+.owner-page .service-form-actions button { width: auto; min-height: 36px; padding: 7px 10px; font-size: 12px; }
+@media (max-width: 550px) {
+  .owner-page .service-management-item { align-items: flex-start; }
+  .owner-page .service-management-actions { align-items: center; }
+  .owner-page .service-management-actions button { min-height: 28px; padding: 3px 6px; font-size: 10px; }
+}
