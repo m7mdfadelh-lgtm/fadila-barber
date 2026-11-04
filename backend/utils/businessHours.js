@@ -5,8 +5,11 @@ function getDayKey(dateString) {
 }
 
 function getScheduleForDate(settings, dateString) {
-  const override = (settings?.dateOverrides || []).find((item) => item.date === dateString);
-  if (override) return override;
+  const overrides = settings?.dateOverrides || [];
+  const exactOverride = overrides.find((item) => item.date === dateString);
+  if (exactOverride) return exactOverride;
+  const rangeOverride = overrides.find((item) => item.startDate && item.endDate && item.startDate <= dateString && dateString <= item.endDate);
+  if (rangeOverride) return rangeOverride;
   return settings?.workingHours?.[getDayKey(dateString)];
 }
 
