@@ -14,6 +14,7 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 const authController = require('./controllers/authController');
 const cronService = require('./services/cronService');
@@ -91,6 +92,7 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 /* ========================
    HEALTH CHECK
