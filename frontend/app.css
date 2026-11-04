@@ -1348,3 +1348,21 @@
 .customer-page .customer-appointment-history[open] > summary { border-bottom: 1px solid #d8e1ee; }
 .customer-page .customer-appointment-history-list { display: grid; gap: 8px; padding: 10px; }
 .customer-page .customer-appointment-history-list .appointment { margin: 0; }
+
+
+.owner-page .message-appointment-editor:not(.hidden) { margin-top: 12px; padding: 12px; border: 1px solid #d8e1ee; border-radius: 12px; background: #f7faff; }
+.owner-page .message-appointment-edit-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 9px; }
+.owner-page .message-appointment-edit-grid .message-edit-schedule { display: grid; grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.owner-page .message-appointment-edit-grid .message-edit-full { grid-column: 1 / -1; }
+.owner-page .message-appointment-edit-grid label { display: block; min-width: 0; margin: 0; color: #344054; font-size: 12px; }
+.owner-page .message-appointment-edit-grid input,
+.owner-page .message-appointment-edit-grid select,
+.owner-page .message-appointment-edit-grid textarea { width: 100%; min-width: 0; margin-top: 5px; padding: 8px 9px; border: 1px solid #d8e1ee; border-radius: 9px; background: #fff; color: #172033; font: inherit; font-size: 13px; }
+.owner-page .message-appointment-edit-grid textarea { min-height: 72px; resize: vertical; }
+.owner-page .message-appointment-edit-actions { display: flex; gap: 8px; margin-top: 10px; }
+.owner-page .message-appointment-edit-actions button { flex: 1; width: auto; min-width: 0; padding: 8px 10px; font-size: 12px; }
+
+
+/* Reduce vertical spacing between service parameters. */
+.owner-page [data-section="services"] .section-content > .grid-two { row-gap: 4px; }
+.owner-page [data-section="services"] .section-content > .grid-two > label { margin: 4px 0; }
