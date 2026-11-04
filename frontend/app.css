@@ -1425,3 +1425,9 @@
 /* Show the customer greeting without a card, aligned to the right. */
 .customer-page .customer-greeting { margin: 8px 0 14px; text-align: right; }
 .customer-page .customer-greeting h2 { margin: 0; color: #0f4ea8; font-size: 18px; }
+
+
+/* Floating Instagram link, stacked above the WhatsApp shortcut. */
+.instagram-float { position: fixed; left: max(18px, env(safe-area-inset-left)); bottom: calc(max(18px, env(safe-area-inset-bottom)) + 56px); z-index: 900; display: flex; align-items: center; gap: 8px; padding: 11px 15px; border-radius: 999px; background: linear-gradient(45deg, #feda75, #fa7e1e 30%, #d62976 62%, #962fbf 82%, #4f5bd5); color: #fff; text-decoration: none; font-weight: 800; box-shadow: 0 10px 28px rgba(111, 45, 142, .3); }
+.instagram-float svg { width: 25px; height: 25px; flex: 0 0 auto; }
+.instagram-float:active { transform: scale(.96); }
