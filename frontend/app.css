@@ -1373,10 +1373,46 @@
 .customer-page .customer-booking-form input,
 .customer-page .customer-booking-form select,
 .customer-page .customer-booking-form textarea { margin-top: 4px; }
-.customer-page .customer-booking-date-time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 10px; width: 100%; margin: 6px 0; }
+.customer-page .customer-booking-date-time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; width: 100%; margin: 6px 0; }
 .customer-page .customer-booking-date-time label { min-width: 0; }
 .customer-page .customer-booking-date-time input,
 .customer-page .customer-booking-date-time select { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; padding-inline: 7px; }
 @media (max-width: 360px) {
+  .customer-page .customer-booking-date-time { grid-template-columns: minmax(0, 1fr); }
+}
+
+
+/* Match the customer change request form to the compact booking form. */
+.customer-page .change-request-form { gap: 6px; padding-top: 10px; }
+.customer-page .change-request-form label { display: block; min-width: 0; margin: 6px 0; font-weight: 650; }
+.customer-page .change-request-form input,
+.customer-page .change-request-form select,
+.customer-page .change-request-form textarea { box-sizing: border-box; display: block; width: 100%; min-width: 0; max-width: 100%; margin-top: 4px; padding: 10px 12px; border: 1px solid #d8e1ee; border-radius: 12px; background: #fff; color: #172033; font: inherit; }
+.customer-page .change-request-form textarea { min-height: 82px; resize: vertical; }
+.customer-page .change-request-form .customer-booking-date-time input,
+.customer-page .change-request-form .customer-booking-date-time select { padding-inline: 7px; }
+
+
+/* Keep every paired date/time control close, equal-width, and non-overlapping. */
+.owner-page .owner-date-time-pair,
+.owner-page .appointment-date-time,
+.owner-page .message-edit-schedule,
+.customer-page .customer-booking-date-time { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; width: 100%; min-width: 0; box-sizing: border-box; }
+.owner-page .owner-date-time-pair > label,
+.owner-page .appointment-date-time > label,
+.owner-page .message-edit-schedule > label,
+.customer-page .customer-booking-date-time > label { min-width: 0; }
+.owner-page .owner-date-time-pair input,
+.owner-page .owner-date-time-pair select,
+.owner-page .appointment-date-time input,
+.owner-page .appointment-date-time select,
+.owner-page .message-edit-schedule input,
+.owner-page .message-edit-schedule select,
+.customer-page .customer-booking-date-time input,
+.customer-page .customer-booking-date-time select { box-sizing: border-box; display: block; width: 100%; min-width: 0; max-width: 100%; }
+@media (max-width: 360px) {
+  .owner-page .owner-date-time-pair,
+  .owner-page .appointment-date-time,
+  .owner-page .message-edit-schedule,
   .customer-page .customer-booking-date-time { grid-template-columns: minmax(0, 1fr); }
 }
