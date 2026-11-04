@@ -1328,3 +1328,14 @@
   .owner-page .date-hours-actions { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 5px; }
   .owner-page .date-hours-actions button { width: 100%; padding: 5px 4px; font-size: 10px; white-space: nowrap; }
 }
+
+/* Appointment editor: date and time share a row; remaining fields stay full width. */
+.owner-page .appointment-schedule-edit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 12px; }
+.owner-page .appointment-date-time { grid-column: 1 / -1; margin: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.owner-page .appointment-service-field,
+.owner-page .appointment-status-field,
+.owner-page .appointment-notes-field { grid-column: 1 / -1; }
+.owner-page .appointment-schedule-edit label { min-width: 0; margin: 0; }
+.owner-page .appointment-customer-note { margin: 8px 0; padding: 10px 12px; border: 1px solid #d8e1ee; border-right: 3px solid #1667d9; border-radius: 10px; background: #fff; }
+.owner-page .appointment-customer-note strong { display: block; margin-bottom: 4px; color: #0f4ea8; font-size: 13px; }
+.owner-page .appointment-customer-note p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
