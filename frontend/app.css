@@ -832,7 +832,7 @@
 .owner-page .inline-check input { width: 19px; min-height: 19px; margin: 0; }
 .owner-page .date-hours-panel { margin-top: 26px; padding-top: 22px; border-top: 2px solid #cbdced; }
 .owner-page .date-hours-panel h3 { margin: 0 0 6px; color: #183b66; }
-.owner-page .date-hours-controls { display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; align-items: end; gap: 12px; }
+.owner-page .date-hours-controls { display: grid; grid-template-columns: 1.1fr 1.1fr .8fr .8fr auto; align-items: end; gap: 12px; }
 .owner-page .date-hours-actions { display: flex; gap: 10px; margin-top: 12px; }
 .owner-page .date-hours-actions button { width: auto; }
 .owner-page .date-overrides-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
