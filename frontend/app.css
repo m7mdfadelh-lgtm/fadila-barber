@@ -832,7 +832,7 @@
 .owner-page .inline-check input { width: 19px; min-height: 19px; margin: 0; }
 .owner-page .date-hours-panel { margin-top: 26px; padding-top: 22px; border-top: 2px solid #cbdced; }
 .owner-page .date-hours-panel h3 { margin: 0 0 6px; color: #183b66; }
-.owner-page .date-hours-controls { display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; align-items: end; gap: 12px; }
+.owner-page .date-hours-controls { display: grid; grid-template-columns: 1.1fr 1.1fr .8fr .8fr auto; align-items: end; gap: 12px; }
 .owner-page .date-hours-actions { display: flex; gap: 10px; margin-top: 12px; }
 .owner-page .date-hours-actions button { width: auto; }
 .owner-page .date-overrides-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
@@ -1298,4 +1298,33 @@
   .owner-page .service-management-item { align-items: flex-start; }
   .owner-page .service-management-actions { align-items: center; }
   .owner-page .service-management-actions button { min-height: 28px; padding: 3px 6px; font-size: 10px; }
+}
+
+/* Tighter, paired controls in the working-hours section. */
+.owner-page .working-hours-list { margin-bottom: 10px; }
+.owner-page .working-hours-row { gap: 6px 10px; padding: 6px 3px; }
+.owner-page .working-hours-day { gap: 7px; }
+.owner-page .working-hours-day .inline-check { min-height: 28px; font-size: 12px; }
+.owner-page .working-hours-times { gap: 6px; }
+.owner-page .working-hours-time-field { gap: 3px; font-size: 11px; }
+.owner-page .working-hours-time-field input { min-height: 34px; padding: 4px 7px; }
+.owner-page .date-hours-panel { margin-top: 16px; padding-top: 14px; }
+.owner-page .date-hours-panel > .muted { margin-bottom: 8px; font-size: 12px; }
+.owner-page .date-hours-controls { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.owner-page .date-range-fields,
+.owner-page .date-hours-time-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: end; gap: 7px; min-width: 0; }
+.owner-page .date-hours-controls > .inline-check { grid-column: 1 / -1; min-height: 28px; font-size: 12px; }
+.owner-page .date-hours-controls label:not(.inline-check) { min-width: 0; margin: 0; font-size: 11px; }
+.owner-page .date-hours-controls input { min-width: 0; min-height: 34px; margin-top: 3px; padding: 4px 7px; font-size: 12px; }
+.owner-page .date-hours-actions { gap: 6px; margin-top: 8px; }
+.owner-page .date-hours-actions button { min-height: 32px; padding: 5px 8px; font-size: 11px; }
+.owner-page .date-overrides-list { gap: 6px; margin-top: 10px; }
+.owner-page .date-override-item { min-width: 120px; padding: 7px 10px; font-size: 12px; }
+@media (max-width: 550px) {
+  .owner-page .working-hours-row { gap: 6px; padding: 7px 2px; }
+  .owner-page .working-hours-times { gap: 6px; }
+  .owner-page .date-hours-controls { grid-template-columns: 1fr; gap: 6px; }
+  .owner-page .date-hours-controls > .inline-check { grid-column: auto; }
+  .owner-page .date-hours-actions { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 5px; }
+  .owner-page .date-hours-actions button { width: 100%; padding: 5px 4px; font-size: 10px; white-space: nowrap; }
 }
