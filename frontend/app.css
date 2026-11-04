@@ -1420,3 +1420,8 @@
 
 .customer-page .customer-header-actions { position: absolute; top: 10px; left: 0; z-index: 3; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
 .customer-page .customer-header-actions button { width: auto; min-height: 30px; margin: 0; padding: 5px 8px; border-radius: 9px; font-size: 11px; line-height: 1.1; white-space: nowrap; }
+
+
+/* Show the customer greeting without a card, aligned to the right. */
+.customer-page .customer-greeting { margin: 8px 0 14px; text-align: right; }
+.customer-page .customer-greeting h2 { margin: 0; color: #0f4ea8; font-size: 18px; }
