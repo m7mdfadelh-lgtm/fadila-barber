@@ -9,6 +9,8 @@ const { getScheduleForDate } = require('../utils/businessHours');
 exports.createAppointment = async (req, res) => {
   try {
     const { service, date, time } = req.body;
+    const notes = String(req.body.notes || '').trim();
+    if (notes.length > 500) return res.status(400).json({ success: false, error: 'الملاحظة طويلة جداً' });
     let customer = req.user;
     if (req.user.role === 'owner') {
       customer = await User.findOne({ _id: req.body.customerId, role: 'customer', active: true });
@@ -39,7 +41,7 @@ exports.createAppointment = async (req, res) => {
     const status = req.user.role === 'owner' ? 'confirmed' : 'pending';
     const appointment = await Appointment.create({
       customer: customer._id, customerName: customer.name, customerPhone: customer.phone,
-      service, duration, date: start, time, status,
+      service, duration, date: start, time, notes, status,
       approvalRequestedAt: status === 'pending' ? new Date() : null,
       approvalDecisionAt: status === 'confirmed' ? new Date() : null,
       approvalDecision: status === 'confirmed' ? 'approved' : null
