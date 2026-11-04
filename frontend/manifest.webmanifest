@@ -1,5 +1,5 @@
 {
-  "name": "مواعيد Fadila", "short_name": "Fadila", "description": "إدارة المواعيد في Fadila",
+  "name": "FADILA BARBER", "short_name": "FADILA BARBER", "description": "Appointment booking at FADILA BARBER",
   "start_url": "./index.html", "scope": "./", "display": "standalone", "orientation": "portrait-primary",
   "background_color": "#ffffff", "theme_color": "#0f4ea8", "lang": "ar", "dir": "rtl",
   "icons": [
