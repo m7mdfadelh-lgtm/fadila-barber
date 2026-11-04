@@ -1339,3 +1339,12 @@
 .owner-page .appointment-customer-note { margin: 8px 0; padding: 10px 12px; border: 1px solid #d8e1ee; border-right: 3px solid #1667d9; border-radius: 10px; background: #fff; }
 .owner-page .appointment-customer-note strong { display: block; margin-bottom: 4px; color: #0f4ea8; font-size: 13px; }
 .owner-page .appointment-customer-note p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+
+.customer-page .customer-appointment-compact { display: flex; align-items: center; min-height: 44px; padding: 9px 12px; }
+.customer-page .customer-appointment-compact time { font-size: 14px; }
+.customer-page .customer-appointment-history { overflow: hidden; border: 1px solid #d8e1ee; border-radius: 12px; background: #fff; }
+.customer-page .customer-appointment-history > summary { cursor: pointer; padding: 12px 14px; color: #0f4ea8; font-weight: 700; }
+.customer-page .customer-appointment-history[open] > summary { border-bottom: 1px solid #d8e1ee; }
+.customer-page .customer-appointment-history-list { display: grid; gap: 8px; padding: 10px; }
+.customer-page .customer-appointment-history-list .appointment { margin: 0; }
