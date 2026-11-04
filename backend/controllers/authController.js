@@ -46,15 +46,46 @@ exports.listCustomers = async (req, res) => {
 
 exports.updateCustomer = async (req, res) => {
   try {
-    const username = String(req.body.username || '').trim().toLowerCase();
-    if (!username) return res.status(400).json({ success: false, error: 'اسم المستخدم مطلوب' });
+    const updates = req.body || {};
+    const hasUsername = Object.prototype.hasOwnProperty.call(updates, 'username');
+    const hasPhone = Object.prototype.hasOwnProperty.call(updates, 'phone');
+    const hasPassword = Object.prototype.hasOwnProperty.call(updates, 'password');
+    if (!hasUsername && !hasPhone && !hasPassword) {
+      return res.status(400).json({ success: false, error: 'لم يتم إرسال بيانات للتحديث' });
+    }
     const user = await User.findOne({ _id: req.params.id, role: 'customer' });
     if (!user) return res.status(404).json({ success: false, error: 'لم يتم العثور على الزبون' });
-    user.username = username;
+    if (hasUsername) {
+      const username = String(updates.username || '').trim().toLowerCase();
+      if (!username) return res.status(400).json({ success: false, error: 'اسم المستخدم مطلوب' });
+      user.username = username;
+    }
+    let phoneChanged = false;
+    if (hasPhone) {
+      const phone = String(updates.phone || '').replace(/\D/g, '');
+      if (!/^05\d{8}$/.test(phone)) {
+        return res.status(400).json({ success: false, error: 'رقم الهاتف غير صالح (05XXXXXXXX)' });
+      }
+      phoneChanged = phone !== user.phone;
+      user.phone = phone;
+    }
+    if (hasPassword) {
+      const password = String(updates.password || '');
+      if (password) {
+        if (password.length < 6) return res.status(400).json({ success: false, error: 'يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل' });
+        user.password = password;
+      }
+    }
     await user.save();
+    if (phoneChanged) {
+      await Appointment.updateMany(
+        { customer: user._id },
+        { $set: { customerPhone: user.phone, customerName: user.name } }
+      );
+    }
     res.json({ success: true, user: user.toSafeObject() });
   } catch (error) {
-    const message = error.code === 11000 ? 'اسم المستخدم موجود مسبقاً' : (error.message || 'تعذر تحديث اسم المستخدم');
+    const message = error.code === 11000 ? 'اسم المستخدم موجود مسبقاً' : (error.message || 'تعذر تحديث بيانات الزبون');
     res.status(400).json({ success: false, error: message });
   }
 };
