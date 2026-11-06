@@ -32,14 +32,14 @@
     <div class="section-content"><div class="appointment-filter-row"><label>تصفية حسب التاريخ<input id="filterDate" type="date"></label><button id="showAllAppointments" class="secondary" type="button">عرض كل المواعيد</button><button id="timelineEditorButton" type="button">تعديل الخط الزمني</button></div><div id="appointments" class="appointment-list"></div></div>
   </section>
 
+  <section class="card collapsible-card" data-section="create-appointment">
+    <div class="section-heading"><h2>إنشاء موعد للزبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إنشاء موعد للزبون">−</button></div>
+    <div class="section-content"><label>الزبون<select id="manualCustomer"></select></label><div id="manualOneOffFields" class="manual-one-off-fields hidden"><label>اسم العميل<input id="manualCustomerName" type="text" maxlength="50" autocomplete="off"></label><label>رقم الهاتف<input id="manualCustomerPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="05XXXXXXXX" autocomplete="tel"></label></div><label>الخدمة<select id="manualService"></select></label><div class="grid-two owner-date-time-pair"><label>التاريخ<input id="manualDate" type="date"></label><label>الساعة<select id="manualTime" disabled></select></label></div><button id="createAppointment">إنشاء موعد مؤكد</button><p id="manualMessage" class="message"></p></div>
+  </section>
+
   <section class="card collapsible-card" data-section="customer-notification">
     <div class="section-heading"><h2>إرسال إشعار للزبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إرسال إشعار للزبون">−</button></div>
     <div class="section-content"><p class="muted">سيُرسل الإشعار إلى جميع الأجهزة التي فعّل الزبون الإشعارات عليها.</p><label>البحث عن زبون<input id="notificationCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>الزبون<select id="notificationCustomer"><option value="">اختر زبوناً</option></select></label><label>العنوان<input id="notificationTitle" maxlength="80" placeholder="مثال: تحديث من Fadila"></label><label>الرسالة<textarea id="notificationBody" maxlength="240" rows="4" placeholder="اكتب محتوى الإشعار"></textarea></label><button id="sendCustomerNotification">إرسال الإشعار</button><p id="sendNotificationMessage" class="message"></p></div>
-  </section>
-
-  <section class="card collapsible-card" data-section="create-customer">
-    <div class="section-heading"><h2>إنشاء حساب زبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إنشاء حساب زبون">−</button></div>
-    <div class="section-content"><div class="grid-two"><label>الاسم الكامل<input id="customerName"></label><label>الهاتف<input id="customerPhone" inputmode="tel"></label><label>اسم المستخدم<input id="customerUsername" autocomplete="off"></label><label>كلمة مرور مؤقتة<input id="customerPassword" type="password" autocomplete="new-password"></label></div><button id="createCustomer">إنشاء الحساب</button><p id="customerMessage" class="message"></p></div>
   </section>
 
   <section class="card collapsible-card" data-section="manage-customers">
@@ -47,9 +47,9 @@
     <div class="section-content"><p class="muted">ابحث عن الزبون بالاسم أو اختره من القائمة لإظهار خيارات الإدارة.</p><label>البحث عن زبون<input id="manageCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>اختيار الزبون<select id="manageCustomerSelect"><option value="">اختر زبوناً</option></select></label><div id="customersManagement" class="customer-management-list"></div><p id="manageCustomerMessage" class="message"></p></div>
   </section>
 
-  <section class="card collapsible-card" data-section="create-appointment">
-    <div class="section-heading"><h2>إنشاء موعد للزبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إنشاء موعد للزبون">−</button></div>
-    <div class="section-content"><label>الزبون<select id="manualCustomer"></select></label><div id="manualOneOffFields" class="manual-one-off-fields hidden"><label>اسم العميل<input id="manualCustomerName" type="text" maxlength="50" autocomplete="off"></label><label>رقم الهاتف<input id="manualCustomerPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="05XXXXXXXX" autocomplete="tel"></label></div><label>الخدمة<select id="manualService"></select></label><div class="grid-two owner-date-time-pair"><label>التاريخ<input id="manualDate" type="date"></label><label>الساعة<select id="manualTime" disabled></select></label></div><button id="createAppointment">إنشاء موعد مؤكد</button><p id="manualMessage" class="message"></p></div>
+  <section class="card collapsible-card" data-section="working-hours">
+    <div class="section-heading"><h2>ساعات العمل</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم ساعات العمل">−</button></div>
+    <div class="section-content"><div id="workingHours" class="working-hours-list"></div><button id="saveHours">حفظ الساعات</button><div class="date-hours-panel"><h3>ساعات خاصة لفترة محددة</h3><p class="muted">اختر تاريخ البداية والنهاية؛ كلاهما مشمولان في الفترة. يمكنك استخدام اليوم نفسه لإعداد يوم واحد.</p><div class="date-hours-controls"><div class="date-range-fields"><label>من التاريخ<input id="overrideStartDate" type="date"></label><label>حتى التاريخ<input id="overrideEndDate" type="date"></label></div><div class="date-hours-time-fields"><label>الفتح<input id="overrideStart" type="time" value="09:00"></label><label>الإغلاق<input id="overrideEnd" type="time" value="19:00"></label></div><label class="inline-check"><input id="overrideEnabled" type="checkbox" checked> مفتوح</label></div><div class="date-hours-actions"><button id="newDateOverride" class="secondary" type="button">فترة جديدة</button><button id="saveDateOverride" type="button">حفظ الفترة</button><button id="removeDateOverride" class="secondary" type="button">إزالة الإعداد الخاص</button></div><div id="dateOverrides" class="date-overrides-list"></div><p id="dateOverrideMessage" class="message"></p></div></div>
   </section>
 
   <section class="card collapsible-card" data-section="services">
@@ -57,9 +57,9 @@
     <div class="section-content"><div class="grid-two"><label>الاسم<input id="serviceName"></label><label>السعر<input id="servicePrice" type="number"></label><label>المدة بالدقائق<input id="serviceDuration" type="number"></label></div><div class="service-form-actions"><button id="addService">إضافة خدمة</button><button id="cancelServiceEdit" class="secondary hidden" type="button">إلغاء التعديل</button></div><p id="serviceMessage" class="message"></p><div id="services"></div></div>
   </section>
 
-  <section class="card collapsible-card" data-section="working-hours">
-    <div class="section-heading"><h2>ساعات العمل</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم ساعات العمل">−</button></div>
-    <div class="section-content"><div id="workingHours" class="working-hours-list"></div><button id="saveHours">حفظ الساعات</button><div class="date-hours-panel"><h3>ساعات خاصة لفترة محددة</h3><p class="muted">اختر تاريخ البداية والنهاية؛ كلاهما مشمولان في الفترة. يمكنك استخدام اليوم نفسه لإعداد يوم واحد.</p><div class="date-hours-controls"><div class="date-range-fields"><label>من التاريخ<input id="overrideStartDate" type="date"></label><label>حتى التاريخ<input id="overrideEndDate" type="date"></label></div><div class="date-hours-time-fields"><label>الفتح<input id="overrideStart" type="time" value="09:00"></label><label>الإغلاق<input id="overrideEnd" type="time" value="19:00"></label></div><label class="inline-check"><input id="overrideEnabled" type="checkbox" checked> مفتوح</label></div><div class="date-hours-actions"><button id="newDateOverride" class="secondary" type="button">فترة جديدة</button><button id="saveDateOverride" type="button">حفظ الفترة</button><button id="removeDateOverride" class="secondary" type="button">إزالة الإعداد الخاص</button></div><div id="dateOverrides" class="date-overrides-list"></div><p id="dateOverrideMessage" class="message"></p></div></div>
+  <section class="card collapsible-card" data-section="create-customer">
+    <div class="section-heading"><h2>إنشاء حساب زبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إنشاء حساب زبون">−</button></div>
+    <div class="section-content"><div class="grid-two"><label>الاسم الكامل<input id="customerName"></label><label>الهاتف<input id="customerPhone" inputmode="tel"></label><label>اسم المستخدم<input id="customerUsername" autocomplete="off"></label><label>كلمة مرور مؤقتة<input id="customerPassword" type="password" autocomplete="new-password"></label></div><button id="createCustomer">إنشاء الحساب</button><p id="customerMessage" class="message"></p></div>
   </section>
 </main>
 <div id="timelineModal" class="timeline-modal hidden" role="dialog" aria-modal="true" aria-labelledby="timelineTitle">
