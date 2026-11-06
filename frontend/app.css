@@ -1447,3 +1447,45 @@
 
 .instagram-float svg { width: 26px; height: 26px; }
 .instagram-float:active { scale: .96; }
+
+
+/* Compact customer ratings and public feedback. */
+.customer-page .customer-feedback-card { padding: 14px 16px; }
+.customer-page .feedback-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.customer-page .feedback-heading h2 { margin: 0; font-size: 18px; }
+.customer-page .feedback-heading p { margin: 0; color: #718096; font-size: 10px; white-space: nowrap; }
+.customer-page .customer-feedback-summary { display: flex; align-items: center; gap: 8px; margin: 8px 0; padding: 8px 10px; border-radius: 11px; background: #f2f7fd; }
+.customer-page .feedback-average-value { color: var(--app-navy); font-size: 18px; font-weight: 850; }
+.customer-page .feedback-average-stars { color: #f4b400; font-size: 17px; letter-spacing: 1px; direction: ltr; }
+.customer-page .customer-feedback-summary small { margin-inline-start: auto; color: #718096; font-size: 11px; }
+.customer-page .feedback-rating-label { display: block; margin: 5px 0 0 !important; font-size: 12px !important; }
+.customer-page .feedback-rating-stars { display: flex; justify-content: flex-start; gap: 3px; direction: ltr; }
+.customer-page .feedback-star { width: 31px; min-height: 30px; padding: 0; border: 0; background: transparent !important; color: #c8d2df; font-size: 23px; line-height: 1; box-shadow: none !important; }
+.customer-page .feedback-star.is-selected { color: #f4b400; }
+.customer-page .feedback-star:focus-visible { outline: 2px solid #1768d1; outline-offset: 2px; }
+.customer-page .customer-feedback-card label:not(.feedback-rating-label) { display: block; margin: 5px 0 !important; font-size: 12px; }
+.customer-page .customer-feedback-card input,
+.customer-page .customer-feedback-card textarea { box-sizing: border-box; display: block; width: 100%; min-height: 36px; margin-top: 3px; padding: 7px 10px; border: 1px solid var(--app-line); border-radius: 10px; background: #fbfdff; font: inherit; font-size: 13px; }
+.customer-page .customer-feedback-card textarea { min-height: 48px; resize: vertical; }
+.customer-page #feedbackSubmit { width: 100%; min-height: 39px; margin-top: 3px; padding: 8px 12px; font-size: 13px; }
+.customer-page .customer-feedback-card .message:not(:empty) { margin: 5px 0 0; padding: 6px 8px; font-size: 11px; }
+.customer-page .feedback-list-heading { display: flex; justify-content: space-between; align-items: center; margin-top: 9px; padding-top: 7px; border-top: 1px solid #e5edf6; }
+.customer-page .feedback-list-heading h3 { margin: 0; color: var(--app-navy); font-size: 13px; }
+.customer-page .feedback-list-heading span { color: #718096; font-size: 10px; }
+.customer-page .feedback-list { display: grid; gap: 7px; max-height: 230px; margin-top: 6px; overflow-y: auto; }
+.customer-page .feedback-item { padding: 8px 10px; border: 1px solid #dce8f4; border-radius: 11px; background: #f8fbff; }
+.customer-page .feedback-item-heading { display: flex; align-items: center; gap: 7px; }
+.customer-page .feedback-item-heading strong { color: #344054; font-size: 12px; }
+.customer-page .feedback-item-stars { color: #f4b400; font-size: 11px; white-space: nowrap; }
+.customer-page .feedback-item time { display: block; margin-top: 2px; color: #98a2b3; font-size: 10px; }
+.customer-page .feedback-item p { margin: 4px 0 0; color: #52657e; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.customer-page .feedback-empty { margin: 6px 0 0; font-size: 12px; }
+
+.owner-page .owner-feedback-list { display: grid; gap: 8px; max-height: 430px; overflow-y: auto; }
+.owner-page .owner-feedback-item { padding: 10px 12px; border: 1px solid #dce8f4; border-radius: 12px; background: #f8fbff; }
+.owner-page .owner-feedback-item-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+.owner-page .owner-feedback-item-heading strong { color: #344054; font-size: 13px; }
+.owner-page .owner-feedback-item-heading span { color: #f4b400; font-size: 12px; }
+.owner-page .owner-feedback-item-heading time { margin-inline-start: auto; color: #98a2b3; font-size: 10px; }
+.owner-page .owner-feedback-item p { margin: 6px 0 8px; color: #52657e; font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.owner-page .owner-feedback-item button { width: auto; min-height: 32px; padding: 6px 10px; font-size: 12px; box-shadow: none; }
