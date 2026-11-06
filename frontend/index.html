@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="FADILA BARBER">
   <title>FADILA BARBER — المواعيد</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=47">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=48">
 </head>
 <body class="customer-page">
   <div id="installGate" class="gate hidden">
@@ -36,11 +36,16 @@
     <div id="customerView" class="hidden">
       <div class="customer-greeting"><h2 id="welcome"></h2></div>
       <section id="notificationCard" class="card"><h2>الإشعارات</h2><p id="notificationState" class="muted">لتلقي التحديثات والتذكيرات، يرجى السماح بالإشعارات.</p></section>
-      <section class="card customer-booking-form"><h2>حجز موعد</h2>
-        <label>الخدمة<select id="service"><option value="">اختر خدمة</option></select></label>
-        <div class="grid-two customer-booking-date-time"><label>التاريخ<input id="date" type="date"></label><label>الساعة<select id="time" disabled><option value="">اختر خدمة وتاريخاً</option></select></label></div>
-        <label>ملاحظة (اختياري)<textarea id="bookingNotes" maxlength="500" rows="3" placeholder="أضف أي تفاصيل تساعدنا"></textarea></label>
-        <button id="bookButton">إرسال الطلب</button><p id="bookingMessage" class="message"></p>
+      <section class="card customer-booking-form booking-collapsed">
+        <button id="bookingToggle" class="booking-toggle" type="button" aria-expanded="false" aria-controls="bookingFields" aria-label="فتح نموذج حجز موعد">
+          <span class="booking-toggle-copy"><span class="booking-toggle-title" role="heading" aria-level="2">حجز موعد</span><span id="bookingToggleHint" class="booking-toggle-hint">اضغط لاختيار الخدمة والتاريخ والساعة</span></span><span id="bookingToggleIcon" class="booking-toggle-icon" aria-hidden="true">⌄</span>
+        </button>
+        <div id="bookingFields" class="booking-fields hidden">
+          <label>الخدمة<select id="service"><option value="">اختر خدمة</option></select></label>
+          <div class="grid-two customer-booking-date-time"><label>التاريخ<input id="date" type="date"></label><label>الساعة<select id="time" disabled><option value="">اختر خدمة وتاريخاً</option></select></label></div>
+          <label>ملاحظة (اختياري)<textarea id="bookingNotes" maxlength="500" rows="3" placeholder="أضف أي تفاصيل تساعدنا"></textarea></label>
+          <button id="bookButton">إرسال الطلب</button><p id="bookingMessage" class="message"></p>
+        </div>
       </section>
       <section class="card customer-feedback-card">
         <div class="feedback-heading"><h2>آراء وتقييمات العملاء</h2><p>يُنشر تقييمك مباشرة للجميع</p></div>
@@ -57,7 +62,7 @@
       </section>
       <section class="card"><h2>مواعيدي</h2><div id="appointments" class="appointment-list"></div></section>
       <a class="instagram-float" href="https://www.instagram.com/fadila_barber?exln=MWttYjI2eGxzbmFyZg%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="افتح صفحة فاديلا على Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.7" r="1.2" fill="currentColor"/></svg></a>
-      <a class="whatsapp-float" href="https://wa.me/972527533887" target="_blank" rel="noopener noreferrer" aria-label="فتح محادثة واتساب مع فاديلا"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3A13 13 0 0 0 4.8 22.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6c-2 0-3.9-.5-5.6-1.5l-.4-.2-3.9 1 1.1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.4.2-.7.1-1.9-1-3.2-1.8-4.5-4-.3-.6.3-.6.9-1.3.1-.2.2-.4.3-.6.1-.2 0-.4 0-.6-.1-.2-.7-1.7-1-2.3-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-1.1 1.1-1.6 2.4-1.5 3.8.2 1.7.9 3.4 2 4.7 1.8 2.6 4.2 4.6 7.1 5.6.9.3 2 .2 2.8-.2.8-.5 1.4-1.3 1.6-2.2.1-.4.1-.8 0-.9-.2-.2-.5-.3-.8-.4Z"/></svg><span>WhatsApp</span></a>
+      <a class="whatsapp-float" href="https://wa.me/972527533887" target="_blank" rel="noopener noreferrer" aria-label="فتح محادثة واتساب مع فاديلا"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3A13 13 0 0 0 4.8 22.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6c-2 0-3.9-.5-5.6-1.5l-.4-.2-3.9 1 1.1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.4.2-.7.1-1.9-1-3.2-1.8-4.5-4-.3-.6.3-.6.9-1.3.1-.2.2-.4.3-.6.1-.2 0-.4 0-.6-.1-.2-.7-1.7-1-2.3-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-1.1 1.1-1.6 2.4-1.5 3.8.2 1.7.9 3.4 2 4.7 1.8 2.6 4.2 4.6 7.1 5.6.9.3 2 .2 2.8-.2.8-.5 1.4-1.3 1.6-2.2.1-.4.1-.8 0-.9-.2-.2-.5-.3-.8-.4Z"/></svg></a>
     </div>
     </div>
   </main>
