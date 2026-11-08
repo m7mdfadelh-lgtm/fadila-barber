@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="FADILA BARBER">
   <title>FADILA BARBER — المواعيد</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=49">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=50">
 </head>
 <body class="customer-page">
   <div id="installGate" class="gate hidden">
@@ -66,8 +66,19 @@
     </div>
     </div>
   </main>
+  <div id="feedbackPrompt" class="feedback-prompt hidden" role="dialog" aria-modal="true" aria-labelledby="feedbackPromptTitle" aria-describedby="feedbackPromptCopy">
+    <section class="feedback-prompt-card">
+      <button id="feedbackPromptClose" class="feedback-prompt-close" type="button" aria-label="إغلاق">×</button>
+      <div class="feedback-prompt-icon" aria-hidden="true">★</div>
+      <h2 id="feedbackPromptTitle">رأيك يهمنا</h2>
+      <p id="feedbackPromptCopy">لم تترك تقييماً بعد. شاركنا رأيك وساعدنا على تحسين تجربتك.</p>
+      <div class="feedback-prompt-stars" aria-label="خمس نجوم">★★★★★</div>
+      <button id="feedbackPromptNow" class="feedback-prompt-primary" type="button">إضافة تقييم</button>
+      <button id="feedbackPromptLater" class="secondary feedback-prompt-later" type="button">لاحقاً</button>
+    </section>
+  </div>
   <div id="messagesPanel" class="messages-panel hidden" role="dialog" aria-modal="true" aria-labelledby="messagesTitle">
     <div class="messages-panel-card"><div class="messages-panel-header"><h2 id="messagesTitle">رسائلي</h2><button id="closeMessages" class="secondary compact" type="button">إغلاق</button></div><div id="messagesList" class="messages-list"></div></div>
   </div>
-  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=45"></script>
+  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=46"></script>
 </body></html>
