@@ -1535,3 +1535,32 @@
 @media (max-width: 550px) {
   .customer-page .customer-booking-form { padding: 0 16px 13px; }
 }
+
+
+/* One-time customer WhatsApp reminders */
+.owner-page .one-off-reminder-item .appointment-summary {
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+}
+
+.owner-page .one-off-reminder-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-height: 36px;
+  padding: 7px 11px;
+  border-radius: 10px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .owner-page .one-off-reminder-item .appointment-summary {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+
+  .owner-page .one-off-reminder-button {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
