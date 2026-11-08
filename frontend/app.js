@@ -7,8 +7,8 @@ async function login(){try{const data=await api('/auth/login',{method:'POST',hea
 async function syncExistingPushSubscription(){try{if(!token()||!('serviceWorker'in navigator)||!('PushManager'in window)||!('Notification'in window)||Notification.permission!=='granted')return;const registration=await navigator.serviceWorker.ready,subscription=await registration.pushManager.getSubscription();if(subscription)await api('/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription})})}catch(error){console.error('Push account sync failed:',error)}}
 async function logout(){if(appointmentArchiveTimer){clearTimeout(appointmentArchiveTimer);appointmentArchiveTimer=null}const savedToken=token();try{if(savedToken&&'serviceWorker'in navigator){const registration=await navigator.serviceWorker.ready,subscription=await registration.pushManager.getSubscription();if(subscription)await fetch(`${API_URL}/push/subscribe`,{method:'DELETE',headers:{Authorization:`Bearer ${savedToken}`,'Content-Type':'application/json'},body:JSON.stringify({endpoint:subscription.endpoint}),keepalive:true})}}catch(error){console.error('Push logout cleanup failed:',error)}finally{localStorage.removeItem('token');location.href='index.html'}}
 async function enterApp(){const welcome=el('welcomeView');welcome.classList.add('welcome-leaving');await new Promise(resolve=>setTimeout(resolve,360));welcome.classList.add('hidden');el('appContent').classList.remove('hidden');if(sessionUser){if(sessionUser.role==='owner'){sessionStorage.setItem('skipDashboardIntro','1');return location.href='dashboard.html'}return showCustomer(sessionUser)}el('loginView').classList.remove('hidden')}
-async function showCustomer(user){currentUser=user;el('loginView').classList.add('hidden');el('customerView').classList.remove('hidden');el('messagesButton').classList.remove('hidden');el('customerRefreshButton').classList.remove('hidden');el('customerHeaderActions').classList.remove('hidden');el('welcome').textContent=`مرحباً ${user.name}`;await syncExistingPushSubscription();el('feedbackName').value=user.name||'';await Promise.all([loadServices(),loadAppointments(),loadMessages(),loadFeedback()]);updateNotificationState();maybeShowFeedbackPrompt()}
-async function refreshCustomerData(){const button=el('customerRefreshButton');button.disabled=true;button.classList.add('is-refreshing');try{await Promise.all([loadServices(),loadAppointments(),loadMessages(),loadFeedback()]);maybeShowFeedbackPrompt()}catch(error){alert(error.message)}finally{button.disabled=false;button.classList.remove('is-refreshing')}}
+async function showCustomer(user){currentUser=user;el('loginView').classList.add('hidden');el('customerView').classList.remove('hidden');el('messagesButton').classList.remove('hidden');el('customerRefreshButton').classList.remove('hidden');el('customerHeaderActions').classList.remove('hidden');el('welcome').textContent=`مرحباً ${user.name}`;await syncExistingPushSubscription();el('feedbackName').value=user.name||'';await Promise.all([loadServices(),loadAppointments(),loadMessages(),loadFeedback(),loadGalleryPreview()]);updateNotificationState();maybeShowFeedbackPrompt()}
+async function refreshCustomerData(){const button=el('customerRefreshButton');button.disabled=true;button.classList.add('is-refreshing');try{await Promise.all([loadServices(),loadAppointments(),loadMessages(),loadFeedback(),loadGalleryPreview()]);maybeShowFeedbackPrompt()}catch(error){alert(error.message)}finally{button.disabled=false;button.classList.remove('is-refreshing')}}
 function setBookingFormOpen(open){
   const fields=el('bookingFields'),button=el('bookingToggle');
   fields.classList.toggle('hidden',!open);
@@ -19,6 +19,28 @@ function setBookingFormOpen(open){
   el('bookingCard')?.classList.toggle('is-open',open);
 }
 async function loadServices(){customerServices=await api('/services');el('service').innerHTML='<option value="">اختر خدمة</option>'+customerServices.map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)} — ₪${s.price}</option>`).join('')}
+function isSafeGalleryImage(value){return /^data:image\/(?:jpe?g|png|webp|gif);base64,[A-Za-z0-9+/]+={0,2}$/.test(String(value||''))}
+async function loadGalleryPreview(){
+  const section=el('customerGallerySection'),grid=el('customerGalleryPreview');
+  if(!section||!grid)return;
+  try{
+    const images=await api('/gallery');
+    const validImages=Array.isArray(images)?images.filter(item=>isSafeGalleryImage(item?.image)):[];
+    grid.replaceChildren();
+    validImages.slice(0,3).forEach((item,index)=>{
+      const image=document.createElement('img');
+      image.src=item.image;
+      image.alt='صورة '+(index+1)+' من أعمال فاديلا';
+      image.loading='lazy';
+      image.decoding='async';
+      grid.appendChild(image);
+    });
+    section.classList.toggle('hidden',validImages.length===0);
+  }catch(error){
+    section.classList.add('hidden');
+    console.error('Gallery preview load failed:',error);
+  }
+}
 async function loadSlots(){const date=el('date').value,service=el('service').value;if(!date||!service)return;const data=await api(`/appointments/available/${date}?service=${encodeURIComponent(service)}`);el('time').innerHTML='<option value="">اختر ساعة</option>'+data.availableSlots.map(t=>`<option>${t}</option>`).join('');el('time').disabled=!data.availableSlots.length}
 async function book(){try{await api('/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:el('service').value,date:el('date').value,time:el('time').value,notes:el('bookingNotes').value.trim()})});message('bookingMessage','تم إرسال الطلب إلى صاحب المحل','success');el('bookingNotes').value='';await loadAppointments()}catch(error){message('bookingMessage',error.message,'error')}}
 async function loadAppointments(){
