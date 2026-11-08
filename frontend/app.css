@@ -1636,3 +1636,48 @@
   width: 100%;
   margin-top: 9px;
 }
+
+
+/* Compact customer work gallery preview. */
+.customer-page .customer-gallery-card { padding: 14px 16px; }
+.customer-page .customer-gallery-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.customer-page .customer-gallery-heading h2 {
+  margin: 0;
+  color: var(--app-navy);
+  font-size: 17px;
+}
+.customer-page .customer-gallery-heading p {
+  margin: 3px 0 0;
+  color: #718096;
+  font-size: 12px;
+}
+.customer-page .customer-gallery-all {
+  flex: 0 0 auto;
+  color: #0f4ea8;
+  font-size: 13px;
+  font-weight: 750;
+  text-decoration: none;
+}
+.customer-page .customer-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.customer-page .customer-gallery-grid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 11px;
+  background: #f2f7fd;
+  object-fit: cover;
+}
+@media (max-width: 360px) {
+  .customer-page .customer-gallery-card { padding: 12px; }
+  .customer-page .customer-gallery-grid { gap: 6px; }
+}
