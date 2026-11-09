@@ -1841,12 +1841,16 @@
 
 /* Compact horizontal owner brand heading, matching header concept 2. */
 .owner-page .owner-brand-heading { display:flex; align-items:center; justify-content:center; gap:11px; direction:rtl; margin:0 auto; }
-.owner-page .owner-brand-heading img { width:76px; height:76px; object-fit:contain; }
+.owner-page .owner-brand-heading img { width:102px; height:102px; object-fit:contain; }
 .owner-page .owner-brand-heading h1 { margin:0; color:#0f4ea8; font-size:21px; line-height:1.25; font-weight:800; white-space:nowrap; }
-.owner-page .owner-brand-divider { width:1px; height:44px; flex:0 0 1px; background:#cbd9eb; }
+.owner-page .owner-brand-divider { width:1px; height:52px; flex:0 0 1px; background:#cbd9eb; }
 @media (max-width:480px) {
   .owner-page .owner-brand-heading { gap:8px; }
-  .owner-page .owner-brand-heading img { width:62px; height:62px; }
+  .owner-page .owner-brand-heading img { width:82px; height:82px; }
+  .owner-page .app-header { min-height:96px; }
+  .owner-page .owner-brand-divider { height:40px; }
   .owner-page .owner-brand-divider { height:34px; }
   .owner-page .owner-brand-heading h1 { font-size:18px; }
 }
+.owner-page .app-header { min-height:112px; }
+@media (max-width:480px) { .owner-page .app-header { min-height:96px; } }
