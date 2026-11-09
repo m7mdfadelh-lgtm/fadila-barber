@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#0f4ea8"><meta name="apple-mobile-web-app-capable" content="yes">
   <title>Fadila — الإدارة</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=56">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=57">
 </head>
 <body class="owner-page">
 <div id="installGate" class="gate hidden"><div class="gate-card"><img src="images/Logo.png"><h1>تثبيت التطبيق</h1><p>يجب إضافة التطبيق إلى الشاشة الرئيسية للمتابعة.</p><button id="installButton" class="hidden">ثبّت الآن</button><div id="iosInstructions" class="install-guide hidden"><strong>iPhone / iPad</strong><ol><li>افتح الموقع في Safari.</li><li>اضغط زر المشاركة <b>□↑</b>.</li><li>اختر «إضافة إلى الشاشة الرئيسية» ثم «إضافة».</li></ol></div><div id="androidInstructions" class="install-guide hidden"><strong>Android</strong><ol><li>افتح الموقع في Chrome.</li><li>اضغط قائمة المتصفح <b>⋮</b>.</li><li>اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» ثم وافق.</li></ol></div><p class="muted">بعد التثبيت، افتح Fadila من الأيقونة الجديدة.</p></div></div>
@@ -18,55 +18,80 @@
 </section>
 
 <main id="ownerAppContent" class="app-shell owner-content hidden">
-  <header class="app-header"><button id="ownerMessagesButton" class="owner-messages-button" type="button" aria-label="فتح لوحة الرسائل"><span aria-hidden="true">✉</span><span>الرسائل</span><b id="ownerMessagesBadge" class="messages-badge hidden">0</b></button><button id="ownerRefreshButton" class="data-refresh-button" type="button" aria-label="تحديث البيانات"><span aria-hidden="true">↻</span><span>تحديث</span></button><img src="images/Logo.png"><div><h1>إدارة Fadila</h1><button id="logout" class="secondary compact">تسجيل الخروج</button></div></header>
+  <header class="app-header"><button id="ownerMenuButton" class="owner-menu-button" type="button" aria-label="فتح قائمة الإدارة" aria-expanded="false"><span></span><span></span><span></span></button><button id="ownerMessagesButton" class="owner-messages-button" type="button" aria-label="فتح لوحة الرسائل"><span aria-hidden="true">✉</span><span>الرسائل</span><b id="ownerMessagesBadge" class="messages-badge hidden">0</b></button><button id="ownerRefreshButton" class="data-refresh-button" type="button" aria-label="تحديث البيانات"><span aria-hidden="true">↻</span><span>تحديث</span></button><img src="images/Logo.png"><div><h1>إدارة Fadila</h1><button id="logout" class="secondary compact">تسجيل الخروج</button></div></header>
 
-  <section class="notification-quick-action" aria-label="الإشعارات"><p id="notificationState" class="muted">فعّل الإشعارات لتلقي تذكير قبل الموعد بـ15 دقيقة.</p><button id="enableNotifications" class="secondary compact" type="button">تفعيل الإشعارات</button></section>
+  
 
-  <section class="card collapsible-card owner-feedback-card" data-section="feedback">
+  <section class="card collapsible-card owner-dashboard-panel owner-feedback-card" data-section="feedback" data-owner-panel="feedback" id="ownerPanel-feedback">
     <div class="section-heading"><h2>تقييمات العملاء</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم تقييمات العملاء">−</button></div>
     <div class="section-content"><p id="ownerFeedbackSummary" class="muted">تحميل التقييمات...</p><div id="ownerFeedbackList" class="owner-feedback-list"></div><p id="ownerFeedbackMessage" class="message" aria-live="polite"></p></div>
   </section>
 
-  <section class="card collapsible-card" data-section="appointments">
+  <section class="card collapsible-card owner-dashboard-panel" data-section="appointments" data-owner-panel="appointments" id="ownerPanel-appointments" hidden>
     <div class="section-heading"><h2>المواعيد</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم المواعيد">−</button></div>
     <div class="section-content"><div class="appointment-filter-row"><label>تصفية حسب التاريخ<input id="filterDate" type="date"></label><button id="showAllAppointments" class="secondary" type="button">عرض كل المواعيد</button><button id="timelineEditorButton" type="button">تعديل الخط الزمني</button></div><div id="appointments" class="appointment-list"></div></div>
   </section>
 
-  <section class="card collapsible-card" data-section="one-off-reminders">
+  <section class="card collapsible-card owner-dashboard-panel" data-section="one-off-reminders" data-owner-panel="one-off-reminders" id="ownerPanel-one-off-reminders" hidden>
     <div class="section-heading"><h2>تذكير زبائن لمرة واحدة</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم تذكير زبائن لمرة واحدة">−</button></div>
     <div class="section-content"><p class="muted">ستُفتح رسالة جاهزة في WhatsApp؛ أرسلها فقط إذا وافق الزبون على تلقي رسائل.</p><p id="oneOffReminderSummary" class="muted">تحميل المواعيد...</p><div id="oneOffReminders" class="appointment-list"></div></div>
   </section>
 
-  <section class="card collapsible-card" data-section="create-appointment">
+  <section class="card collapsible-card owner-dashboard-panel" data-section="create-appointment" data-owner-panel="create-appointment" id="ownerPanel-create-appointment" hidden>
     <div class="section-heading"><h2>إنشاء موعد للزبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إنشاء موعد للزبون">−</button></div>
     <div class="section-content"><label>الزبون<select id="manualCustomer"></select></label><div id="manualOneOffFields" class="manual-one-off-fields hidden"><label>اسم العميل<input id="manualCustomerName" type="text" maxlength="50" autocomplete="off"></label><label>رقم الهاتف<input id="manualCustomerPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="05XXXXXXXX" autocomplete="tel"></label></div><label>الخدمة<select id="manualService"></select></label><div class="grid-two owner-date-time-pair"><label>التاريخ<input id="manualDate" type="date"></label><label>الساعة<select id="manualTime" disabled></select></label></div><button id="createAppointment">إنشاء موعد مؤكد</button><p id="manualMessage" class="message"></p></div>
   </section>
 
-  <section class="card collapsible-card" data-section="customer-notification">
+  <section class="card collapsible-card owner-dashboard-panel" data-section="customer-notification" data-owner-panel="customer-notification" id="ownerPanel-customer-notification" hidden>
     <div class="section-heading"><h2>إرسال إشعار للزبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إرسال إشعار للزبون">−</button></div>
-    <div class="section-content"><p class="muted">سيُرسل الإشعار إلى جميع الأجهزة التي فعّل الزبون الإشعارات عليها.</p><label>البحث عن زبون<input id="notificationCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>الزبون<select id="notificationCustomer"><option value="">اختر زبوناً</option></select></label><label>العنوان<input id="notificationTitle" maxlength="80" placeholder="مثال: تحديث من Fadila"></label><label>الرسالة<textarea id="notificationBody" maxlength="240" rows="4" placeholder="اكتب محتوى الإشعار"></textarea></label><button id="sendCustomerNotification">إرسال الإشعار</button><p id="sendNotificationMessage" class="message"></p></div>
+    <div class="section-content"><section class="notification-quick-action" aria-label="الإشعارات"><p id="notificationState" class="muted">فعّل الإشعارات لتلقي تذكير قبل الموعد بـ15 دقيقة.</p><button id="enableNotifications" class="secondary compact" type="button">تفعيل الإشعارات</button></section><p class="muted">سيُرسل الإشعار إلى جميع الأجهزة التي فعّل الزبون الإشعارات عليها.</p><label>البحث عن زبون<input id="notificationCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>الزبون<select id="notificationCustomer"><option value="">اختر زبوناً</option></select></label><label>العنوان<input id="notificationTitle" maxlength="80" placeholder="مثال: تحديث من Fadila"></label><label>الرسالة<textarea id="notificationBody" maxlength="240" rows="4" placeholder="اكتب محتوى الإشعار"></textarea></label><button id="sendCustomerNotification">إرسال الإشعار</button><p id="sendNotificationMessage" class="message"></p></div>
   </section>
 
-  <section class="card collapsible-card" data-section="manage-customers">
+  <section class="card collapsible-card owner-dashboard-panel" data-section="manage-customers" data-owner-panel="manage-customers" id="ownerPanel-manage-customers" hidden>
     <div class="section-heading"><h2>إدارة الزبائن</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إدارة الزبائن">−</button></div>
     <div class="section-content"><p class="muted">ابحث عن الزبون بالاسم أو اختره من القائمة لإظهار خيارات الإدارة.</p><label>البحث عن زبون<input id="manageCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>اختيار الزبون<select id="manageCustomerSelect"><option value="">اختر زبوناً</option></select></label><div id="customersManagement" class="customer-management-list"></div><p id="manageCustomerMessage" class="message"></p></div>
   </section>
 
-  <section class="card collapsible-card" data-section="working-hours">
+  <section class="card collapsible-card owner-dashboard-panel" data-section="working-hours" data-owner-panel="working-hours" id="ownerPanel-working-hours" hidden>
     <div class="section-heading"><h2>ساعات العمل</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم ساعات العمل">−</button></div>
     <div class="section-content"><div id="workingHours" class="working-hours-list"></div><button id="saveHours">حفظ الساعات</button><div class="date-hours-panel"><h3>ساعات خاصة لفترة محددة</h3><p class="muted">اختر تاريخ البداية والنهاية؛ كلاهما مشمولان في الفترة. يمكنك استخدام اليوم نفسه لإعداد يوم واحد.</p><div class="date-hours-controls"><div class="date-range-fields"><label>من التاريخ<input id="overrideStartDate" type="date"></label><label>حتى التاريخ<input id="overrideEndDate" type="date"></label></div><div class="date-hours-time-fields"><label>الفتح<input id="overrideStart" type="time" value="09:00"></label><label>الإغلاق<input id="overrideEnd" type="time" value="19:00"></label></div><label class="inline-check"><input id="overrideEnabled" type="checkbox" checked> مفتوح</label></div><div class="date-hours-actions"><button id="newDateOverride" class="secondary" type="button">فترة جديدة</button><button id="saveDateOverride" type="button">حفظ الفترة</button><button id="removeDateOverride" class="secondary" type="button">إزالة الإعداد الخاص</button></div><div id="dateOverrides" class="date-overrides-list"></div><p id="dateOverrideMessage" class="message"></p></div></div>
   </section>
 
-  <section class="card collapsible-card" data-section="services">
+  <section class="card collapsible-card owner-dashboard-panel" data-section="services" data-owner-panel="services" id="ownerPanel-services" hidden>
     <div class="section-heading"><h2>الخدمات</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم الخدمات">−</button></div>
     <div class="section-content"><div class="grid-two"><label>الاسم<input id="serviceName"></label><label>السعر<input id="servicePrice" type="number"></label><label>المدة بالدقائق<input id="serviceDuration" type="number"></label></div><div class="service-form-actions"><button id="addService">إضافة خدمة</button><button id="cancelServiceEdit" class="secondary hidden" type="button">إلغاء التعديل</button></div><p id="serviceMessage" class="message"></p><div id="services"></div></div>
   </section>
 
-  <section class="card collapsible-card" data-section="create-customer">
+  <section class="card collapsible-card owner-dashboard-panel" data-section="create-customer" data-owner-panel="create-customer" id="ownerPanel-create-customer" hidden>
     <div class="section-heading"><h2>إنشاء حساب زبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إنشاء حساب زبون">−</button></div>
     <div class="section-content"><div class="grid-two"><label>الاسم الكامل<input id="customerName"></label><label>الهاتف<input id="customerPhone" inputmode="tel"></label><label>اسم المستخدم<input id="customerUsername" autocomplete="off"></label><label>كلمة مرور مؤقتة<input id="customerPassword" type="password" autocomplete="new-password"></label></div><button id="createCustomer">إنشاء الحساب</button><p id="customerMessage" class="message"></p></div>
   </section>
+
+  <section class="card collapsible-card owner-dashboard-panel hidden" data-section="gallery" data-owner-panel="gallery" id="ownerPanel-gallery">
+    <div class="section-heading"><h2>معرض الأعمال</h2></div>
+    <div class="section-content">
+      <p class="muted">أضف صور القصّات، احذف الصور، أو غيّر ترتيب ظهورها للعملاء.</p>
+      <input id="galleryUploadInput" class="hidden" type="file" accept="image/jpeg,image/png,image/webp" multiple>
+      <button id="galleryUploadButton" type="button">إضافة صور</button>
+      <p id="galleryAdminMessage" class="message" aria-live="polite"></p>
+      <div id="galleryAdminList" class="owner-gallery-list"></div>
+    </div>
+  </section>
 </main>
+<div id="ownerNavBackdrop" class="owner-nav-backdrop hidden"></div>
+<nav id="ownerNavDrawer" class="owner-nav-drawer" aria-label="خيارات الإدارة" aria-hidden="true">
+  <div class="owner-nav-heading"><h2>خيارات الإدارة</h2><button id="ownerNavClose" class="owner-nav-close" type="button" aria-label="إغلاق القائمة">×</button></div>
+  <button type="button" data-owner-target="feedback"><span>★</span> تقييمات العملاء</button>
+  <button type="button" data-owner-target="appointments"><span>▣</span> المواعيد</button>
+  <button type="button" data-owner-target="create-appointment"><span>＋</span> حجز موعد لزبون</button>
+  <button type="button" data-owner-target="customer-notification"><span>♧</span> إرسال إشعار</button>
+  <button type="button" data-owner-target="manage-customers"><span>♙</span> إدارة الزبائن</button>
+  <button type="button" data-owner-target="working-hours"><span>◷</span> ساعات العمل</button>
+  <button type="button" data-owner-target="services"><span>✂</span> الخدمات</button>
+  <button type="button" data-owner-target="create-customer"><span>⊕</span> إنشاء حساب زبون</button>
+  <button type="button" data-owner-target="one-off-reminders"><span>◉</span> تذكير الزبائن</button>
+  <button type="button" data-owner-target="gallery"><span>▧</span> معرض الأعمال</button>
+</nav>
 <div id="timelineModal" class="timeline-modal hidden" role="dialog" aria-modal="true" aria-labelledby="timelineTitle">
   <div class="timeline-modal-card">
     <div class="timeline-modal-header"><div><h2 id="timelineTitle">تعديل الخط الزمني</h2><p id="timelineDateLabel" class="muted"></p></div><button id="closeTimeline" class="secondary compact" type="button">إغلاق</button></div>
@@ -77,5 +102,5 @@
   </div>
 </div>
 <div id="ownerMessagesPanel" class="owner-messages-panel hidden" role="dialog" aria-modal="true" aria-labelledby="ownerMessagesTitle"><div class="owner-messages-card"><div class="owner-messages-header"><h2 id="ownerMessagesTitle">رسائل صاحب المحل</h2><div class="owner-messages-header-actions"><button id="closeOwnerMessages" class="secondary compact" type="button">إغلاق</button></div></div><div id="messageBulkBar" class="message-bulk-bar hidden"><label><input id="selectAllMessages" type="checkbox"> اختيار الكل</label><span id="selectedMessagesCount">0 محددة</span><button id="deleteSelectedMessages" type="button" class="danger compact" disabled>حذف المحدد</button></div><div id="ownerMessagesList" class="messages-list"></div></div></div>
-<script src="config.js?v=43"></script><script src="pwa.js?v=43"></script><script src="dashboard.js?v=57"></script>
+<script src="config.js?v=43"></script><script src="pwa.js?v=43"></script><script src="dashboard.js?v=58"></script>
 </body></html>
