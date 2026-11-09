@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#0f4ea8"><meta name="apple-mobile-web-app-capable" content="yes">
   <title>Fadila — الإدارة</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=57">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=58">
 </head>
 <body class="owner-page">
 <div id="installGate" class="gate hidden"><div class="gate-card"><img src="images/Logo.png"><h1>تثبيت التطبيق</h1><p>يجب إضافة التطبيق إلى الشاشة الرئيسية للمتابعة.</p><button id="installButton" class="hidden">ثبّت الآن</button><div id="iosInstructions" class="install-guide hidden"><strong>iPhone / iPad</strong><ol><li>افتح الموقع في Safari.</li><li>اضغط زر المشاركة <b>□↑</b>.</li><li>اختر «إضافة إلى الشاشة الرئيسية» ثم «إضافة».</li></ol></div><div id="androidInstructions" class="install-guide hidden"><strong>Android</strong><ol><li>افتح الموقع في Chrome.</li><li>اضغط قائمة المتصفح <b>⋮</b>.</li><li>اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» ثم وافق.</li></ol></div><p class="muted">بعد التثبيت، افتح Fadila من الأيقونة الجديدة.</p></div></div>
@@ -18,7 +18,7 @@
 </section>
 
 <main id="ownerAppContent" class="app-shell owner-content hidden">
-  <header class="app-header"><button id="ownerMenuButton" class="owner-menu-button" type="button" aria-label="فتح قائمة الإدارة" aria-expanded="false"><span></span><span></span><span></span></button><button id="ownerMessagesButton" class="owner-messages-button" type="button" aria-label="فتح لوحة الرسائل"><span aria-hidden="true">✉</span><span>الرسائل</span><b id="ownerMessagesBadge" class="messages-badge hidden">0</b></button><button id="ownerRefreshButton" class="data-refresh-button" type="button" aria-label="تحديث البيانات"><span aria-hidden="true">↻</span><span>تحديث</span></button><img src="images/Logo.png"><div><h1>إدارة Fadila</h1><button id="logout" class="secondary compact">تسجيل الخروج</button></div></header>
+  <header class="app-header"><button id="ownerMenuButton" class="owner-menu-button" type="button" aria-label="فتح قائمة الإدارة" aria-expanded="false"><span></span><span></span><span></span></button><button id="ownerRefreshButton" class="data-refresh-button" type="button" aria-label="تحديث البيانات"><span aria-hidden="true">↻</span><span>تحديث</span></button><img src="images/Logo.png"><div><h1>إدارة Fadila</h1><button id="logout" class="secondary compact">تسجيل الخروج</button></div></header>
 
   
 
@@ -81,6 +81,9 @@
 <div id="ownerNavBackdrop" class="owner-nav-backdrop hidden"></div>
 <nav id="ownerNavDrawer" class="owner-nav-drawer" aria-label="خيارات الإدارة" aria-hidden="true">
   <div class="owner-nav-heading"><h2>خيارات الإدارة</h2><button id="ownerNavClose" class="owner-nav-close" type="button" aria-label="إغلاق القائمة">×</button></div>
+  <button id="ownerMessagesButton" class="owner-nav-messages" type="button" aria-label="الرسائل">
+  <span class="owner-nav-messages-icon" aria-hidden="true">✉</span><span class="owner-nav-messages-label">الرسائل</span><b id="ownerMessagesBadge" class="messages-badge hidden">0</b>
+</button>
   <button type="button" data-owner-target="feedback"><span>★</span> تقييمات العملاء</button>
   <button type="button" data-owner-target="appointments"><span>▣</span> المواعيد</button>
   <button type="button" data-owner-target="create-appointment"><span>＋</span> حجز موعد لزبون</button>
@@ -102,5 +105,5 @@
   </div>
 </div>
 <div id="ownerMessagesPanel" class="owner-messages-panel hidden" role="dialog" aria-modal="true" aria-labelledby="ownerMessagesTitle"><div class="owner-messages-card"><div class="owner-messages-header"><h2 id="ownerMessagesTitle">رسائل صاحب المحل</h2><div class="owner-messages-header-actions"><button id="closeOwnerMessages" class="secondary compact" type="button">إغلاق</button></div></div><div id="messageBulkBar" class="message-bulk-bar hidden"><label><input id="selectAllMessages" type="checkbox"> اختيار الكل</label><span id="selectedMessagesCount">0 محددة</span><button id="deleteSelectedMessages" type="button" class="danger compact" disabled>حذف المحدد</button></div><div id="ownerMessagesList" class="messages-list"></div></div></div>
-<script src="config.js?v=43"></script><script src="pwa.js?v=43"></script><script src="dashboard.js?v=59"></script>
+<script src="config.js?v=43"></script><script src="pwa.js?v=43"></script><script src="dashboard.js?v=60"></script>
 </body></html>
