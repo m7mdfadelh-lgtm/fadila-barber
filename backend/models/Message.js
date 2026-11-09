@@ -7,7 +7,7 @@ const messageSchema = new mongoose.Schema({
   url: { type: String, default: './index.html' },
   tag: { type: String, required: true },
   appointment: { type: mongoose.Schema.Types.ObjectId, ref: 'Appointment', default: null },
-  actionType: { type: String, enum: ['', 'change-request', 'feedback', 'customer-message', 'message-reply'], default: '' },
+  actionType: { type: String, enum: ['', 'change-request', 'feedback', 'customer-message', 'message-reply', 'owner-message'], default: '' },
   conversationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Conversation', default: null, index: true },
   readAt: { type: Date, default: null, index: true }
 }, { timestamps: true });
