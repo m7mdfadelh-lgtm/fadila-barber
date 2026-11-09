@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="FADILA BARBER">
   <title>FADILA BARBER — المواعيد</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=52">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=53">
 </head>
 <body class="customer-page">
   <div id="installGate" class="gate hidden">
@@ -26,7 +26,10 @@
       </div>
     </section>
     <div id="appContent" class="hidden">
-    <header class="app-header"><button id="messagesButton" class="messages-button hidden" type="button" aria-label="فتح لوحة الرسائل"><span aria-hidden="true">✉</span><span>الرسائل</span><b id="messagesBadge" class="messages-badge hidden">0</b></button><button id="customerRefreshButton" class="data-refresh-button hidden" type="button" aria-label="تحديث البيانات"><span aria-hidden="true">↻</span><span>تحديث</span></button><div id="customerHeaderActions" class="customer-header-actions hidden"><button id="enableNotifications" class="secondary compact" type="button">تفعيل الإشعارات</button><button class="secondary compact" id="logoutButton" type="button">تسجيل الخروج</button></div><img src="images/Logo.png" alt="Fadila"><div><p>إدارة المواعيد</p></div></header>
+    <header class="app-header">
+      <button id="customerMenuButton" class="customer-menu-button hidden" type="button" aria-label="فتح القائمة" aria-expanded="false"><span></span><span></span><span></span></button>
+      <img src="images/Logo.png" alt="Fadila"><div><p>إدارة المواعيد</p></div>
+    </header>
     <section id="loginView" class="card hidden">
       <h2>تسجيل الدخول إلى التطبيق</h2><p class="muted">تم إنشاء حسابك من قِبل صاحب المحل.</p>
       <label>اسم المستخدم<input id="username" autocomplete="username"></label>
@@ -35,11 +38,17 @@
     </section>
     <div id="customerView" class="hidden">
       <div class="customer-greeting"><h2 id="welcome"></h2></div>
-      <section id="notificationCard" class="card"><h2>الإشعارات</h2><p id="notificationState" class="muted">لتلقي التحديثات والتذكيرات، يرجى السماح بالإشعارات.</p></section>
-      <section id="customerGallerySection" class="card customer-gallery-card hidden" aria-labelledby="customerGalleryTitle">
-        <div class="customer-gallery-heading"><div><h2 id="customerGalleryTitle">معرض الأعمال</h2><p>شاهد بعض أعمالنا قبل اختيار خدمتك</p></div><a class="customer-gallery-all" href="gallery.html">عرض الكل</a></div>
-        <div id="customerGalleryPreview" class="customer-gallery-grid" aria-label="صور من أعمال فاديلا"></div>
-      </section>
+      <div id="customerNavBackdrop" class="customer-nav-backdrop hidden"></div>
+      <nav id="customerNavDrawer" class="customer-nav-drawer" aria-label="قائمة العميل" aria-hidden="true">
+        <div class="customer-nav-heading"><h2>حسابي</h2><button id="customerNavClose" class="customer-nav-close" type="button" aria-label="إغلاق القائمة">×</button></div>
+        <div class="customer-nav-profile"><span aria-hidden="true">👤</span><div><strong id="customerDrawerName"></strong><small id="customerDrawerPhone"></small></div></div>
+        <button type="button" class="customer-nav-item" data-customer-nav="appointments"><span aria-hidden="true">▣</span> مواعيدي</button>
+        <button id="messagesButton" class="customer-nav-item hidden" type="button"><span aria-hidden="true">✉</span> الرسائل<b id="messagesBadge" class="messages-badge hidden">0</b></button>
+        <section id="notificationCard" class="card customer-nav-notifications"><h2>الإشعارات</h2><p id="notificationState" class="muted">لتلقي التحديثات والتذكيرات، يرجى السماح بالإشعارات.</p></section>
+        <button id="enableNotifications" class="secondary customer-nav-item" type="button">تفعيل الإشعارات</button>
+        <button id="customerRefreshButton" class="secondary customer-nav-item hidden" type="button"><span aria-hidden="true">↻</span> تحديث البيانات</button>
+        <button class="secondary customer-nav-item" id="logoutButton" type="button">تسجيل الخروج</button>
+      </nav>
       <section id="bookingCard" class="card customer-booking-form booking-collapsed">
         <button id="bookingToggle" class="booking-toggle" type="button" aria-expanded="false" aria-controls="bookingFields" aria-label="فتح نموذج حجز موعد">
           <span class="booking-toggle-copy"><span class="booking-toggle-title" role="heading" aria-level="2">حجز موعد</span><span id="bookingToggleHint" class="booking-toggle-hint">اضغط لاختيار الخدمة والتاريخ والساعة</span></span><span id="bookingToggleIcon" class="booking-toggle-icon" aria-hidden="true">⌄</span>
@@ -64,7 +73,15 @@
         <div class="feedback-list-heading"><h3>آخر التقييمات</h3><span>منشورة للجميع</span></div>
         <div id="feedbackList" class="feedback-list"></div>
       </section>
-      <section class="card"><h2>مواعيدي</h2><div id="appointments" class="appointment-list"></div></section>
+      <section id="customerGallerySection" class="card customer-gallery-card hidden" aria-labelledby="customerGalleryTitle">
+        <div class="customer-gallery-heading"><div><h2 id="customerGalleryTitle">معرض الأعمال</h2><p>شاهد بعض أعمالنا قبل اختيار خدمتك</p></div><a class="customer-gallery-all" href="gallery.html">عرض الكل</a></div>
+        <div id="customerGalleryPreview" class="customer-gallery-grid" aria-label="صور من أعمال فاديلا"></div>
+      </section>
+      
+      
+      
+      
+      <section id="myAppointments" class="card"><h2>مواعيدي</h2><div id="appointments" class="appointment-list"></div></section>
       <a class="instagram-float" href="https://www.instagram.com/fadila_barber?exln=MWttYjI2eGxzbmFyZg%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="افتح صفحة فاديلا على Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.7" r="1.2" fill="currentColor"/></svg></a>
       <a class="whatsapp-float" href="https://wa.me/972527533887" target="_blank" rel="noopener noreferrer" aria-label="فتح محادثة واتساب مع فاديلا"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3A13 13 0 0 0 4.8 22.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6c-2 0-3.9-.5-5.6-1.5l-.4-.2-3.9 1 1.1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.4.2-.7.1-1.9-1-3.2-1.8-4.5-4-.3-.6.3-.6.9-1.3.1-.2.2-.4.3-.6.1-.2 0-.4 0-.6-.1-.2-.7-1.7-1-2.3-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-1.1 1.1-1.6 2.4-1.5 3.8.2 1.7.9 3.4 2 4.7 1.8 2.6 4.2 4.6 7.1 5.6.9.3 2 .2 2.8-.2.8-.5 1.4-1.3 1.6-2.2.1-.4.1-.8 0-.9-.2-.2-.5-.3-.8-.4Z"/></svg></a>
     </div>
@@ -84,5 +101,5 @@
   <div id="messagesPanel" class="messages-panel hidden" role="dialog" aria-modal="true" aria-labelledby="messagesTitle">
     <div class="messages-panel-card"><div class="messages-panel-header"><h2 id="messagesTitle">رسائلي</h2><button id="closeMessages" class="secondary compact" type="button">إغلاق</button></div><div id="messagesList" class="messages-list"></div></div>
   </div>
-  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=47"></script>
+  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=48"></script>
 </body></html>
