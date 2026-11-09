@@ -162,6 +162,7 @@ function openOwnerNavigation(){
 function selectOwnerPanel(name){
  const panel=document.querySelector('[data-owner-panel="'+name+'"]');if(!panel)return;
  document.querySelectorAll('[data-owner-panel]').forEach(item=>item.classList.toggle('hidden',item!==panel));
+ panel.classList.remove('is-collapsed');const collapseButton=panel.querySelector('.collapse-button');if(collapseButton){collapseButton.textContent='−';collapseButton.setAttribute('aria-expanded','true');localStorage.setItem('owner-section-'+name,'open')}
  document.querySelectorAll('[data-owner-target]').forEach(button=>{if(button.dataset.ownerTarget===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')});
  localStorage.setItem('owner-active-panel',name);closeOwnerNavigation();window.scrollTo({top:0,behavior:'smooth'});
  if(name==='gallery')loadOwnerGallery()
