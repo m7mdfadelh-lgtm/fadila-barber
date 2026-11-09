@@ -1446,6 +1446,54 @@
 }
 
 .instagram-float svg { width: 26px; height: 26px; }
+.in-app-message-float {
+  position: fixed;
+  left: max(18px, env(safe-area-inset-left));
+  bottom: calc(max(18px, env(safe-area-inset-bottom)) + 124px);
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1556b3, #2d88ed);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(23, 104, 209, .32);
+}
+.in-app-message-float svg { width: 26px; height: 26px; }
+.in-app-message-float:active { transform: scale(.96); }
+
+.customer-message-composer {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(9, 27, 51, .58);
+  backdrop-filter: blur(5px);
+}
+.customer-message-composer-card {
+  width: min(440px, 100%);
+  padding: 22px;
+  border: 1px solid rgba(184, 204, 228, .82);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(9, 27, 51, .26);
+}
+.customer-message-composer-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.customer-message-composer-header h2 { margin: 0 0 6px; color: #102a4c; }
+.customer-message-composer-header .muted { margin: 0; color: #718096; font-size: 13px; line-height: 1.6; }
+.customer-message-composer-close { width: 38px; height: 38px; min-height: 38px; padding: 0; border: 1px solid #dbe6f3; border-radius: 12px; background: #f7faff; color: #164f97; font-size: 25px; line-height: 1; box-shadow: none; }
+.customer-message-sender { margin: 18px 0 14px; color: #52657e; font-size: 14px; }
+.customer-message-sender strong { color: #102a4c; }
+.customer-message-composer-card label { display: block; margin-bottom: 8px; color: #233a59; font-size: 14px; font-weight: 700; }
+.customer-message-composer-card textarea { display: block; width: 100%; min-height: 130px; margin: 0 0 12px; padding: 12px 14px; border: 1px solid #dbe6f3; border-radius: 13px; background: #fbfdff; color: #102a4c; font: inherit; resize: vertical; }
+.customer-message-composer-card textarea:focus { outline: 3px solid rgba(23, 104, 209, .14); border-color: #1768d1; }
+.customer-message-composer-card > button:last-child { width: 100%; }
+
 .instagram-float:active { scale: .96; }
 
 
