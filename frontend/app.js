@@ -149,9 +149,10 @@ async function submitCustomerMessage(){
  if(!text)return message('customerMessageStatus','يرجى كتابة رسالتك','error');
  button.disabled=true;
  try{
-  await api('/messages/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:text})});
+  const result=await api('/messages/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:text})});
   el('customerMessageText').value='';
   message('customerMessageStatus','تم إرسال رسالتك إلى الإدارة','success');
+  if(result.conversationId){closeCustomerMessageComposer();await openCustomerConversation(result.conversationId)}
  }catch(error){message('customerMessageStatus',error.message,'error')}
  finally{button.disabled=false}
 }
