@@ -130,6 +130,32 @@ async function submitFeedback(){
   finally{button.disabled=false}
 }
 
+function openCustomerMessageComposer(){
+ if(!currentUser)return;
+ el('customerMessageSender').textContent=currentUser.name||'العميل';
+ el('customerMessageStatus').textContent='';
+ el('customerMessageStatus').className='message';
+ el('customerMessageComposer').classList.remove('hidden');
+ document.body.classList.add('customer-message-compose-open');
+ el('customerMessageText').focus();
+}
+function closeCustomerMessageComposer(){
+ el('customerMessageComposer').classList.add('hidden');
+ document.body.classList.remove('customer-message-compose-open');
+ el('inAppMessageButton')?.focus();
+}
+async function submitCustomerMessage(){
+ const text=el('customerMessageText').value.trim(),button=el('customerMessageSubmit');
+ if(!text)return message('customerMessageStatus','يرجى كتابة رسالتك','error');
+ button.disabled=true;
+ try{
+  await api('/messages/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({body:text})});
+  el('customerMessageText').value='';
+  message('customerMessageStatus','تم إرسال رسالتك إلى الإدارة','success');
+ }catch(error){message('customerMessageStatus',error.message,'error')}
+ finally{button.disabled=false}
+}
+
 function updateCustomerMessageSelection(){
  const selectAll=el('selectAllCustomerMessages'),bulk=el('messageBulkBar');
  if(!selectAll||!bulk)return;
@@ -214,4 +240,4 @@ function setupCustomerNavigation(){
  el('customerNavDrawer').addEventListener('click',event=>{const button=event.target.closest('[data-customer-nav]');if(!button)return;closeCustomerNavigation();if(button.dataset.customerNav==='appointments')el('myAppointments').scrollIntoView({behavior:'smooth',block:'start'})});
  document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeCustomerNavigation();closeLogoutConfirmation()}});
 }
-document.addEventListener('DOMContentLoaded',async()=>{el('date').min=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});setupCustomerNavigation();el('enterButton').onclick=enterApp;el('loginButton').onclick=login;el('logoutButton').onclick=openLogoutConfirmation;el('cancelLogoutButton').onclick=closeLogoutConfirmation;el('confirmLogoutButton').onclick=logout;el('logoutConfirmDialog').addEventListener('click',event=>{if(event.target===el('logoutConfirmDialog'))closeLogoutConfirmation()});el('messagesButton').onclick=()=>{closeCustomerNavigation();openMessages()};el('customerRefreshButton').onclick=()=>{closeCustomerNavigation();refreshCustomerData()};el('closeMessages').onclick=closeMessages;el('feedbackPromptClose').onclick=dismissFeedbackPrompt;el('feedbackPromptLater').onclick=dismissFeedbackPrompt;el('feedbackPromptNow').onclick=openFeedbackFromPrompt;el('feedbackPrompt').addEventListener('click',event=>{if(event.target===el('feedbackPrompt'))dismissFeedbackPrompt()});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!el('feedbackPrompt').classList.contains('hidden'))dismissFeedbackPrompt()});el('messagesPanel').addEventListener('click',event=>{if(event.target===el('messagesPanel'))closeMessages()});el('messagesList').addEventListener('click',handleCustomerMessageAction);el('messagesList').addEventListener('change',event=>{const checkbox=event.target.closest('[data-message-select]');if(!checkbox)return;const id=String(checkbox.value);if(checkbox.checked)selectedCustomerMessageIds.add(id);else selectedCustomerMessageIds.delete(id);updateCustomerMessageSelection()});el('selectAllCustomerMessages').addEventListener('change',event=>{selectedCustomerMessageIds.clear();if(event.target.checked)customerMessages.forEach(item=>selectedCustomerMessageIds.add(String(item._id)));renderCustomerMessages()});el('deleteSelectedCustomerMessages').onclick=deleteSelectedCustomerMessages;navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='fadila-message'&&currentUser){loadMessages();loadFeedback()}});el('enableNotifications').onclick=enablePush;el('bookingToggle').onclick=()=>setBookingFormOpen(el('bookingToggle').getAttribute('aria-expanded')!=='true');setBookingFormOpen(false);el('service').onchange=loadSlots;el('date').onchange=loadSlots;el('bookButton').onclick=book;el('feedbackSubmit').onclick=submitFeedback;el('feedbackRating').addEventListener('click',event=>{const button=event.target.closest('.feedback-star');if(button)setFeedbackRating(button.dataset.rating)});setFeedbackRating(5);if(token()){try{const data=await api('/auth/me');sessionUser=data.user}catch{sessionUser=null}}});
+document.addEventListener('DOMContentLoaded',async()=>{el('date').min=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});setupCustomerNavigation();el('inAppMessageButton').onclick=openCustomerMessageComposer;el('closeCustomerMessage').onclick=closeCustomerMessageComposer;el('customerMessageSubmit').onclick=submitCustomerMessage;el('customerMessageComposer').addEventListener('click',event=>{if(event.target===el('customerMessageComposer'))closeCustomerMessageComposer()});el('enterButton').onclick=enterApp;el('loginButton').onclick=login;el('logoutButton').onclick=openLogoutConfirmation;el('cancelLogoutButton').onclick=closeLogoutConfirmation;el('confirmLogoutButton').onclick=logout;el('logoutConfirmDialog').addEventListener('click',event=>{if(event.target===el('logoutConfirmDialog'))closeLogoutConfirmation()});el('messagesButton').onclick=()=>{closeCustomerNavigation();openMessages()};el('customerRefreshButton').onclick=()=>{closeCustomerNavigation();refreshCustomerData()};el('closeMessages').onclick=closeMessages;el('feedbackPromptClose').onclick=dismissFeedbackPrompt;el('feedbackPromptLater').onclick=dismissFeedbackPrompt;el('feedbackPromptNow').onclick=openFeedbackFromPrompt;el('feedbackPrompt').addEventListener('click',event=>{if(event.target===el('feedbackPrompt'))dismissFeedbackPrompt()});document.addEventListener('keydown',event=>{if(event.key==='Escape'){if(!el('feedbackPrompt').classList.contains('hidden'))dismissFeedbackPrompt();if(!el('customerMessageComposer').classList.contains('hidden'))closeCustomerMessageComposer()}});el('messagesPanel').addEventListener('click',event=>{if(event.target===el('messagesPanel'))closeMessages()});el('messagesList').addEventListener('click',handleCustomerMessageAction);el('messagesList').addEventListener('change',event=>{const checkbox=event.target.closest('[data-message-select]');if(!checkbox)return;const id=String(checkbox.value);if(checkbox.checked)selectedCustomerMessageIds.add(id);else selectedCustomerMessageIds.delete(id);updateCustomerMessageSelection()});el('selectAllCustomerMessages').addEventListener('change',event=>{selectedCustomerMessageIds.clear();if(event.target.checked)customerMessages.forEach(item=>selectedCustomerMessageIds.add(String(item._id)));renderCustomerMessages()});el('deleteSelectedCustomerMessages').onclick=deleteSelectedCustomerMessages;navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='fadila-message'&&currentUser){loadMessages();loadFeedback()}});el('enableNotifications').onclick=enablePush;el('bookingToggle').onclick=()=>setBookingFormOpen(el('bookingToggle').getAttribute('aria-expanded')!=='true');setBookingFormOpen(false);el('service').onchange=loadSlots;el('date').onchange=loadSlots;el('bookButton').onclick=book;el('feedbackSubmit').onclick=submitFeedback;el('feedbackRating').addEventListener('click',event=>{const button=event.target.closest('.feedback-star');if(button)setFeedbackRating(button.dataset.rating)});setFeedbackRating(5);if(token()){try{const data=await api('/auth/me');sessionUser=data.user}catch{sessionUser=null}}});
