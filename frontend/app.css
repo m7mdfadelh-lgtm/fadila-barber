@@ -1446,6 +1446,54 @@
 }
 
 .instagram-float svg { width: 26px; height: 26px; }
+.in-app-message-float {
+  position: fixed;
+  left: max(18px, env(safe-area-inset-left));
+  bottom: calc(max(18px, env(safe-area-inset-bottom)) + 124px);
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1556b3, #2d88ed);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(23, 104, 209, .32);
+}
+.in-app-message-float svg { width: 26px; height: 26px; }
+.in-app-message-float:active { transform: scale(.96); }
+
+.customer-message-composer {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(9, 27, 51, .58);
+  backdrop-filter: blur(5px);
+}
+.customer-message-composer-card {
+  width: min(440px, 100%);
+  padding: 22px;
+  border: 1px solid rgba(184, 204, 228, .82);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(9, 27, 51, .26);
+}
+.customer-message-composer-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.customer-message-composer-header h2 { margin: 0 0 6px; color: #102a4c; }
+.customer-message-composer-header .muted { margin: 0; color: #718096; font-size: 13px; line-height: 1.6; }
+.customer-message-composer-close { width: 38px; height: 38px; min-height: 38px; padding: 0; border: 1px solid #dbe6f3; border-radius: 12px; background: #f7faff; color: #164f97; font-size: 25px; line-height: 1; box-shadow: none; }
+.customer-message-sender { margin: 18px 0 14px; color: #52657e; font-size: 14px; }
+.customer-message-sender strong { color: #102a4c; }
+.customer-message-composer-card label { display: block; margin-bottom: 8px; color: #233a59; font-size: 14px; font-weight: 700; }
+.customer-message-composer-card textarea { display: block; width: 100%; min-height: 130px; margin: 0 0 12px; padding: 12px 14px; border: 1px solid #dbe6f3; border-radius: 13px; background: #fbfdff; color: #102a4c; font: inherit; resize: vertical; }
+.customer-message-composer-card textarea:focus { outline: 3px solid rgba(23, 104, 209, .14); border-color: #1768d1; }
+.customer-message-composer-card > button:last-child { width: 100%; }
+
 .instagram-float:active { scale: .96; }
 
 
@@ -1914,3 +1962,25 @@
   .logout-confirm-actions { gap:8px; }
   .logout-confirm-actions button { padding:10px 8px; font-size:13px; }
 }
+
+/* Two-way customer and owner message conversations. */
+.conversation-panel{position:fixed;inset:0;z-index:9800;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));background:rgba(9,27,51,.62);backdrop-filter:blur(5px)}
+.conversation-card{display:flex;flex-direction:column;width:min(520px,100%);max-height:min(88dvh,760px);padding:20px;border:1px solid rgba(184,204,228,.82);border-radius:22px;background:#fff;box-shadow:0 24px 70px rgba(9,27,51,.26)}
+.conversation-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding-bottom:12px}
+.conversation-header h2{margin:0 0 5px;color:#102a4c;font-size:20px}
+.conversation-header .muted{margin:0;color:#718096;font-size:13px}
+.conversation-close{flex:0 0 38px;width:38px;height:38px;min-height:38px;padding:0;border:1px solid #dbe6f3;border-radius:12px;background:#f7faff;color:#164f97;font-size:25px;line-height:1;box-shadow:none}
+.conversation-messages{display:flex;flex-direction:column;gap:10px;min-height:140px;max-height:48dvh;overflow-y:auto;padding:12px;border:1px solid #e3ebf5;border-radius:16px;background:#f7faff}
+.conversation-message{width:fit-content;max-width:88%;padding:10px 12px;border:1px solid #dce8f4;border-radius:14px;background:#fff;overflow-wrap:anywhere}
+.conversation-message.mine{align-self:flex-start;border-color:#c7dcf7;background:#eaf3ff}
+.conversation-message.theirs{align-self:flex-end}
+.conversation-message-meta{display:flex;align-items:baseline;justify-content:space-between;gap:14px;color:#52657e;font-size:11px}
+.conversation-message-meta time{white-space:nowrap;color:#8794a5}
+.conversation-message p{margin:5px 0 0;color:#263b56;font-size:14px;line-height:1.55;white-space:pre-wrap}
+.conversation-card>label{display:block;margin:13px 0 6px;color:#233a59;font-size:14px;font-weight:700}
+.conversation-card>textarea{width:100%;min-height:78px;padding:10px 12px;border:1px solid #dbe6f3;border-radius:12px;background:#fbfdff;font:inherit;resize:vertical}
+.conversation-card>textarea:focus{outline:3px solid rgba(23,104,209,.14);border-color:#1768d1}
+.conversation-card>.message{margin:8px 0 0}
+.conversation-card>button:last-child{width:100%;margin-top:10px}
+.conversation-open{overflow:hidden}
+@media(max-width:520px){.conversation-card{max-height:92dvh;padding:16px}.conversation-messages{max-height:42dvh}}

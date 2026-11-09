@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="FADILA BARBER">
   <title>FADILA BARBER — المواعيد</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=55">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=57">
 </head>
 <body class="customer-page">
   <div id="installGate" class="gate hidden">
@@ -83,6 +83,7 @@
       
       
       <section id="myAppointments" class="card"><h2>مواعيدي</h2><div id="appointments" class="appointment-list"></div></section>
+      <button id="inAppMessageButton" class="in-app-message-float" type="button" aria-label="שליחת הודעה למנהל"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5.5h16v12H9l-5 3v-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 10h8M8 13.5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       <a class="instagram-float" href="https://www.instagram.com/fadila_barber?exln=MWttYjI2eGxzbmFyZg%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="افتح صفحة فاديلا على Instagram"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.7" r="1.2" fill="currentColor"/></svg></a>
       <a class="whatsapp-float" href="https://wa.me/972527533887" target="_blank" rel="noopener noreferrer" aria-label="فتح محادثة واتساب مع فاديلا"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3A13 13 0 0 0 4.8 22.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6c-2 0-3.9-.5-5.6-1.5l-.4-.2-3.9 1 1.1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-.9 1.2-.2.2-.4.2-.7.1-1.9-1-3.2-1.8-4.5-4-.3-.6.3-.6.9-1.3.1-.2.2-.4.3-.6.1-.2 0-.4 0-.6-.1-.2-.7-1.7-1-2.3-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-1 .5-1.1 1.1-1.6 2.4-1.5 3.8.2 1.7.9 3.4 2 4.7 1.8 2.6 4.2 4.6 7.1 5.6.9.3 2 .2 2.8-.2.8-.5 1.4-1.3 1.6-2.2.1-.4.1-.8 0-.9-.2-.2-.5-.3-.8-.4Z"/></svg></a>
     </div>
@@ -110,6 +111,24 @@
       <div id="messagesList" class="messages-list"></div>
     </div>
   </div>
+  <div id="customerMessageComposer" class="customer-message-composer hidden" role="dialog" aria-modal="true" aria-labelledby="customerMessageTitle">
+    <section class="customer-message-composer-card">
+      <div class="customer-message-composer-header"><div><h2 id="customerMessageTitle">שליחת הודעה</h2><p class="muted">ההודעה תישלח למנהל ותופיע ב״ההודעות שלי״.</p></div><button id="closeCustomerMessage" class="customer-message-composer-close" type="button" aria-label="סגירה">×</button></div>
+      <p class="customer-message-sender">נשלח בשם: <strong id="customerMessageSender"></strong></p>
+      <label for="customerMessageText">ההודעה שלך</label>
+      <textarea id="customerMessageText" maxlength="400" rows="5" placeholder="כתוב/י כאן הודעה למנהל"></textarea>
+      <p id="customerMessageStatus" class="message" aria-live="polite"></p>
+      <button id="customerMessageSubmit" type="button">שליחת הודעה</button>
+    </section>
+  </div>
+  <div id="customerConversationPanel" class="conversation-panel hidden" role="dialog" aria-modal="true" aria-labelledby="customerConversationTitle">
+    <section class="conversation-card">
+      <div class="conversation-header"><div><h2 id="customerConversationTitle">المحادثة مع الإدارة</h2><p id="customerConversationMeta" class="muted"></p></div><button id="closeCustomerConversation" class="conversation-close" type="button" aria-label="إغلاق المحادثة">×</button></div>
+      <div id="customerConversationMessages" class="conversation-messages"></div>
+      <label for="customerConversationReply">ردك</label><textarea id="customerConversationReply" maxlength="400" rows="3" placeholder="اكتب ردك هنا"></textarea>
+      <p id="customerConversationStatus" class="message" aria-live="polite"></p><button id="sendCustomerConversationReply" type="button">إرسال الرد</button>
+    </section>
+  </div>
   <div id="logoutConfirmDialog" class="logout-confirm-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
     <section class="logout-confirm-card">
       <div class="logout-confirm-icon" aria-hidden="true">↪</div>
@@ -121,5 +140,5 @@
       </div>
     </section>
   </div>
-  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=50"></script>
+  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=52"></script>
 </body></html>
