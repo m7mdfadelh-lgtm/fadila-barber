@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const pushService = require('../services/pushService');
 const User = require('../models/User');
+const Conversation = require('../models/Conversation');
+const crypto = require('crypto');
 const { protect, ownerOnly } = require('../middleware/authMiddleware');
 
 router.get('/public-key', protect, async (req, res) => res.json({ publicKey: await pushService.getPublicKey() }));
@@ -42,9 +44,23 @@ router.post('/send', protect, ownerOnly, async (req, res) => {
         return res.status(404).json({ success: false, error: 'لم يتم العثور على زبائن نشطين' });
       }
 
+      const threadBody = `${title}\n\n${body}`;
+      const conversations = await Conversation.insertMany(customers.map((customer) => ({
+        customer: customer._id,
+        messages: [{ sender: req.user._id, body: threadBody }]
+      })));
+      const conversationIds = Object.fromEntries(conversations.map((conversation) => [
+        conversation.customer.toString(),
+        conversation._id.toString()
+      ]));
       const result = await pushService.sendToUsers(
         customers.map((customer) => customer._id),
-        { title, body, url: './index.html', tag: `manual-all-${Date.now()}` }
+        {
+          title, body, url: './index.html',
+          tag: `manual-all-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
+          actionType: 'owner-message',
+          conversationIds
+        }
       );
 
       return res.json({
@@ -58,11 +74,17 @@ router.post('/send', protect, ownerOnly, async (req, res) => {
     const customer = await User.findOne({ _id: customerId, role: 'customer', active: true });
     if (!customer) return res.status(404).json({ success: false, error: 'لم يتم العثور على الزبون' });
 
+    const conversation = await Conversation.create({
+      customer: customer._id,
+      messages: [{ sender: req.user._id, body: `${title}\n\n${body}` }]
+    });
     const result = await pushService.sendToUser(customer._id, {
       title,
       body,
       url: './index.html',
-      tag: `manual-${customer._id}-${Date.now()}`
+      tag: `manual-${customer._id}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
+      actionType: 'owner-message',
+      conversationId: conversation._id
     });
 
     return res.json({
