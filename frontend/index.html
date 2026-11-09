@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="FADILA BARBER">
   <title>FADILA BARBER — المواعيد</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=56">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=57">
 </head>
 <body class="customer-page">
   <div id="installGate" class="gate hidden">
@@ -121,6 +121,14 @@
       <button id="customerMessageSubmit" type="button">שליחת הודעה</button>
     </section>
   </div>
+  <div id="customerConversationPanel" class="conversation-panel hidden" role="dialog" aria-modal="true" aria-labelledby="customerConversationTitle">
+    <section class="conversation-card">
+      <div class="conversation-header"><div><h2 id="customerConversationTitle">المحادثة مع الإدارة</h2><p id="customerConversationMeta" class="muted"></p></div><button id="closeCustomerConversation" class="conversation-close" type="button" aria-label="إغلاق المحادثة">×</button></div>
+      <div id="customerConversationMessages" class="conversation-messages"></div>
+      <label for="customerConversationReply">ردك</label><textarea id="customerConversationReply" maxlength="400" rows="3" placeholder="اكتب ردك هنا"></textarea>
+      <p id="customerConversationStatus" class="message" aria-live="polite"></p><button id="sendCustomerConversationReply" type="button">إرسال الرد</button>
+    </section>
+  </div>
   <div id="logoutConfirmDialog" class="logout-confirm-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
     <section class="logout-confirm-card">
       <div class="logout-confirm-icon" aria-hidden="true">↪</div>
@@ -132,5 +140,5 @@
       </div>
     </section>
   </div>
-  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=51"></script>
+  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=52"></script>
 </body></html>
