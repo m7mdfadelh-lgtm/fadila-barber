@@ -133,6 +133,14 @@
   </div>
 </div>
 <div id="ownerMessagesPanel" class="owner-messages-panel hidden" role="dialog" aria-modal="true" aria-labelledby="ownerMessagesTitle"><div class="owner-messages-card"><div class="owner-messages-header"><h2 id="ownerMessagesTitle">رسائل صاحب المحل</h2><div class="owner-messages-header-actions"><button id="closeOwnerMessages" class="secondary compact" type="button">إغلاق</button></div></div><div id="messageBulkBar" class="message-bulk-bar hidden"><label><input id="selectAllMessages" type="checkbox"> اختيار الكل</label><span id="selectedMessagesCount">0 محددة</span><button id="deleteSelectedMessages" type="button" class="danger compact" disabled>حذف المحدد</button></div><div id="ownerMessagesList" class="messages-list"></div></div></div>
+<div id="ownerConversationPanel" class="conversation-panel hidden" role="dialog" aria-modal="true" aria-labelledby="ownerConversationTitle">
+  <section class="conversation-card">
+    <div class="conversation-header"><div><h2 id="ownerConversationTitle">محادثة العميل</h2><p id="ownerConversationMeta" class="muted"></p></div><button id="closeOwnerConversation" class="conversation-close" type="button" aria-label="إغلاق المحادثة">×</button></div>
+    <div id="ownerConversationMessages" class="conversation-messages"></div>
+    <label for="ownerConversationReply">الرد</label><textarea id="ownerConversationReply" maxlength="400" rows="3" placeholder="اكتب ردك للعميل"></textarea>
+    <p id="ownerConversationStatus" class="message" aria-live="polite"></p><button id="sendOwnerConversationReply" type="button">إرسال الرد</button>
+  </section>
+</div>
 <div id="logoutConfirmDialog" class="logout-confirm-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
     <section class="logout-confirm-card">
       <div class="logout-confirm-icon" aria-hidden="true">↪</div>
@@ -144,5 +152,5 @@
       </div>
     </section>
   </div>
-<script src="config.js?v=43"></script><script src="pwa.js?v=43"></script><script src="dashboard.js?v=62"></script>
+<script src="config.js?v=43"></script><script src="pwa.js?v=43"></script><script src="dashboard.js?v=63"></script>
 </body></html>
