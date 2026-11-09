@@ -1638,46 +1638,58 @@
 }
 
 
-/* Compact customer work gallery preview. */
-.customer-page .customer-gallery-card { padding: 14px 16px; }
+/* Customer work gallery preview, styled to match the booking page. */
+.customer-page .customer-gallery-card {
+  padding: 20px;
+  border: 1.5px solid #d5e2f5;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(17, 65, 135, .07);
+}
 .customer-page .customer-gallery-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 .customer-page .customer-gallery-heading h2 {
   margin: 0;
   color: var(--app-navy);
-  font-size: 17px;
+  font-size: clamp(20px, 5vw, 25px);
+  line-height: 1.3;
 }
 .customer-page .customer-gallery-heading p {
-  margin: 3px 0 0;
+  margin: 5px 0 0;
   color: #718096;
-  font-size: 12px;
+  font-size: 13px;
 }
 .customer-page .customer-gallery-all {
   flex: 0 0 auto;
   color: #0f4ea8;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 750;
   text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
 }
 .customer-page .customer-gallery-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
 }
 .customer-page .customer-gallery-grid img {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
-  border-radius: 11px;
+  border-radius: 15px;
   background: #f2f7fd;
   object-fit: cover;
 }
-@media (max-width: 360px) {
-  .customer-page .customer-gallery-card { padding: 12px; }
+@media (max-width: 420px) {
+  .customer-page .customer-gallery-card { padding: 16px; border-radius: 19px; }
+  .customer-page .customer-gallery-grid { gap: 7px; }
+  .customer-page .customer-gallery-grid img { border-radius: 12px; }
+}
   .customer-page .customer-gallery-grid { gap: 6px; }
 }
