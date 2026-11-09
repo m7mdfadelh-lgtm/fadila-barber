@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const Message = require('../models/Message');
 const Conversation = require('../models/Conversation');
+const User = require('../models/User');
 const Appointment = require('../models/Appointment');
 const { protect } = require('../middleware/authMiddleware');
 const pushService = require('../services/pushService');
@@ -88,11 +89,41 @@ router.post('/conversations/:id/replies', async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
-  const [data, unreadCount] = await Promise.all([
-    Message.find({ user: req.user._id }).sort({ createdAt: -1 }).lean(),
-    Message.countDocuments({ user: req.user._id, readAt: null })
-  ]);
-  res.json({ success: true, data, unreadCount });
+  try {
+    if (req.user.role === 'customer') {
+      const legacyMessages = await Message.find({
+        user: req.user._id,
+        conversationId: null,
+        tag: /^manual(?:-all)?-/i
+      }).sort({ createdAt: 1 }).lean();
+      if (legacyMessages.length) {
+        const owner = await User.findOne({ role: 'owner', active: true }).select('_id').lean();
+        if (owner) {
+          for (const item of legacyMessages) {
+            const conversation = await Conversation.create({
+              customer: req.user._id,
+              messages: [{ sender: owner._id, body: `${item.title}\n\n${item.body}` }]
+            });
+            const linked = await Message.findOneAndUpdate(
+              { _id: item._id, user: req.user._id, conversationId: null },
+              { $set: { conversationId: conversation._id, actionType: 'owner-message' } },
+              { new: true }
+            ).select('_id').lean();
+            if (!linked) await Conversation.deleteOne({ _id: conversation._id });
+          }
+        }
+      }
+    }
+
+    const [data, unreadCount] = await Promise.all([
+      Message.find({ user: req.user._id }).sort({ createdAt: -1 }).lean(),
+      Message.countDocuments({ user: req.user._id, readAt: null })
+    ]);
+    res.json({ success: true, data, unreadCount });
+  } catch (error) {
+    console.error('Messages load failed:', error);
+    res.status(500).json({ success: false, error: 'تعذر تحميل الرسائل الآن' });
+  }
 });
 
 
