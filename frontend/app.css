@@ -1773,7 +1773,7 @@
 }
 .customer-page .customer-nav-item > span { width:24px; text-align:center; font-size:18px; }
 .customer-page #messagesButton { position:relative; }
-.customer-page #messagesButton .messages-badge { margin-right:auto; }
+.customer-page #messagesButton .messages-badge { margin:0; }
 .customer-page .customer-nav-notifications { margin:2px 0; padding:13px; border-radius:14px; box-shadow:none; }
 .customer-page .customer-nav-notifications h2 { margin-bottom:5px; font-size:16px; }
 .customer-page .customer-nav-notifications p { margin:0; font-size:13px; line-height:1.5; }
@@ -1781,4 +1781,38 @@
 @media (max-width:480px) {
   .customer-page .app-header { padding-right:54px; padding-left:54px; }
   .customer-page .customer-menu-button { right:5px; }
+}
+
+
+/* Customer message management controls. */
+.customer-messages-title { display:flex; align-items:center; gap:10px; min-width:0; }
+.customer-messages-title h2 { margin:0; }
+.messages-unread-count { display:inline-flex; align-items:center; white-space:nowrap; padding:5px 9px; border-radius:999px; background:#e8f1ff; color:#0f4ea8; font-size:12px; font-weight:750; }
+.customer-message-bulk-bar {
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:12px 0;
+  padding:11px 12px; border:1px solid #d8e1ee; border-radius:13px; background:#f5f8fc;
+}
+.customer-message-bulk-bar label { display:flex; align-items:center; gap:8px; margin:0; color:#344054; font-size:13px; font-weight:700; }
+.customer-message-bulk-bar input[type="checkbox"], .customer-message-select input[type="checkbox"] { width:18px; height:18px; margin:0; accent-color:#1769d2; }
+.customer-message-bulk-bar > span { flex:1; color:#667085; font-size:12px; }
+.customer-message-bulk-bar button { width:auto; min-height:38px; padding:8px 12px; }
+.customer-message-item { position:relative; padding:14px; border:1px solid #d8e1ee; border-radius:15px; background:#fff; }
+.customer-message-item.unread { border-right:4px solid #1769d2; background:#f7faff; }
+.customer-message-top { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+.customer-message-select { display:inline-flex; align-items:center; justify-content:center; margin:0; cursor:pointer; }
+.customer-message-status { display:inline-flex; align-items:center; gap:5px; padding:4px 9px; border-radius:999px; font-size:11px; font-weight:750; }
+.customer-message-status.is-unread { background:#e5efff; color:#0f4ea8; }
+.customer-message-status.is-read { background:#f0f2f5; color:#667085; }
+.customer-message-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.customer-message-heading h3 { margin:0; color:#1d2939; font-size:16px; }
+.customer-message-heading time { flex:0 0 auto; color:#667085; font-size:11px; }
+.customer-message-item > p { margin:8px 0 12px; color:#475467; line-height:1.6; white-space:pre-wrap; overflow-wrap:anywhere; }
+.customer-message-actions { display:flex; flex-wrap:wrap; gap:8px; border-top:1px solid #eef2f7; padding-top:10px; }
+.customer-message-actions button { flex:1 1 130px; width:auto; min-height:40px; padding:8px 10px; font-size:13px; }
+@media (max-width:420px) {
+  .customer-message-bulk-bar { gap:8px; }
+  .customer-message-heading { display:block; }
+  .customer-message-heading time { display:block; margin-top:4px; }
+  .customer-messages-title { gap:6px; }
+  .messages-unread-count { padding:4px 7px; font-size:11px; }
 }
