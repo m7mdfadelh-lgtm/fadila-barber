@@ -1,5 +1,5 @@
 const API_URL=window.FADILA_API_URL;
-const el=id=>document.getElementById(id);let currentUser=null,sessionUser=null,customerServices=[],customerAppointments=[],appointmentArchiveTimer=null,selectedFeedbackRating=5;
+const el=id=>document.getElementById(id);let currentUser=null,sessionUser=null,customerServices=[],customerAppointments=[],appointmentArchiveTimer=null,selectedFeedbackRating=5,customerFeedback=[],customerFeedbackLoaded=false;
 const token=()=>localStorage.getItem('token');
 const api=async(path,options={})=>{options.headers={...(options.headers||{}),...(token()?{Authorization:`Bearer ${token()}`}:{})};const response=await fetch(`${API_URL}${path}`,options);const data=await response.json().catch(()=>({}));if(response.status===401)logout();if(!response.ok)throw new Error(data.error||'حدث خطأ');return data};
 function message(id,text,type=''){el(id).textContent=text;el(id).className=`message ${type}`}
@@ -7,8 +7,8 @@ async function login(){try{const data=await api('/auth/login',{method:'POST',hea
 async function syncExistingPushSubscription(){try{if(!token()||!('serviceWorker'in navigator)||!('PushManager'in window)||!('Notification'in window)||Notification.permission!=='granted')return;const registration=await navigator.serviceWorker.ready,subscription=await registration.pushManager.getSubscription();if(subscription)await api('/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription})})}catch(error){console.error('Push account sync failed:',error)}}
 async function logout(){if(appointmentArchiveTimer){clearTimeout(appointmentArchiveTimer);appointmentArchiveTimer=null}const savedToken=token();try{if(savedToken&&'serviceWorker'in navigator){const registration=await navigator.serviceWorker.ready,subscription=await registration.pushManager.getSubscription();if(subscription)await fetch(`${API_URL}/push/subscribe`,{method:'DELETE',headers:{Authorization:`Bearer ${savedToken}`,'Content-Type':'application/json'},body:JSON.stringify({endpoint:subscription.endpoint}),keepalive:true})}}catch(error){console.error('Push logout cleanup failed:',error)}finally{localStorage.removeItem('token');location.href='index.html'}}
 async function enterApp(){const welcome=el('welcomeView');welcome.classList.add('welcome-leaving');await new Promise(resolve=>setTimeout(resolve,360));welcome.classList.add('hidden');el('appContent').classList.remove('hidden');if(sessionUser){if(sessionUser.role==='owner'){sessionStorage.setItem('skipDashboardIntro','1');return location.href='dashboard.html'}return showCustomer(sessionUser)}el('loginView').classList.remove('hidden')}
-async function showCustomer(user){currentUser=user;el('loginView').classList.add('hidden');el('customerView').classList.remove('hidden');el('messagesButton').classList.remove('hidden');el('customerRefreshButton').classList.remove('hidden');el('customerHeaderActions').classList.remove('hidden');el('welcome').textContent=`مرحباً ${user.name}`;await syncExistingPushSubscription();el('feedbackName').value=user.name||'';await Promise.all([loadServices(),loadAppointments(),loadMessages(),loadFeedback()]);updateNotificationState()}
-async function refreshCustomerData(){const button=el('customerRefreshButton');button.disabled=true;button.classList.add('is-refreshing');try{await Promise.all([loadServices(),loadAppointments(),loadMessages(),loadFeedback()])}catch(error){alert(error.message)}finally{button.disabled=false;button.classList.remove('is-refreshing')}}
+async function showCustomer(user){currentUser=user;el('loginView').classList.add('hidden');el('customerView').classList.remove('hidden');el('messagesButton').classList.remove('hidden');el('customerRefreshButton').classList.remove('hidden');el('customerHeaderActions').classList.remove('hidden');el('welcome').textContent=`مرحباً ${user.name}`;await syncExistingPushSubscription();el('feedbackName').value=user.name||'';await Promise.all([loadServices(),loadAppointments(),loadMessages(),loadFeedback(),loadGalleryPreview()]);updateNotificationState();maybeShowFeedbackPrompt()}
+async function refreshCustomerData(){const button=el('customerRefreshButton');button.disabled=true;button.classList.add('is-refreshing');try{await Promise.all([loadServices(),loadAppointments(),loadMessages(),loadFeedback(),loadGalleryPreview()]);maybeShowFeedbackPrompt()}catch(error){alert(error.message)}finally{button.disabled=false;button.classList.remove('is-refreshing')}}
 function setBookingFormOpen(open){
   const fields=el('bookingFields'),button=el('bookingToggle');
   fields.classList.toggle('hidden',!open);
@@ -19,6 +19,28 @@ function setBookingFormOpen(open){
   el('bookingCard')?.classList.toggle('is-open',open);
 }
 async function loadServices(){customerServices=await api('/services');el('service').innerHTML='<option value="">اختر خدمة</option>'+customerServices.map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)} — ₪${s.price}</option>`).join('')}
+function isSafeGalleryImage(value){return /^data:image\/(?:jpe?g|png|webp|gif);base64,[A-Za-z0-9+/]+={0,2}$/.test(String(value||''))}
+async function loadGalleryPreview(){
+  const section=el('customerGallerySection'),grid=el('customerGalleryPreview');
+  if(!section||!grid)return;
+  try{
+    const images=await api('/gallery');
+    const validImages=Array.isArray(images)?images.filter(item=>isSafeGalleryImage(item?.image)):[];
+    grid.replaceChildren();
+    validImages.slice(0,3).forEach((item,index)=>{
+      const image=document.createElement('img');
+      image.src=item.image;
+      image.alt='صورة '+(index+1)+' من أعمال فاديلا';
+      image.loading='lazy';
+      image.decoding='async';
+      grid.appendChild(image);
+    });
+    section.classList.toggle('hidden',validImages.length===0);
+  }catch(error){
+    section.classList.add('hidden');
+    console.error('Gallery preview load failed:',error);
+  }
+}
 async function loadSlots(){const date=el('date').value,service=el('service').value;if(!date||!service)return;const data=await api(`/appointments/available/${date}?service=${encodeURIComponent(service)}`);el('time').innerHTML='<option value="">اختر ساعة</option>'+data.availableSlots.map(t=>`<option>${t}</option>`).join('');el('time').disabled=!data.availableSlots.length}
 async function book(){try{await api('/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:el('service').value,date:el('date').value,time:el('time').value,notes:el('bookingNotes').value.trim()})});message('bookingMessage','تم إرسال الطلب إلى صاحب المحل','success');el('bookingNotes').value='';await loadAppointments()}catch(error){message('bookingMessage',error.message,'error')}}
 async function loadAppointments(){
@@ -55,6 +77,8 @@ function setFeedbackRating(rating){
   });
 }
 function renderFeedback(data){
+  customerFeedback=Array.isArray(data.data)?data.data:[];
+  customerFeedbackLoaded=true;
   const average=Number(data.averageRating)||0,count=Number(data.ratingCount)||0;
   el('feedbackAverageValue').textContent=count?average.toFixed(1):'—';
   const filled=count?Math.max(1,Math.min(5,Math.round(average))):0;
@@ -62,6 +86,31 @@ function renderFeedback(data){
   el('feedbackCount').textContent=`${count} تقييم`;
   el('feedbackList').innerHTML=data.data.length?data.data.map(item=>`<article class="feedback-item"><div class="feedback-item-heading"><strong>${escapeHtml(item.displayName)}</strong><span class="feedback-item-stars" aria-label="${item.rating} من 5">${'★'.repeat(item.rating)}${'☆'.repeat(5-item.rating)}</span></div><time>${new Date(item.createdAt).toLocaleDateString('ar',{timeZone:'Asia/Jerusalem'})}</time><p>${escapeHtml(item.text)}</p></article>`).join(''):'<p class="muted feedback-empty">كن أول من يشارك رأيه.</p>';
 }
+function maybeShowFeedbackPrompt(){
+  const prompt=el('feedbackPrompt');
+  if(!prompt||!currentUser?.id||!customerFeedbackLoaded)return;
+  const customerId=String(currentUser.id);
+  const hasFeedback=customerFeedback.some(item=>String(item.user?._id||item.user?.id||item.user)===customerId);
+  if(hasFeedback){prompt.classList.add('hidden');document.body.classList.remove('feedback-prompt-open');return}
+  const hasCompletedVisit=customerAppointments.some(appointment=>appointment.status==='completed');
+  let dismissed=false;
+  try{dismissed=sessionStorage.getItem('feedbackPromptDismissed:'+customerId)==='1'}catch(error){console.warn('Feedback prompt state unavailable:',error)}
+  if(!hasCompletedVisit||dismissed)return;
+  prompt.classList.remove('hidden');
+  document.body.classList.add('feedback-prompt-open');
+  el('feedbackPromptNow')?.focus({preventScroll:true});
+}
+function dismissFeedbackPrompt(){
+  el('feedbackPrompt')?.classList.add('hidden');
+  document.body.classList.remove('feedback-prompt-open');
+  if(currentUser?.id){try{sessionStorage.setItem('feedbackPromptDismissed:'+String(currentUser.id),'1')}catch(error){console.warn('Feedback prompt state unavailable:',error)}}
+}
+function openFeedbackFromPrompt(){
+  dismissFeedbackPrompt();
+  document.querySelector('.customer-feedback-card')?.scrollIntoView({block:'center'});
+  el('feedbackRating')?.querySelector('.feedback-star')?.focus({preventScroll:true});
+}
+
 async function loadFeedback(){
   try{const data=await api('/feedback');renderFeedback(data)}
   catch(error){console.error('Feedback load failed:',error);if(el('feedbackMessage'))message('feedbackMessage','تعذر تحميل التقييمات حالياً','error')}
@@ -83,4 +132,4 @@ async function submitFeedback(){
 async function loadMessages(){try{const data=await api('/messages');el('messagesBadge').textContent=data.unreadCount>99?'99+':String(data.unreadCount);el('messagesBadge').classList.toggle('hidden',!data.unreadCount);el('messagesList').innerHTML=data.data.length?data.data.map(item=>`<article class="message-item ${item.readAt?'':'unread'}"><div><h3>${escapeHtml(item.title)}</h3><time>${new Date(item.createdAt).toLocaleString('ar',{timeZone:'Asia/Jerusalem'})}</time></div><p>${escapeHtml(item.body)}</p></article>`).join(''):'<p class="muted empty-messages">لا توجد رسائل بعد</p>'}catch(error){console.error('Messages load failed:',error)}}
 async function openMessages(){await loadMessages();el('messagesPanel').classList.remove('hidden');document.body.classList.add('messages-open');try{await api('/messages/read-all',{method:'PUT'});el('messagesBadge').classList.add('hidden');el('messagesList').querySelectorAll('.unread').forEach(item=>item.classList.remove('unread'))}catch(error){console.error('Mark messages read failed:',error)}}
 function closeMessages(){el('messagesPanel').classList.add('hidden');document.body.classList.remove('messages-open')}
-document.addEventListener('DOMContentLoaded',async()=>{el('date').min=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});el('enterButton').onclick=enterApp;el('loginButton').onclick=login;el('logoutButton').onclick=logout;el('messagesButton').onclick=openMessages;el('customerRefreshButton').onclick=refreshCustomerData;el('closeMessages').onclick=closeMessages;el('messagesPanel').addEventListener('click',event=>{if(event.target===el('messagesPanel'))closeMessages()});navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='fadila-message'&&currentUser){loadMessages();loadFeedback()}});el('enableNotifications').onclick=enablePush;el('bookingToggle').onclick=()=>setBookingFormOpen(el('bookingToggle').getAttribute('aria-expanded')!=='true');setBookingFormOpen(false);el('service').onchange=loadSlots;el('date').onchange=loadSlots;el('bookButton').onclick=book;el('feedbackSubmit').onclick=submitFeedback;el('feedbackRating').addEventListener('click',event=>{const button=event.target.closest('.feedback-star');if(button)setFeedbackRating(button.dataset.rating)});setFeedbackRating(5);if(token()){try{const data=await api('/auth/me');sessionUser=data.user}catch{sessionUser=null}}});
+document.addEventListener('DOMContentLoaded',async()=>{el('date').min=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});el('enterButton').onclick=enterApp;el('loginButton').onclick=login;el('logoutButton').onclick=logout;el('messagesButton').onclick=openMessages;el('customerRefreshButton').onclick=refreshCustomerData;el('closeMessages').onclick=closeMessages;el('feedbackPromptClose').onclick=dismissFeedbackPrompt;el('feedbackPromptLater').onclick=dismissFeedbackPrompt;el('feedbackPromptNow').onclick=openFeedbackFromPrompt;el('feedbackPrompt').addEventListener('click',event=>{if(event.target===el('feedbackPrompt'))dismissFeedbackPrompt()});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!el('feedbackPrompt').classList.contains('hidden'))dismissFeedbackPrompt()});el('messagesPanel').addEventListener('click',event=>{if(event.target===el('messagesPanel'))closeMessages()});navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='fadila-message'&&currentUser){loadMessages();loadFeedback()}});el('enableNotifications').onclick=enablePush;el('bookingToggle').onclick=()=>setBookingFormOpen(el('bookingToggle').getAttribute('aria-expanded')!=='true');setBookingFormOpen(false);el('service').onchange=loadSlots;el('date').onchange=loadSlots;el('bookButton').onclick=book;el('feedbackSubmit').onclick=submitFeedback;el('feedbackRating').addEventListener('click',event=>{const button=event.target.closest('.feedback-star');if(button)setFeedbackRating(button.dataset.rating)});setFeedbackRating(5);if(token()){try{const data=await api('/auth/me');sessionUser=data.user}catch{sessionUser=null}}});
