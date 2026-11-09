@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#0f4ea8"><meta name="apple-mobile-web-app-capable" content="yes">
   <title>Fadila — الإدارة</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=58">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=60">
 </head>
 <body class="owner-page">
 <div id="installGate" class="gate hidden"><div class="gate-card"><img src="images/Logo.png"><h1>تثبيت التطبيق</h1><p>يجب إضافة التطبيق إلى الشاشة الرئيسية للمتابعة.</p><button id="installButton" class="hidden">ثبّت الآن</button><div id="iosInstructions" class="install-guide hidden"><strong>iPhone / iPad</strong><ol><li>افتح الموقع في Safari.</li><li>اضغط زر المشاركة <b>□↑</b>.</li><li>اختر «إضافة إلى الشاشة الرئيسية» ثم «إضافة».</li></ol></div><div id="androidInstructions" class="install-guide hidden"><strong>Android</strong><ol><li>افتح الموقع في Chrome.</li><li>اضغط قائمة المتصفح <b>⋮</b>.</li><li>اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» ثم وافق.</li></ol></div><p class="muted">بعد التثبيت، افتح Fadila من الأيقونة الجديدة.</p></div></div>
@@ -18,7 +18,11 @@
 </section>
 
 <main id="ownerAppContent" class="app-shell owner-content hidden">
-  <header class="app-header"><button id="ownerMenuButton" class="owner-menu-button" type="button" aria-label="فتح قائمة الإدارة" aria-expanded="false"><span></span><span></span><span></span></button><button id="ownerRefreshButton" class="data-refresh-button" type="button" aria-label="تحديث البيانات"><span aria-hidden="true">↻</span><span>تحديث</span></button><img src="images/Logo.png"><div><h1>إدارة Fadila</h1><button id="logout" class="secondary compact">تسجيل الخروج</button></div></header>
+  <header class="app-header">
+    <button id="ownerMenuButton" class="owner-menu-button" type="button" aria-label="فتح قائمة الإدارة" aria-expanded="false"><span></span><span></span><span></span></button>
+    <button id="ownerRefreshButton" class="data-refresh-button" type="button" aria-label="تحديث البيانات"><span aria-hidden="true">↻</span><span>تحديث</span></button>
+    <div class="owner-brand-heading"><img src="images/Logo.png" alt="Fadila Barber"><h1>لوحة الإدارة</h1></div>
+  </header>
 
   
 
@@ -94,6 +98,7 @@
   <button type="button" data-owner-target="create-customer"><span>⊕</span> إنشاء حساب زبون</button>
   <button type="button" data-owner-target="one-off-reminders"><span>◉</span> تذكير الزبائن</button>
   <button type="button" data-owner-target="gallery"><span>▧</span> معرض الأعمال</button>
+  <button id="logout" class="owner-nav-logout" type="button"><span aria-hidden="true">↪</span> تسجيل الخروج</button>
 </nav>
 <div id="timelineModal" class="timeline-modal hidden" role="dialog" aria-modal="true" aria-labelledby="timelineTitle">
   <div class="timeline-modal-card">
