@@ -1984,3 +1984,16 @@
 .conversation-card>button:last-child{width:100%;margin-top:10px}
 .conversation-open{overflow:hidden}
 @media(max-width:520px){.conversation-card{max-height:92dvh;padding:16px}.conversation-messages{max-height:42dvh}}
+
+/* Keep the customer's unread badge separate from the messages label. */
+.customer-page #messagesButton { gap: 12px; }
+.customer-page #messagesButton .customer-nav-item-label {
+  width: auto;
+  flex: 0 1 auto;
+  text-align: right;
+  white-space: nowrap;
+}
+.customer-page #messagesButton .messages-badge {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+}
