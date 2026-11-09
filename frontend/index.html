@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="FADILA BARBER">
   <title>FADILA BARBER — المواعيد</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=54">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=55">
 </head>
 <body class="customer-page">
   <div id="installGate" class="gate hidden">
@@ -110,5 +110,16 @@
       <div id="messagesList" class="messages-list"></div>
     </div>
   </div>
-  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=49"></script>
+  <div id="logoutConfirmDialog" class="logout-confirm-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
+    <section class="logout-confirm-card">
+      <div class="logout-confirm-icon" aria-hidden="true">↪</div>
+      <h2 id="logoutConfirmTitle">هل أنت متأكد من تسجيل الخروج؟</h2>
+      <p>يمكنك البقاء في التطبيق أو تسجيل الخروج الآن.</p>
+      <div class="logout-confirm-actions">
+        <button id="cancelLogoutButton" class="secondary" type="button">لا، البقاء</button>
+        <button id="confirmLogoutButton" class="danger" type="button">نعم، تسجيل الخروج</button>
+      </div>
+    </section>
+  </div>
+  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=50"></script>
 </body></html>

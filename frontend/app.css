@@ -1854,3 +1854,63 @@
 }
 .owner-page .app-header { min-height:112px; }
 @media (max-width:480px) { .owner-page .app-header { min-height:96px; } }
+
+
+/* Owner overview home screen. */
+.owner-page .owner-overview { padding:20px; }
+.owner-page .owner-overview-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.owner-page .owner-overview-heading h2 { margin:0; color:#0f4ea8; font-size:23px; }
+.owner-page .owner-overview-heading p { margin:5px 0 0; }
+.owner-page .owner-overview-greeting { color:#344054; font-size:14px; font-weight:700; }
+.owner-page .owner-overview-stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.owner-page .owner-overview-stat { display:flex; align-items:center; gap:12px; min-height:90px; padding:15px; border:1px solid #d5e2f5; border-radius:16px; background:linear-gradient(135deg,#fff,#f7faff); }
+.owner-page .owner-overview-icon { display:grid; place-items:center; flex:0 0 46px; width:46px; height:46px; border-radius:14px; background:#e9f2ff; color:#0f4ea8; font-size:23px; font-weight:800; }
+.owner-page .owner-overview-stat > div { display:grid; gap:5px; min-width:0; }
+.owner-page .owner-overview-stat small { color:#667085; font-size:12px; line-height:1.4; }
+.owner-page .owner-overview-stat strong { color:#102a54; font-size:28px; line-height:1; }
+.owner-page .owner-overview-quick { margin-top:22px; }
+.owner-page .owner-overview-quick h3 { margin:0 0 11px; color:#17345d; font-size:16px; }
+.owner-page .owner-overview-quick-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.owner-page .owner-overview-quick-grid button { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; min-height:98px; padding:12px 8px; border-radius:15px; background:linear-gradient(145deg,#1769d2,#0f397d); font-size:13px; line-height:1.35; }
+.owner-page .owner-overview-quick-grid button span { font-size:25px; line-height:1; }
+.owner-page .owner-overview-next { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:18px; padding:16px; border:1px solid #d5e2f5; border-radius:16px; background:#fff; }
+.owner-page .owner-overview-next > div { display:grid; gap:5px; min-width:0; }
+.owner-page .owner-overview-next small { color:#0f4ea8; font-weight:750; }
+.owner-page .owner-overview-next strong { color:#172b4d; font-size:17px; }
+.owner-page .owner-overview-next span { color:#667085; font-size:13px; }
+.owner-page .owner-overview-next time { flex:0 0 auto; color:#0f4ea8; font-weight:750; }
+@media (max-width:420px) {
+  .owner-page .owner-overview { padding:16px; }
+  .owner-page .owner-overview-stat { gap:9px; min-height:82px; padding:11px; }
+  .owner-page .owner-overview-icon { flex-basis:40px; width:40px; height:40px; font-size:20px; }
+  .owner-page .owner-overview-stat small { font-size:11px; }
+  .owner-page .owner-overview-stat strong { font-size:25px; }
+  .owner-page .owner-overview-quick-grid { gap:7px; }
+  .owner-page .owner-overview-quick-grid button { min-height:88px; font-size:12px; }
+  .owner-page .owner-overview-next { padding:13px; }
+}
+
+
+/* Confirm before signing out from either app view. */
+.logout-confirm-overlay {
+  position:fixed; inset:0; z-index:9700; display:grid; place-items:center;
+  padding:20px; background:rgba(10,25,48,.48); backdrop-filter:blur(3px);
+}
+.logout-confirm-card {
+  width:min(100%,420px); padding:24px; border:1px solid #d8e1ee; border-radius:20px;
+  background:#fff; box-shadow:0 24px 64px rgba(10,35,75,.24); text-align:center;
+}
+.logout-confirm-icon {
+  display:grid; place-items:center; width:50px; height:50px; margin:0 auto 12px;
+  border-radius:16px; background:#fff1f0; color:#b42318; font-size:26px;
+}
+.logout-confirm-card h2 { margin:0 0 8px; color:#17345d; font-size:20px; }
+.logout-confirm-card p { margin:0; color:#667085; line-height:1.6; }
+.logout-confirm-actions { display:flex; gap:10px; margin-top:22px; }
+.logout-confirm-actions button { flex:1; width:auto; min-height:46px; }
+.logout-confirm-open { overflow:hidden; }
+@media (max-width:420px) {
+  .logout-confirm-card { padding:20px; }
+  .logout-confirm-actions { gap:8px; }
+  .logout-confirm-actions button { padding:10px 8px; font-size:13px; }
+}

@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#0f4ea8"><meta name="apple-mobile-web-app-capable" content="yes">
   <title>Fadila — الإدارة</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=62">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=64">
 </head>
 <body class="owner-page">
 <div id="installGate" class="gate hidden"><div class="gate-card"><img src="images/Logo.png"><h1>تثبيت التطبيق</h1><p>يجب إضافة التطبيق إلى الشاشة الرئيسية للمتابعة.</p><button id="installButton" class="hidden">ثبّت الآن</button><div id="iosInstructions" class="install-guide hidden"><strong>iPhone / iPad</strong><ol><li>افتح الموقع في Safari.</li><li>اضغط زر المشاركة <b>□↑</b>.</li><li>اختر «إضافة إلى الشاشة الرئيسية» ثم «إضافة».</li></ol></div><div id="androidInstructions" class="install-guide hidden"><strong>Android</strong><ol><li>افتح الموقع في Chrome.</li><li>اضغط قائمة المتصفح <b>⋮</b>.</li><li>اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» ثم وافق.</li></ol></div><p class="muted">بعد التثبيت، افتح Fadila من الأيقونة الجديدة.</p></div></div>
@@ -26,7 +26,29 @@
 
   
 
-  <section class="card collapsible-card owner-dashboard-panel owner-feedback-card" data-section="feedback" data-owner-panel="feedback" id="ownerPanel-feedback">
+
+  <section id="ownerOverview" class="card owner-dashboard-panel owner-overview" data-owner-panel="overview" aria-labelledby="ownerOverviewTitle">
+    <div class="owner-overview-heading"><div><h2 id="ownerOverviewTitle">نظرة عامة</h2><p id="ownerOverviewDate" class="muted"></p></div><span class="owner-overview-greeting">مرحباً، فاديلا</span></div>
+    <div class="owner-overview-stats">
+      <article class="owner-overview-stat"><span class="owner-overview-icon" aria-hidden="true">▣</span><div><small>مواعيد اليوم</small><strong id="overviewTodayCount">0</strong></div></article>
+      <article class="owner-overview-stat"><span class="owner-overview-icon" aria-hidden="true">◷</span><div><small>طلبات بانتظار التأكيد</small><strong id="overviewPendingCount">0</strong></div></article>
+      <article class="owner-overview-stat"><span class="owner-overview-icon" aria-hidden="true">✉</span><div><small>رسائل غير مقروءة</small><strong id="overviewUnreadCount">0</strong></div></article>
+      <article class="owner-overview-stat"><span class="owner-overview-icon" aria-hidden="true">★</span><div><small>تقييمات العملاء</small><strong id="overviewFeedbackCount">0</strong></div></article>
+    </div>
+    <div class="owner-overview-quick">
+      <h3>إجراءات سريعة</h3>
+      <div class="owner-overview-quick-grid">
+        <button type="button" data-overview-target="appointments"><span aria-hidden="true">▣</span> عرض المواعيد</button>
+        <button type="button" data-overview-target="customer-notification"><span aria-hidden="true">♧</span> إرسال إشعار</button>
+        <button type="button" data-overview-target="gallery"><span aria-hidden="true">▧</span> معرض الأعمال</button>
+      </div>
+    </div>
+    <article class="owner-overview-next">
+      <div><small>الموعد القادم</small><strong id="overviewNextName">جارٍ تحميل المواعيد...</strong><span id="overviewNextService"></span></div>
+      <time id="overviewNextTime"></time>
+    </article>
+  </section>
+  <section class="card collapsible-card owner-dashboard-panel owner-feedback-card hidden" data-section="feedback" data-owner-panel="feedback" id="ownerPanel-feedback">
     <div class="section-heading"><h2>تقييمات العملاء</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم تقييمات العملاء">−</button></div>
     <div class="section-content"><p id="ownerFeedbackSummary" class="muted">تحميل التقييمات...</p><div id="ownerFeedbackList" class="owner-feedback-list"></div><p id="ownerFeedbackMessage" class="message" aria-live="polite"></p></div>
   </section>
@@ -88,6 +110,7 @@
   <button id="ownerMessagesButton" class="owner-nav-messages" type="button" aria-label="الرسائل">
   <span class="owner-nav-messages-icon" aria-hidden="true">✉</span><span class="owner-nav-messages-label">الرسائل</span><b id="ownerMessagesBadge" class="messages-badge hidden">0</b>
 </button>
+  <button type="button" data-owner-target="overview"><span>⌂</span> نظرة عامة</button>
   <button type="button" data-owner-target="feedback"><span>★</span> تقييمات العملاء</button>
   <button type="button" data-owner-target="appointments"><span>▣</span> المواعيد</button>
   <button type="button" data-owner-target="create-appointment"><span>＋</span> حجز موعد لزبون</button>
@@ -110,5 +133,16 @@
   </div>
 </div>
 <div id="ownerMessagesPanel" class="owner-messages-panel hidden" role="dialog" aria-modal="true" aria-labelledby="ownerMessagesTitle"><div class="owner-messages-card"><div class="owner-messages-header"><h2 id="ownerMessagesTitle">رسائل صاحب المحل</h2><div class="owner-messages-header-actions"><button id="closeOwnerMessages" class="secondary compact" type="button">إغلاق</button></div></div><div id="messageBulkBar" class="message-bulk-bar hidden"><label><input id="selectAllMessages" type="checkbox"> اختيار الكل</label><span id="selectedMessagesCount">0 محددة</span><button id="deleteSelectedMessages" type="button" class="danger compact" disabled>حذف المحدد</button></div><div id="ownerMessagesList" class="messages-list"></div></div></div>
-<script src="config.js?v=43"></script><script src="pwa.js?v=43"></script><script src="dashboard.js?v=60"></script>
+<div id="logoutConfirmDialog" class="logout-confirm-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="logoutConfirmTitle">
+    <section class="logout-confirm-card">
+      <div class="logout-confirm-icon" aria-hidden="true">↪</div>
+      <h2 id="logoutConfirmTitle">هل أنت متأكد من تسجيل الخروج؟</h2>
+      <p>يمكنك البقاء في التطبيق أو تسجيل الخروج الآن.</p>
+      <div class="logout-confirm-actions">
+        <button id="cancelLogoutButton" class="secondary" type="button">لا، البقاء</button>
+        <button id="confirmLogoutButton" class="danger" type="button">نعم، تسجيل الخروج</button>
+      </div>
+    </section>
+  </div>
+<script src="config.js?v=43"></script><script src="pwa.js?v=43"></script><script src="dashboard.js?v=62"></script>
 </body></html>
