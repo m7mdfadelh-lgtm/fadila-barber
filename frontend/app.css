@@ -1829,3 +1829,12 @@
 .owner-page .owner-nav-messages-label { color:inherit; }
 .owner-page .owner-nav-messages .messages-badge { margin:0; }
 
+
+/* Keep sign-out separated at the bottom of the owner navigation. */
+.owner-page .owner-nav-logout {
+  width:100%; min-height:46px; display:flex; align-items:center; justify-content:flex-start; gap:12px;
+  margin-top:auto; padding:10px 13px; border:1px solid #f4d6d3; border-radius:12px;
+  background:#fff8f7; color:#b42318; text-align:right; font-size:14px; font-weight:750; box-shadow:none;
+}
+.owner-page .owner-nav-logout > span { width:30px; flex:0 0 30px; text-align:center; font-size:20px; }
+.owner-page .owner-nav-logout:hover { background:#fde9e7; }
