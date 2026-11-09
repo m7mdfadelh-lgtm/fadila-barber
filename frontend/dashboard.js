@@ -228,7 +228,7 @@ function setupOwnerNavigation(){
  $('ownerMenuButton').addEventListener('click',()=>{if($('ownerNavDrawer').classList.contains('is-open'))closeOwnerNavigation();else openOwnerNavigation()});
  $('ownerNavClose').addEventListener('click',closeOwnerNavigation);$('ownerNavBackdrop').addEventListener('click',closeOwnerNavigation);
  $('ownerNavDrawer').addEventListener('click',event=>{const button=event.target.closest('[data-owner-target]');if(button)selectOwnerPanel(button.dataset.ownerTarget)});
- $('ownerOverview').addEventListener('click',event=>{const button=event.target.closest('[data-overview-target]');if(button)selectOwnerPanel(button.dataset.overviewTarget)});
+ $('ownerOverview').addEventListener('click',event=>{if(event.target.closest('[data-overview-messages]')){openOwnerMessages();return}const button=event.target.closest('[data-overview-target]');if(button)selectOwnerPanel(button.dataset.overviewTarget)});
  document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeOwnerNavigation();closeLogoutConfirmation();if(!$('ownerConversationPanel').classList.contains('hidden'))closeOwnerConversation()}});
  selectOwnerPanel('overview')
 }

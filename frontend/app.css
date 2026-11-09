@@ -1997,3 +1997,23 @@
   flex: 0 0 auto;
   margin-inline-start: auto;
 }
+
+/* Make dashboard summary cards behave as clear, accessible buttons. */
+.owner-page button.owner-overview-stat {
+  width: 100%;
+  min-height: 90px;
+  text-align: right;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.owner-page .owner-overview-stat-copy { display: grid; gap: 5px; min-width: 0; }
+.owner-page button.owner-overview-stat:hover {
+  border-color: #aac8ed;
+  box-shadow: 0 8px 20px rgba(23, 104, 209, .1);
+  transform: translateY(-1px);
+}
+.owner-page button.owner-overview-stat:focus-visible {
+  outline: 3px solid rgba(23, 104, 209, .38);
+  outline-offset: 2px;
+}
