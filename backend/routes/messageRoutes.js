@@ -2,8 +2,39 @@ const router = require('express').Router();
 const Message = require('../models/Message');
 const Appointment = require('../models/Appointment');
 const { protect } = require('../middleware/authMiddleware');
+const pushService = require('../services/pushService');
+const crypto = require('crypto');
 
 router.use(protect);
+
+router.post('/contact', async (req, res) => {
+  if (req.user.role !== 'customer') {
+    return res.status(403).json({ success: false, error: 'هذه الخدمة مخصصة للعملاء' });
+  }
+
+  const text = String(req.body.body || '').trim();
+  if (!text || text.length > 400) {
+    return res.status(400).json({ success: false, error: 'اكتب رسالة لا تتجاوز 400 حرف' });
+  }
+
+  const sender = [req.user.name, req.user.phone].filter(Boolean).join(' · ').slice(0, 90);
+  const title = 'رسالة جديدة من عميل';
+  const body = `من ${sender || 'عميل'}:\n${text}`;
+  const tag = `customer-message-${req.user._id}-${Date.now()}-${crypto.randomBytes(5).toString('hex')}`;
+
+  try {
+    const result = await pushService.sendToOwners({
+      title,
+      body,
+      url: './dashboard.html',
+      tag
+    });
+    return res.json({ success: true, notificationSent: result.sent > 0 });
+  } catch (error) {
+    console.error('Customer message delivery failed:', error);
+    return res.status(500).json({ success: false, error: 'تعذر إرسال الرسالة الآن' });
+  }
+});
 
 router.get('/', async (req, res) => {
   const [data, unreadCount] = await Promise.all([
