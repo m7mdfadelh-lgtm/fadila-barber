@@ -52,7 +52,7 @@ exports.sendToUsers = async (userIds, payload) => {
   const tag = String(payload.tag || `message-${Date.now()}`);
   await Promise.all(validUserIds.map((user) => Message.updateOne(
     { user, tag },
-    { $setOnInsert: { user, tag, title: String(payload.title || 'إشعار جديد'), body: String(payload.messageBody || payload.body || ''), url: String(payload.url || './index.html'), appointment: payload.appointmentId || null, actionType: String(payload.actionType || ''), conversationId: payload.conversationId || null } },
+    { $setOnInsert: { user, tag, title: String(payload.title || 'إشعار جديد'), body: String(payload.messageBody || payload.body || ''), url: String(payload.url || './index.html'), appointment: payload.appointmentId || null, actionType: String(payload.actionType || ''), conversationId: payload.conversationIds?.[String(user)] || payload.conversationId || null } },
     { upsert: true }
   )));
   await configure();
