@@ -7,10 +7,24 @@ router.use(protect);
 
 router.get('/', async (req, res) => {
   const [data, unreadCount] = await Promise.all([
-    Message.find({ user: req.user._id }).sort({ createdAt: -1 }).limit(100).lean(),
+    Message.find({ user: req.user._id }).sort({ createdAt: -1 }).lean(),
     Message.countDocuments({ user: req.user._id, readAt: null })
   ]);
   res.json({ success: true, data, unreadCount });
+});
+
+
+router.put('/:id/read', async (req, res) => {
+  if (!/^[a-f0-9]{24}$/i.test(String(req.params.id)) || typeof req.body.read !== 'boolean') {
+    return res.status(400).json({ success: false, error: 'بيانات القراءة غير صالحة' });
+  }
+  const updated = await Message.findOneAndUpdate(
+    { _id: req.params.id, user: req.user._id },
+    { $set: { readAt: req.body.read ? new Date() : null } },
+    { new: true }
+  ).select('_id readAt').lean();
+  if (!updated) return res.status(404).json({ success: false, error: 'لم يتم العثور على الرسالة' });
+  res.json({ success: true, data: updated });
 });
 
 router.put('/read-all', async (req, res) => {
