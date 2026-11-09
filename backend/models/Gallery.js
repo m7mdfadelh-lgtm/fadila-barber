@@ -8,6 +8,9 @@ const gallerySchema = new mongoose.Schema({
   contentType: {
     type: String,
     required: true
+  },
+  order: {
+    type: Number
   }
 }, { timestamps: true });
 

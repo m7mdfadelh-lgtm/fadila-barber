@@ -1693,3 +1693,49 @@
 }
   .customer-page .customer-gallery-grid { gap: 6px; }
 }
+
+
+/* Owner dashboard navigation drawer and single-panel layout. */
+.owner-page .app-header { position: relative; min-height: 88px; padding: 0 54px; }
+.owner-page .owner-menu-button {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  width: 42px; height: 42px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  border: 1px solid #d8e1ee; border-radius: 12px; background: #fff; color: #0f4ea8; box-shadow: none; padding: 8px;
+}
+.owner-page .owner-menu-button span { display:block; width:21px; height:2.5px; border-radius:4px; background:#0f4ea8; }
+.owner-page .owner-nav-backdrop { position:fixed; inset:0; z-index:7998; background:rgba(11,25,48,.42); }
+.owner-page .owner-nav-drawer {
+  position:fixed; z-index:7999; top:0; right:0; bottom:0; width:min(86vw,360px); overflow-y:auto;
+  padding: max(18px,env(safe-area-inset-top)) 16px max(22px,env(safe-area-inset-bottom));
+  background:#fff; box-shadow:-14px 0 38px rgba(11,35,75,.2); transform:translateX(105%); transition:transform .22s ease;
+  display:flex; flex-direction:column; gap:5px; visibility:hidden;
+}
+.owner-page .owner-nav-drawer.is-open { transform:translateX(0); visibility:visible; }
+.owner-page .owner-nav-heading { display:flex; align-items:center; justify-content:space-between; padding:4px 3px 14px; border-bottom:1px solid #e6edf7; margin-bottom:5px; }
+.owner-page .owner-nav-heading h2 { margin:0; color:#0f4ea8; font-size:20px; }
+.owner-page .owner-nav-close { width:38px; height:38px; padding:0; border-radius:12px; background:#f3f7fc; color:#0f4ea8; font-size:26px; line-height:1; box-shadow:none; }
+.owner-page .owner-nav-drawer > button[data-owner-target] {
+  width:100%; display:flex; align-items:center; gap:13px; text-align:right; min-height:48px;
+  padding:10px 12px; border:0; border-radius:12px; background:transparent; color:#28364a; box-shadow:none; font-size:15px; font-weight:700;
+}
+.owner-page .owner-nav-drawer > button[data-owner-target] > span {
+  width:30px; flex:0 0 30px; text-align:center; color:#0f4ea8; font-size:20px;
+}
+.owner-page .owner-nav-drawer > button[data-owner-target]:hover,
+.owner-page .owner-nav-drawer > button[data-owner-target][aria-current="page"] { background:#eaf3ff; color:#0f4ea8; }
+.owner-page .owner-dashboard-panel .section-heading { margin-bottom:12px; }
+.owner-page .owner-dashboard-panel .section-heading .collapse-button { display:none; }
+.owner-page .owner-gallery-list { display:grid; gap:14px; margin-top:16px; }
+.owner-page .owner-gallery-item { overflow:hidden; border:1px solid #d8e1ee; border-radius:16px; background:#fff; }
+.owner-page .owner-gallery-item > img { display:block; width:100%; aspect-ratio:4/3; object-fit:cover; background:#f2f7fd; }
+.owner-page .owner-gallery-controls { display:flex; align-items:center; gap:9px; padding:10px; }
+.owner-page .owner-gallery-controls button { min-width:42px; }
+.owner-page .owner-gallery-position { flex:1; color:#667085; font-size:13px; }
+.owner-page .owner-gallery-controls button:disabled { opacity:.45; cursor:default; }
+.owner-page .owner-gallery-empty { padding:18px; border:1px dashed #c8d6e8; border-radius:14px; text-align:center; }
+.owner-page.owner-nav-open { overflow:hidden; }
+@media (max-width:480px) {
+  .owner-page .app-header { padding:0 48px; }
+  .owner-page .owner-menu-button { right:4px; }
+  .owner-page .owner-gallery-controls { gap:6px; padding:8px; }
+}

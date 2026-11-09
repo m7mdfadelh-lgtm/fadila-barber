@@ -106,7 +106,81 @@ async function openOwnerMessages(){await refreshOwnerMessages();$('ownerMessages
 function closeOwnerMessages(){$('ownerMessagesPanel').classList.add('hidden');document.body.classList.remove('messages-open')}
 function showOwnerApp(){const welcome=$('ownerWelcomeView');welcome.classList.add('welcome-leaving');setTimeout(()=>{welcome.classList.add('hidden');$('ownerAppContent').classList.remove('hidden')},360)}
 function setupCollapsibleSections(){document.querySelectorAll('.collapsible-card').forEach(card=>{const key=`owner-section-${card.dataset.section}`,button=card.querySelector('.collapse-button');const setCollapsed=collapsed=>{card.classList.toggle('is-collapsed',collapsed);button.textContent=collapsed?'+':'−';button.setAttribute('aria-expanded',String(!collapsed));button.setAttribute('aria-label',`${collapsed?'فتح':'طي'} ${card.querySelector('h2').textContent}`)};setCollapsed(localStorage.getItem(key)==='collapsed');button.addEventListener('click',()=>{const collapsed=!card.classList.contains('is-collapsed');setCollapsed(collapsed);localStorage.setItem(key,collapsed?'collapsed':'open')})})}
+
+let galleryAdminItems=[];
+function renderOwnerGallery(){
+ const container=$('galleryAdminList');
+ if(!container)return;
+ container.replaceChildren();
+ if(!galleryAdminItems.length){const empty=document.createElement('p');empty.className='owner-gallery-empty muted';empty.textContent='لا توجد صور في المعرض بعد. أضف صوراً لتظهر للعملاء.';container.appendChild(empty);return}
+ galleryAdminItems.forEach((item,index)=>{
+  const card=document.createElement('article');card.className='owner-gallery-item';
+  const image=document.createElement('img');image.alt='صورة '+(index+1)+' من أعمال المحل';image.loading='lazy';image.decoding='async';
+  image.src=/^data:image\/(?:jpe?g|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(String(item.image||''))?item.image:'';
+  const controls=document.createElement('div');controls.className='owner-gallery-controls';
+  const remove=document.createElement('button');remove.type='button';remove.className='danger compact';remove.dataset.galleryDelete=String(item._id);remove.textContent='حذف';
+  const position=document.createElement('span');position.className='owner-gallery-position';position.textContent='الصورة '+(index+1);
+  const up=document.createElement('button');up.type='button';up.className='secondary compact';up.dataset.galleryMove=String(item._id);up.dataset.direction='-1';up.disabled=index===0;up.setAttribute('aria-label','تحريك الصورة للأعلى');up.textContent='↑';
+  const down=document.createElement('button');down.type='button';down.className='secondary compact';down.dataset.galleryMove=String(item._id);down.dataset.direction='1';down.disabled=index===galleryAdminItems.length-1;down.setAttribute('aria-label','تحريك الصورة للأسفل');down.textContent='↓';
+  controls.append(remove,position,up,down);card.append(image,controls);container.appendChild(card);
+ });
+}
+async function loadOwnerGallery(){
+ try{galleryAdminItems=await api('/gallery');if(!Array.isArray(galleryAdminItems))galleryAdminItems=[];renderOwnerGallery()}
+ catch(error){msg('galleryAdminMessage',error.message,'error')}
+}
+async function saveOwnerGalleryOrder(){
+ try{await api('/gallery/reorder',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageIds:galleryAdminItems.map(item=>String(item._id))})});msg('galleryAdminMessage','تم حفظ ترتيب الصور','success')}
+ catch(error){msg('galleryAdminMessage',error.message,'error');await loadOwnerGallery()}
+}
+async function uploadOwnerGalleryFiles(fileList){
+ const files=Array.from(fileList||[]);if(!files.length)return;
+ const invalid=files.find(file=>!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>8*1024*1024);
+ if(invalid){msg('galleryAdminMessage','اختر صور JPG أو PNG أو WebP بحجم لا يتجاوز 8 ميغابايت للصورة','error');return}
+ const button=$('galleryUploadButton');button.disabled=true;
+ try{
+  for(let i=0;i<files.length;i++){msg('galleryAdminMessage','جارٍ رفع الصورة '+(i+1)+' من '+files.length+'...');const form=new FormData();form.append('image',files[i]);await api('/gallery',{method:'POST',body:form})}
+  await loadOwnerGallery();msg('galleryAdminMessage','تمت إضافة الصور إلى المعرض','success')
+ }catch(error){msg('galleryAdminMessage',error.message,'error')}
+ finally{button.disabled=false;$('galleryUploadInput').value=''}
+}
+async function deleteOwnerGalleryImage(id){
+ const item=galleryAdminItems.find(image=>String(image._id)===String(id));if(!item||!confirm('هل تريد حذف هذه الصورة من المعرض؟'))return;
+ try{await api('/gallery/'+encodeURIComponent(id),{method:'DELETE'});galleryAdminItems=galleryAdminItems.filter(image=>String(image._id)!==String(id));renderOwnerGallery();await saveOwnerGalleryOrder();msg('galleryAdminMessage','تم حذف الصورة','success')}
+ catch(error){msg('galleryAdminMessage',error.message,'error')}
+}
+async function moveOwnerGalleryImage(id,direction){
+ const from=galleryAdminItems.findIndex(image=>String(image._id)===String(id)),to=from+Number(direction);if(from<0||to<0||to>=galleryAdminItems.length)return;
+ [galleryAdminItems[from],galleryAdminItems[to]]=[galleryAdminItems[to],galleryAdminItems[from]];renderOwnerGallery();await saveOwnerGalleryOrder()
+}
+function closeOwnerNavigation(){
+ $('ownerNavDrawer').classList.remove('is-open');$('ownerNavDrawer').setAttribute('aria-hidden','true');$('ownerNavBackdrop').classList.add('hidden');$('ownerMenuButton').setAttribute('aria-expanded','false');document.body.classList.remove('owner-nav-open')
+}
+function openOwnerNavigation(){
+ $('ownerNavDrawer').classList.add('is-open');$('ownerNavDrawer').setAttribute('aria-hidden','false');$('ownerNavBackdrop').classList.remove('hidden');$('ownerMenuButton').setAttribute('aria-expanded','true');document.body.classList.add('owner-nav-open')
+}
+function selectOwnerPanel(name){
+ const panel=document.querySelector('[data-owner-panel="'+name+'"]');if(!panel)return;
+ document.querySelectorAll('[data-owner-panel]').forEach(item=>item.classList.toggle('hidden',item!==panel));
+ panel.classList.remove('is-collapsed');const collapseButton=panel.querySelector('.collapse-button');if(collapseButton){collapseButton.textContent='−';collapseButton.setAttribute('aria-expanded','true');localStorage.setItem('owner-section-'+name,'open')}
+ document.querySelectorAll('[data-owner-target]').forEach(button=>{if(button.dataset.ownerTarget===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current')});
+ localStorage.setItem('owner-active-panel',name);closeOwnerNavigation();window.scrollTo({top:0,behavior:'smooth'});
+ if(name==='gallery')loadOwnerGallery()
+}
+function setupOwnerNavigation(){
+ $('ownerMenuButton').addEventListener('click',()=>{if($('ownerNavDrawer').classList.contains('is-open'))closeOwnerNavigation();else openOwnerNavigation()});
+ $('ownerNavClose').addEventListener('click',closeOwnerNavigation);$('ownerNavBackdrop').addEventListener('click',closeOwnerNavigation);
+ $('ownerNavDrawer').addEventListener('click',event=>{const button=event.target.closest('[data-owner-target]');if(button)selectOwnerPanel(button.dataset.ownerTarget)});
+ document.addEventListener('keydown',event=>{if(event.key==='Escape')closeOwnerNavigation()});
+ const available=[...document.querySelectorAll('[data-owner-target]')].map(button=>button.dataset.ownerTarget),saved=localStorage.getItem('owner-active-panel');
+ selectOwnerPanel(available.includes(saved)?saved:'feedback')
+}
+function setupOwnerGallery(){
+ $('galleryUploadButton').addEventListener('click',()=>$('galleryUploadInput').click());
+ $('galleryUploadInput').addEventListener('change',event=>uploadOwnerGalleryFiles(event.target.files));
+ $('galleryAdminList').addEventListener('click',event=>{const remove=event.target.closest('[data-gallery-delete]'),move=event.target.closest('[data-gallery-move]');if(remove)deleteOwnerGalleryImage(remove.dataset.galleryDelete);else if(move)moveOwnerGalleryImage(move.dataset.galleryMove,move.dataset.direction)})
+}
 document.addEventListener('input',event=>{if(event.target.id==='notificationCustomerSearch')renderCustomerSelectors();if(event.target.id==='manageCustomerSearch')renderCustomersManagement()});
 document.addEventListener('change',event=>{if(event.target.id==='manageCustomerSelect')renderCustomersManagement()});
 document.addEventListener('click',event=>{if(event.target.closest('#confirmMoveDate'))confirmMoveDate();if(event.target.closest('#cancelMoveDate'))closeMoveDatePanel()});
-document.addEventListener('DOMContentLoaded',async()=>{setupCollapsibleSections();$('ownerEnterButton').onclick=showOwnerApp;if(sessionStorage.getItem('skipDashboardIntro')==='1'){sessionStorage.removeItem('skipDashboardIntro');$('ownerWelcomeView').classList.add('hidden');$('ownerAppContent').classList.remove('hidden')}$('filterDate').value=getTodayInJerusalem();$('overrideStartDate').min=getTodayInJerusalem();$('overrideEndDate').min=getTodayInJerusalem();$('overrideStartDate').onchange=()=>{$('overrideEndDate').min=$('overrideStartDate').value||getTodayInJerusalem();if($('overrideEndDate').value&&$('overrideEndDate').value<$('overrideStartDate').value)$('overrideEndDate').value=$('overrideStartDate').value};updateAppointmentFilterControls();try{const me=await api('/auth/me');if(me.user.role!=='owner')location.href='index.html';await Promise.all([loadCustomers(),loadServices(),loadHours(),loadFeedback()]);await loadAppointments();await loadOwnerMessages()}catch(e){console.error(e)}$('logout').onclick=()=>{localStorage.removeItem('token');location.href='index.html'};$('ownerMessagesButton').onclick=openOwnerMessages;$('closeOwnerMessages').onclick=closeOwnerMessages;$('ownerMessagesPanel').addEventListener('click',event=>{if(event.target===$('ownerMessagesPanel'))closeOwnerMessages()});navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='fadila-message')refreshOwnerMessages()});$('createCustomer').onclick=createCustomer;$('addService').onclick=addService;$('cancelServiceEdit').onclick=cancelServiceEdit;$('manualCustomer').onchange=updateManualCustomerFields;$('manualService').onchange=loadSlots;$('manualDate').onchange=loadSlots;$('createAppointment').onclick=createAppointment;$('filterDate').onchange=()=>{updateAppointmentFilterControls();renderAppointments();decorateAllAppointmentDates()};$('showAllAppointments').onclick=toggleAllAppointments;$('timelineEditorButton').onclick=openTimeline;$('closeTimeline').onclick=closeTimeline;$('applyTimelineChanges').onclick=applyTimelineChanges;$('timelineModal').addEventListener('click',event=>{if(event.target===$('timelineModal'))closeTimeline()});$('saveHours').onclick=saveHours;$('newDateOverride').onclick=startNewDateOverride;$('saveDateOverride').onclick=saveDateOverride;$('removeDateOverride').onclick=removeDateOverride;$('selectAllMessages').onchange=toggleAllMessages;$('deleteSelectedMessages').onclick=deleteSelectedMessages;$('enableNotifications').onclick=enablePush;$('sendCustomerNotification').onclick=sendCustomerNotification});
+document.addEventListener('DOMContentLoaded',async()=>{setupCollapsibleSections();setupOwnerNavigation();setupOwnerGallery();$('ownerEnterButton').onclick=showOwnerApp;if(sessionStorage.getItem('skipDashboardIntro')==='1'){sessionStorage.removeItem('skipDashboardIntro');$('ownerWelcomeView').classList.add('hidden');$('ownerAppContent').classList.remove('hidden')}$('filterDate').value=getTodayInJerusalem();$('overrideStartDate').min=getTodayInJerusalem();$('overrideEndDate').min=getTodayInJerusalem();$('overrideStartDate').onchange=()=>{$('overrideEndDate').min=$('overrideStartDate').value||getTodayInJerusalem();if($('overrideEndDate').value&&$('overrideEndDate').value<$('overrideStartDate').value)$('overrideEndDate').value=$('overrideStartDate').value};updateAppointmentFilterControls();try{const me=await api('/auth/me');if(me.user.role!=='owner')location.href='index.html';await Promise.all([loadCustomers(),loadServices(),loadHours(),loadFeedback()]);await loadAppointments();await loadOwnerMessages()}catch(e){console.error(e)}$('logout').onclick=()=>{localStorage.removeItem('token');location.href='index.html'};$('ownerMessagesButton').onclick=openOwnerMessages;$('closeOwnerMessages').onclick=closeOwnerMessages;$('ownerMessagesPanel').addEventListener('click',event=>{if(event.target===$('ownerMessagesPanel'))closeOwnerMessages()});navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='fadila-message')refreshOwnerMessages()});$('createCustomer').onclick=createCustomer;$('addService').onclick=addService;$('cancelServiceEdit').onclick=cancelServiceEdit;$('manualCustomer').onchange=updateManualCustomerFields;$('manualService').onchange=loadSlots;$('manualDate').onchange=loadSlots;$('createAppointment').onclick=createAppointment;$('filterDate').onchange=()=>{updateAppointmentFilterControls();renderAppointments();decorateAllAppointmentDates()};$('showAllAppointments').onclick=toggleAllAppointments;$('timelineEditorButton').onclick=openTimeline;$('closeTimeline').onclick=closeTimeline;$('applyTimelineChanges').onclick=applyTimelineChanges;$('timelineModal').addEventListener('click',event=>{if(event.target===$('timelineModal'))closeTimeline()});$('saveHours').onclick=saveHours;$('newDateOverride').onclick=startNewDateOverride;$('saveDateOverride').onclick=saveDateOverride;$('removeDateOverride').onclick=removeDateOverride;$('selectAllMessages').onchange=toggleAllMessages;$('deleteSelectedMessages').onclick=deleteSelectedMessages;$('enableNotifications').onclick=enablePush;$('sendCustomerNotification').onclick=sendCustomerNotification});
