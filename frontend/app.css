@@ -1816,3 +1816,16 @@
   .customer-messages-title { gap:6px; }
   .messages-unread-count { padding:4px 7px; font-size:11px; }
 }
+
+
+/* Owner message entry in the hamburger menu. */
+.owner-page .owner-nav-messages {
+  width:100%; min-height:48px; display:flex; align-items:center; justify-content:flex-start; gap:13px;
+  margin:0 0 5px; padding:10px 12px; border:1px solid #d8e1ee; border-radius:12px;
+  background:#fff; color:#28364a; text-align:right; font-size:15px; font-weight:700; box-shadow:none;
+}
+.owner-page .owner-nav-messages:hover { background:#eaf3ff; color:#0f4ea8; }
+.owner-page .owner-nav-messages-icon { width:30px; flex:0 0 30px; color:#0f4ea8; font-size:20px; text-align:center; }
+.owner-page .owner-nav-messages-label { color:inherit; }
+.owner-page .owner-nav-messages .messages-badge { margin:0; }
+
