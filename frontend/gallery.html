@@ -6,6 +6,35 @@
   <title>معرض الأعمال — Fadila Barber</title>
   <link rel="stylesheet" href="style.css">
   <style>
+
+    .gallery-return-bar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: flex-start;
+      padding: 10px 16px;
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid #d8e1ee;
+      backdrop-filter: blur(10px);
+    }
+
+    .gallery-return-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 15px;
+      border: 1px solid #bfd3eb;
+      border-radius: 12px;
+      background: #fff;
+      color: #164f97;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 5px 14px rgba(23,104,209,.1);
+    }
+
     /* ===== Gallery Grid ===== */
     .gallery-grid {
       display: grid;
@@ -86,6 +115,8 @@
 </head>
 
 <body>
+<div class="gallery-return-bar"><button type="button" class="gallery-return-button" onclick="returnToBooking()"><span aria-hidden="true">↩</span> العودة للحجز</button></div>
+
 
 <header>
   <a href="index.html" class="logo-link">
@@ -155,7 +186,7 @@ async function loadGallery() {
   }
 }
 
-function closeModal() {
+function returnToBooking() {\n  try {\n    const referrer = document.referrer ? new URL(document.referrer) : null;\n    if (referrer && referrer.origin === location.origin && history.length > 1) {\n      history.back();\n      return;\n    }\n  } catch (error) {\n    console.warn('Could not return to the previous page:', error);\n  }\n  location.href = 'index.html';\n}\n\nfunction closeModal() {
   if (modal) modal.classList.remove("active");
 }
 
