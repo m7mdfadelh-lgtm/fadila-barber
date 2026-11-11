@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#0f4ea8"><meta name="apple-mobile-web-app-capable" content="yes">
   <title>Fadila — الإدارة</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=66">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=67">
 </head>
 <body class="owner-page">
 <div id="installGate" class="gate hidden"><div class="gate-card"><img src="images/Logo.png"><h1>تثبيت التطبيق</h1><p>يجب إضافة التطبيق إلى الشاشة الرئيسية للمتابعة.</p><button id="installButton" class="hidden">ثبّت الآن</button><div id="iosInstructions" class="install-guide hidden"><strong>iPhone / iPad</strong><ol><li>افتح الموقع في Safari.</li><li>اضغط زر المشاركة <b>□↑</b>.</li><li>اختر «إضافة إلى الشاشة الرئيسية» ثم «إضافة».</li></ol></div><div id="androidInstructions" class="install-guide hidden"><strong>Android</strong><ol><li>افتح الموقع في Chrome.</li><li>اضغط قائمة المتصفح <b>⋮</b>.</li><li>اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية» ثم وافق.</li></ol></div><p class="muted">بعد التثبيت، افتح Fadila من الأيقونة الجديدة.</p></div></div>
@@ -33,8 +33,8 @@
       <button type="button" class="owner-overview-stat" data-overview-target="appointments" aria-label="فتح مواعيد اليوم">
         <span class="owner-overview-icon" aria-hidden="true">▣</span><span class="owner-overview-stat-copy"><small>مواعيد اليوم</small><strong id="overviewTodayCount">0</strong></span>
       </button>
-      <button type="button" class="owner-overview-stat" data-overview-target="appointments" data-overview-filter="pending" aria-label="عرض طلبات التأكيد المعلقة">
-        <span class="owner-overview-icon" aria-hidden="true">◷</span><span class="owner-overview-stat-copy"><small>طلبات بانتظار التأكيد</small><strong id="overviewPendingCount">0</strong></span>
+      <button type="button" class="owner-overview-stat" data-overview-regular-customers="true" aria-label="عرض العملاء المعتادين للحجز حسب اليوم">
+        <span class="owner-overview-icon" aria-hidden="true">◷</span><span class="owner-overview-stat-copy"><small>زبائن يكررون الحجز</small><strong id="overviewRegularCustomersCount">0</strong><span id="overviewRegularCustomersDay" class="owner-overview-stat-day"></span></span>
       </button>
       <button type="button" class="owner-overview-stat" data-overview-messages="true" aria-label="فتح الرسائل غير المقروءة">
         <span class="owner-overview-icon" aria-hidden="true">✉</span><span class="owner-overview-stat-copy"><small>رسائل غير مقروءة</small><strong id="overviewUnreadCount">0</strong></span>
@@ -56,6 +56,17 @@
       <time id="overviewNextTime"></time>
     </article>
   </section>
+  <div id="regularCustomersModal" class="regular-customers-modal hidden" role="dialog" aria-modal="true" aria-labelledby="regularCustomersTitle">
+    <section class="regular-customers-card">
+      <header class="regular-customers-header">
+        <div><h2 id="regularCustomersTitle">الزبائن المعتادون</h2><p id="regularCustomersDayHeading" class="muted"></p></div>
+        <button id="closeRegularCustomers" class="secondary compact" type="button" aria-label="إغلاق القائمة">إغلاق</button>
+      </header>
+      <label class="regular-customers-day-picker">اليوم المختار<select id="regularCustomersDaySelect" aria-label="اختيار اليوم"></select></label>
+      <p id="regularCustomersCountSummary" class="regular-customers-count" aria-live="polite"></p>
+      <div id="regularCustomersList" class="regular-customers-list" aria-live="polite"></div>
+    </section>
+  </div>
   <section class="card collapsible-card owner-dashboard-panel owner-feedback-card hidden" data-section="feedback" data-owner-panel="feedback" id="ownerPanel-feedback">
     <div class="section-heading"><h2>تقييمات العملاء</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم تقييمات العملاء">−</button></div>
     <div class="section-content"><p id="ownerFeedbackSummary" class="muted">تحميل التقييمات...</p><div id="ownerFeedbackList" class="owner-feedback-list"></div><p id="ownerFeedbackMessage" class="message" aria-live="polite"></p></div>

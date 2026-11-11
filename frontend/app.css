@@ -2017,3 +2017,29 @@
   outline: 3px solid rgba(23, 104, 209, .38);
   outline-offset: 2px;
 }
+
+.owner-page .owner-overview-stat-day { color:#667085; font-size:12px; }
+.owner-page .regular-customers-modal {
+  position:fixed; inset:0; z-index:9600; display:grid; place-items:center; padding:16px;
+  background:rgba(9, 27, 51, .62); backdrop-filter:blur(5px);
+}
+.owner-page .regular-customers-card {
+  width:min(520px, 100%); max-height:calc(100dvh - 32px); display:flex; flex-direction:column;
+  padding:20px; border-radius:20px; background:#fff; box-shadow:0 24px 70px rgba(9, 27, 51, .28);
+}
+.owner-page .regular-customers-header { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.owner-page .regular-customers-header h2 { margin:0; color:#0f4ea8; font-size:21px; }
+.owner-page .regular-customers-header p { margin:5px 0 0; font-size:13px; }
+.owner-page .regular-customers-day-picker { display:grid; grid-template-columns:auto minmax(140px, 1fr); align-items:center; gap:12px; margin-top:16px; color:#344054; font-size:14px; }
+.owner-page .regular-customers-day-picker select { width:100%; min-width:0; min-height:42px; margin:0; padding:8px 10px; border:1px solid #cdd9e8; border-radius:10px; background:#fff; color:#172b4d; font:inherit; }
+.owner-page .regular-customers-count { margin:16px 0 8px; color:#344054; font-size:14px; font-weight:700; }
+.owner-page .regular-customers-list { min-height:0; max-height:min(390px, calc(100dvh - 230px)); overflow-y:auto; }
+.owner-page .regular-customers-row { display:grid; grid-template-columns:minmax(0, 1fr) minmax(130px, .72fr); align-items:center; gap:12px; min-height:48px; padding:8px 2px; border-bottom:1px solid #e7edf5; color:#172b4d; font-size:14px; }
+.owner-page .regular-customers-row:last-child { border-bottom:0; }
+.owner-page .regular-customers-row span:last-child { color:#52657e; text-align:left; direction:ltr; font-variant-numeric:tabular-nums; }
+.owner-page .regular-customers-empty { margin:0; padding:24px 8px; color:#667085; text-align:center; font-size:14px; }
+@media (max-width:480px) {
+  .owner-page .regular-customers-card { padding:16px; border-radius:16px; }
+  .owner-page .regular-customers-day-picker { grid-template-columns:1fr; gap:6px; }
+  .owner-page .regular-customers-row { grid-template-columns:minmax(0, 1fr) minmax(118px, .8fr); gap:8px; font-size:13px; }
+}
