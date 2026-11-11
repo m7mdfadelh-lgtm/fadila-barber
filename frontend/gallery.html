@@ -186,7 +186,19 @@ async function loadGallery() {
   }
 }
 
-function returnToBooking() {\n  try {\n    const referrer = document.referrer ? new URL(document.referrer) : null;\n    if (referrer && referrer.origin === location.origin && history.length > 1) {\n      history.back();\n      return;\n    }\n  } catch (error) {\n    console.warn('Could not return to the previous page:', error);\n  }\n  location.href = 'index.html';\n}\n\nfunction closeModal() {
+function returnToBooking() {
+  try {
+    const referrer = document.referrer ? new URL(document.referrer) : null;
+    if (referrer && referrer.origin === location.origin && history.length > 1) {
+      history.back();
+      return;
+    }
+  } catch (error) {
+    console.warn('Could not return to the previous page:', error);
+  }
+  location.href = 'index.html';
+}
+function closeModal() {
   if (modal) modal.classList.remove("active");
 }
 
