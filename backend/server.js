@@ -19,6 +19,7 @@ const feedbackRoutes = require('./routes/feedbackRoutes');
 const authController = require('./controllers/authController');
 const cronService = require('./services/cronService');
 const BusinessSettings = require('./models/BusinessSettings');
+const Appointment = require('./models/Appointment');
 
 const app = express();
 
@@ -166,6 +167,15 @@ async function ensureSettings() {
   }
 }
 
+async function approveExistingPendingAppointments() {
+  const decidedAt = new Date();
+  const result = await Appointment.updateMany(
+    { status: 'pending' },
+    { $set: { status: 'confirmed', approvalDecision: 'approved', approvalDecisionAt: decidedAt } }
+  );
+  console.log(`✅ Silently approved ${result.modifiedCount} existing pending appointment(s)`);
+}
+
 /* ========================
    INITIALIZATION & START SERVER
 ======================== */
@@ -176,6 +186,7 @@ app.listen(PORT, () => {
   console.log(`🕒 Business timezone: ${process.env.TZ}`);
   connectDB()
     .then(async () => {
+      await approveExistingPendingAppointments();
       await ensureSettings();
       await authController.createOwner();
       cronService.start();

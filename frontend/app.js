@@ -42,7 +42,7 @@ async function loadGalleryPreview(){
   }
 }
 async function loadSlots(){const date=el('date').value,service=el('service').value;if(!date||!service)return;const data=await api(`/appointments/available/${date}?service=${encodeURIComponent(service)}`);el('time').innerHTML='<option value="">اختر ساعة</option>'+data.availableSlots.map(t=>`<option>${t}</option>`).join('');el('time').disabled=!data.availableSlots.length}
-async function book(){try{await api('/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:el('service').value,date:el('date').value,time:el('time').value,notes:el('bookingNotes').value.trim()})});message('bookingMessage','تم إرسال الطلب إلى صاحب المحل','success');el('bookingNotes').value='';await loadAppointments()}catch(error){message('bookingMessage',error.message,'error')}}
+async function book(){try{await api('/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:el('service').value,date:el('date').value,time:el('time').value,notes:el('bookingNotes').value.trim()})});message('bookingMessage','تم تأكيد موعدك بنجاح','success');el('bookingNotes').value='';await loadAppointments()}catch(error){message('bookingMessage',error.message,'error')}}
 async function loadAppointments(){
   const data=await api('/appointments');
   customerAppointments=data.data;

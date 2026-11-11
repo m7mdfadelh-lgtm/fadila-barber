@@ -55,7 +55,7 @@ exports.createAppointment = async (req, res) => {
       return start < otherEnd && end > otherStart;
     });
     if (conflict) return res.status(409).json({ success: false, error: 'الساعة المختارة غير متاحة' });
-    const status = req.user.role === 'owner' ? 'confirmed' : 'pending';
+    const status = 'confirmed';
     const appointment = await Appointment.create({
       customer: customerId || null, customerName, customerPhone,
       service, duration, date: start, time, notes, status,
@@ -63,12 +63,9 @@ exports.createAppointment = async (req, res) => {
       approvalDecisionAt: status === 'confirmed' ? new Date() : null,
       approvalDecision: status === 'confirmed' ? 'approved' : null
     });
-    res.status(201).json({ success: true, data: appointment, message: status === 'pending' ? 'الطلب بانتظار الموافقة' : 'تم تحديد الموعد' });
-    if (status === 'pending') {
-      const ownerMessage = `${customerName} طلب موعد ${service} بتاريخ ${formatJerusalemDate(start)} الساعة ${time}${notes ? `\nملاحظة العميل: ${notes}` : ''}`.slice(0, 500);
-      pushService.sendToOwners({ title: 'طلب موعد جديد', body: ownerMessage, url: './dashboard.html', tag: `new-${appointment._id}`, appointmentId: appointment._id });
-    } else if (customerId) {
-      pushService.sendToUser(customerId, { title: 'تم تحديد موعد لك', body: `${service}، ${formatJerusalemDate(start)} الساعة ${time}`, url: './index.html', tag: `created-${appointment._id}` });
+    res.status(201).json({ success: true, data: appointment, message: 'تم تأكيد الموعد' });
+    if (customerId) {
+      pushService.sendToUser(customerId, { title: 'تم تأكيد موعدك', body: `${service}، ${formatJerusalemDate(start)} الساعة ${time}`, url: './index.html', tag: `created-${appointment._id}` });
     }
   } catch (error) {
     console.error('Appointment creation failed:', error);
