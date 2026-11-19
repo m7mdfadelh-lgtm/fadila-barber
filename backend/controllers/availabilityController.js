@@ -99,12 +99,14 @@ exports.getAvailableSlots = async (req, res) => {
         !Number.isNaN(range.end.getTime())
       );
 
-    let prayerRanges;
-    try {
-      prayerRanges = await getPrayerBlockedRanges(dateString);
-    } catch (prayerError) {
-      console.error('Prayer-time lookup failed; refusing to expose slots:', prayerError);
-      return res.status(503).json({ success: false, error: 'تعذر تحديث مواقيت الصلاة الآن. يرجى المحاولة بعد قليل.' });
+    let prayerRanges = [];
+    if (settings.prayerTimeBlockingEnabled !== false) {
+      try {
+        prayerRanges = await getPrayerBlockedRanges(dateString);
+      } catch (prayerError) {
+        console.error('Prayer-time lookup failed; refusing to expose slots:', prayerError);
+        return res.status(503).json({ success: false, error: 'تعذر تحديث مواقيت الصلاة الآن. يرجى المحاولة بعد قليل.' });
+      }
     }
 
     const blockedRanges = [...appointmentRanges, ...breakRanges, ...prayerRanges]
