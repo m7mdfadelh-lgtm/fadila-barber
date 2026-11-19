@@ -33,7 +33,7 @@ router.put("/", protect, ownerOnly, async (req,res)=>{
   }
   const settings = await BusinessSettings.findOneAndUpdate(
     {},
-    { $set: update, $setOnInsert: { prayerTimeBlockingEnabled: true } },
+    { $set: update },
     { new:true, upsert:true, runValidators:true }
   );
   res.json(settings);
