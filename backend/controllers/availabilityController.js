@@ -8,6 +8,7 @@ const {
   getAppointmentInstant
 } = require('../utils/timeZone');
 const { getScheduleForDate } = require('../utils/businessHours');
+const { getPrayerBlockedRanges } = require('../utils/prayerTimes');
 
 const SLOT_INTERVAL_MINUTES = 5;
 
@@ -98,7 +99,15 @@ exports.getAvailableSlots = async (req, res) => {
         !Number.isNaN(range.end.getTime())
       );
 
-    const blockedRanges = [...appointmentRanges, ...breakRanges]
+    let prayerRanges;
+    try {
+      prayerRanges = await getPrayerBlockedRanges(dateString);
+    } catch (prayerError) {
+      console.error('Prayer-time lookup failed; refusing to expose slots:', prayerError);
+      return res.status(503).json({ success: false, error: 'تعذر تحديث مواقيت الصلاة الآن. يرجى المحاولة بعد قليل.' });
+    }
+
+    const blockedRanges = [...appointmentRanges, ...breakRanges, ...prayerRanges]
       .sort((a, b) => a.start.getTime() - b.start.getTime());
 
     const now = new Date();
