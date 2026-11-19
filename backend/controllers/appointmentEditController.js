@@ -4,6 +4,7 @@ const BusinessSettings = require('../models/BusinessSettings');
 const pushService = require('../services/pushService');
 const { jerusalemDateTimeToUtc, getAppointmentInstant, getJerusalemDateString, formatJerusalemDate } = require('../utils/timeZone');
 const { getScheduleForDate } = require('../utils/businessHours');
+const { getPrayerBlockedRanges, findPrayerConflict } = require('../utils/prayerTimes');
 
 const allowed = ['pending', 'confirmed', 'cancelled', 'completed', 'no-show'];
 
@@ -35,6 +36,20 @@ exports.updateAppointment = async (req, res) => {
         return res.status(409).json({ success: false, error: 'الساعة المختارة تقع ضمن وقت الاستراحة' });
       }
     }
+      if (status !== 'cancelled') {
+        const settings = await BusinessSettings.findOne();
+        if (settings?.prayerTimeBlockingEnabled !== false) {
+          let prayerRanges;
+          try {
+            prayerRanges = await getPrayerBlockedRanges(date);
+          } catch (prayerError) {
+            console.error('Prayer-time lookup failed; refusing appointment update:', prayerError);
+            return res.status(503).json({ success: false, error: 'تعذر التحقق من مواقيت الصلاة الآن. يرجى المحاولة بعد قليل.' });
+          }
+          const prayerConflict = findPrayerConflict(prayerRanges, start, end);
+          if (prayerConflict) return res.status(409).json({ success: false, error: `لا يمكن وضع الموعد خلال وقت صلاة ${prayerConflict.label}.` });
+        }
+      }
     const others = status === 'cancelled' ? [] : await Appointment.find({ _id: { $ne: appointment._id }, status: { $ne: 'cancelled' }, date: { $gte: new Date(start - 86400000), $lte: new Date(start.getTime() + 86400000) } });
     if (others.some((item) => { const s = getAppointmentInstant(item); return start < new Date(s.getTime() + item.duration * 60000) && end > s; })) {
       return res.status(409).json({ success: false, error: 'الموعد يتعارض مع موعد موجود' });
