@@ -24,7 +24,7 @@ const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
 const cache = new Map();
 
 function parsePrayerTime(value) {
-  const match = String(value || '').match(/^(\\d{1,2}):(\\d{2})/);
+  const match = String(value || '').match(/^(\d{1,2}):(\d{2})/);
   if (!match) throw new Error('Invalid prayer time returned by prayer-time provider');
   return `${match[1].padStart(2, '0')}:${match[2]}`;
 }
@@ -47,7 +47,7 @@ function buildPrayerBlockedRanges(dateString, timings) {
 }
 
 async function getPrayerBlockedRanges(dateString) {
-  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(String(dateString))) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateString))) {
     throw new Error('Invalid date for prayer-time lookup');
   }
 
