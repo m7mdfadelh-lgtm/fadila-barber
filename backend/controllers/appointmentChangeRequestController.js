@@ -5,6 +5,7 @@ const BusinessSettings = require('../models/BusinessSettings');
 const Message = require('../models/Message');
 const { formatJerusalemDate, jerusalemDateTimeToUtc, getAppointmentInstant } = require('../utils/timeZone');
 const { getScheduleForDate } = require('../utils/businessHours');
+const { getPrayerBlockedRanges, findPrayerConflict } = require('../utils/prayerTimes');
 
 exports.createChangeRequest = async (req, res) => {
   try {
@@ -66,6 +67,15 @@ exports.resolveChangeRequest = async (req, res) => {
       const workEnd = jerusalemDateTimeToUtc(date, hours.end);
       if (start < workStart || end > workEnd) return res.status(409).json({ success: false, requiresManualEdit: true, error: 'الوقت المطلوب خارج ساعات العمل. يجب تعديل الموعد يدوياً' });
       if ((hours.breaks || []).some((item) => start < jerusalemDateTimeToUtc(date, item.end) && end > jerusalemDateTimeToUtc(date, item.start))) return res.status(409).json({ success: false, requiresManualEdit: true, error: 'الوقت المطلوب يقع ضمن وقت الاستراحة. يجب تعديل الموعد يدوياً' });
+      let prayerRanges;
+      try {
+        prayerRanges = await getPrayerBlockedRanges(date);
+      } catch (prayerError) {
+        console.error('Prayer-time lookup failed; refusing change-request approval:', prayerError);
+        return res.status(503).json({ success: false, requiresManualEdit: true, error: 'تعذر التحقق من مواقيت الصلاة الآن. حاول مرة أخرى لاحقاً.' });
+      }
+      const prayerConflict = findPrayerConflict(prayerRanges, start, end);
+      if (prayerConflict) return res.status(409).json({ success: false, requiresManualEdit: true, error: `الوقت المطلوب يقع ضمن وقت صلاة ${prayerConflict.label}.` });
       const nearby = await Appointment.find({ _id: { $ne: appointment._id }, status: { $ne: 'cancelled' }, date: { $gte: new Date(start - 86400000), $lte: new Date(start.getTime() + 86400000) } });
       const conflict = nearby.some((item) => { const otherStart = getAppointmentInstant(item); return start < new Date(otherStart.getTime() + item.duration * 60000) && end > otherStart; });
       if (conflict) return res.status(409).json({ success: false, requiresManualEdit: true, error: 'الوقت المطلوب يتعارض مع موعد آخر. يجب تعديل الموعد يدوياً' });
