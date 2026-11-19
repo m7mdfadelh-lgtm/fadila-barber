@@ -5,6 +5,7 @@ const BusinessSettings = require('../models/BusinessSettings');
 const pushService = require('../services/pushService');
 const { jerusalemDateTimeToUtc, getAppointmentInstant, formatJerusalemDate } = require('../utils/timeZone');
 const { getScheduleForDate } = require('../utils/businessHours');
+const { getPrayerBlockedRanges, findPrayerConflict } = require('../utils/prayerTimes');
 
 exports.createAppointment = async (req, res) => {
   try {
@@ -48,6 +49,15 @@ exports.createAppointment = async (req, res) => {
     if ((hours.breaks || []).some((item) => start < jerusalemDateTimeToUtc(date, item.end) && end > jerusalemDateTimeToUtc(date, item.start))) {
       return res.status(409).json({ success: false, error: 'الساعة المختارة تقع ضمن وقت الاستراحة' });
     }
+    let prayerRanges;
+    try {
+      prayerRanges = await getPrayerBlockedRanges(String(date));
+    } catch (prayerError) {
+      console.error('Prayer-time lookup failed; refusing booking:', prayerError);
+      return res.status(503).json({ success: false, error: 'تعذر التحقق من مواقيت الصلاة الآن. يرجى المحاولة بعد قليل.' });
+    }
+    const prayerConflict = findPrayerConflict(prayerRanges, start, end);
+    if (prayerConflict) return res.status(409).json({ success: false, error: `الحجز مغلق حول صلاة ${prayerConflict.label} من ${prayerConflict.prayerTime}. يرجى اختيار وقت آخر.` });
     const nearby = await Appointment.find({ status: { $ne: 'cancelled' }, date: { $gte: new Date(start - 86400000), $lte: new Date(start.getTime() + 86400000) } });
     const conflict = nearby.some((item) => {
       const otherStart = getAppointmentInstant(item);
