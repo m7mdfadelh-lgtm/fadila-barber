@@ -27,9 +27,13 @@ router.put("/", protect, ownerOnly, async (req,res)=>{
   if (!validOverrides || !nonOverlappingRanges) {
     return res.status(400).json({ success: false, error: 'إعدادات التواريخ الخاصة غير صالحة أو متداخلة' });
   }
+  const update = { workingHours: req.body.workingHours, dateOverrides };
+  if (typeof req.body.prayerTimeBlockingEnabled === 'boolean') {
+    update.prayerTimeBlockingEnabled = req.body.prayerTimeBlockingEnabled;
+  }
   const settings = await BusinessSettings.findOneAndUpdate(
     {},
-    { workingHours: req.body.workingHours, dateOverrides },
+    { $set: update, $setOnInsert: { prayerTimeBlockingEnabled: true } },
     { new:true, upsert:true, runValidators:true }
   );
   res.json(settings);
