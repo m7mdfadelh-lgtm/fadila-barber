@@ -138,7 +138,6 @@ async function enablePush(){try{if(!window.isSecureContext)throw new Error('تت
 async function syncExistingOwnerPush(){if(existingPushSynced)return;try{if(!('serviceWorker'in navigator)||!('Notification'in window)||Notification.permission!=='granted')return;const reg=await navigator.serviceWorker.ready,subscription=await reg.pushManager.getSubscription();if(subscription)await api('/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription})});existingPushSynced=true}catch(e){console.error('Owner push account sync failed:',e)}}
 async function logoutOwner(){try{if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.ready,subscription=await reg.pushManager.getSubscription();if(subscription)await fetch(API+'/push/subscribe',{method:'DELETE',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({endpoint:subscription.endpoint}),keepalive:true})}}catch(e){console.error('Owner push logout cleanup failed:',e)}finally{localStorage.removeItem('token');location.href='index.html'}}
 document.addEventListener('click',event=>{if(event.target.closest('#logout')){event.preventDefault();event.stopImmediatePropagation();logoutOwner()}},true);
-document.addEventListener('click',event=>{if(event.target.closest('#ownerRefreshButton'))refreshOwnerData()});
 function notificationDeliveryLabel(status){return({sent:'قُبل الإرسال إلى الأجهزة المسجلة',partial:'قُبل الإرسال لبعض أجهزة العميل فقط',failed:'فشل الإرسال إلى كل الأجهزة المسجلة','no-subscription':'لا يوجد اشتراك إشعارات مسجل'})[status]||'حالة غير معروفة'}
 function renderNotificationCampaigns(campaigns){const container=$('notificationCampaignReports');if(!campaigns.length){container.innerHTML='<p class="muted">لا توجد رسائل مسجلة بعد.</p>';return}container.innerHTML=campaigns.map(campaign=>{const missed=campaign.recipients.filter(item=>item.status==='failed'||item.status==='no-subscription'),partial=campaign.recipients.filter(item=>item.status==='partial'),date=new Date(campaign.createdAt).toLocaleString('ar',{timeZone:'Asia/Jerusalem'}),audience=campaign.audience==='all'?'كل العملاء':'عميل واحد';const customerRows=items=>items.length?`<ul>${items.map(item=>`<li><strong>${safe(item.name)}</strong><span>${safe(item.phone)}</span><small>${notificationDeliveryLabel(item.status)}${item.active?'':' · حساب غير نشط'}</small></li>`).join('')}</ul>`:'<p class="muted">لا يوجد عملاء في هذه الفئة.</p>';return `<article class="notification-campaign-card"><header><div><strong>${safe(campaign.title)}</strong><time>${safe(date)}</time></div><span>${audience}</span></header><p class="notification-campaign-totals">${campaign.recipientCount} حسابات · قُبل الإرسال إلى ${campaign.sentDevices} جهازاً · فشل الإرسال إلى ${campaign.failedDevices} أجهزة</p><h4>لم يُرسل أو لا يوجد اشتراك</h4>${customerRows(missed)}${partial.length?`<h4>قُبل الإرسال جزئياً</h4>${customerRows(partial)}`:''}</article>`}).join('')}
 async function loadNotificationCampaignReports(){const container=$('notificationCampaignReports');container.innerHTML='<p class="muted">جارٍ تحميل التقارير...</p>';try{const data=await api('/push/campaigns');renderNotificationCampaigns(data.data||[])}catch(error){container.innerHTML=`<p class="message error">${safe(error.message||'تعذر تحميل تقارير الإرسال')}</p>`}}
@@ -192,7 +191,25 @@ function updateMessageSelection(){const selected=selectedMessageIds(),total=docu
 function toggleAllMessages(){document.querySelectorAll('.message-checkbox').forEach(input=>input.checked=$('selectAllMessages').checked);updateMessageSelection()}
 async function deleteSelectedMessages(){const ids=selectedMessageIds();if(!ids.length||!confirm(`حذف ${ids.length} رسائل محددة؟`))return;try{await api('/messages',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});await loadOwnerMessages()}catch(e){alert(e.message)}}
 async function refreshOwnerMessages(){await loadAppointments();await loadOwnerMessages();await loadFeedback()}
-async function refreshOwnerData(){const button=$('ownerRefreshButton');button.disabled=true;button.classList.add('is-refreshing');try{await Promise.all([loadCustomers(),loadServices(),loadHours(),loadFeedback()]);await loadAppointments();await loadOwnerMessages()}catch(e){alert(e.message)}finally{button.disabled=false;button.classList.remove('is-refreshing')}}
+async function refreshOwnerData(){
+ const button=$('ownerRefreshButton');
+ if(!button||button.disabled)return;
+ const label=button.querySelector('span:last-child'),originalLabel=label?.textContent||'تحديث';
+ button.disabled=true;button.setAttribute('aria-busy','true');button.classList.add('is-refreshing');
+ if(label)label.textContent='جارٍ التحديث...';
+ try{
+  await Promise.all([loadCustomers(),loadServices(),loadHours(),loadFeedback()]);
+  await loadAppointments();
+  await loadOwnerMessages();
+  if(label)label.textContent='تم التحديث';
+ }catch(e){
+  if(label)label.textContent='تعذر التحديث';
+  alert(e.message);
+ }finally{
+  button.disabled=false;button.removeAttribute('aria-busy');button.classList.remove('is-refreshing');
+  window.setTimeout(()=>{if(label)label.textContent=originalLabel},1600);
+ }
+}
 async function openOwnerMessages(){closeOwnerNavigation();await refreshOwnerMessages();$('ownerMessagesPanel').classList.remove('hidden');document.body.classList.add('messages-open');try{await api('/messages/read-all',{method:'PUT'});$('ownerMessagesBadge').classList.add('hidden');$('ownerMessagesList').querySelectorAll('.unread').forEach(item=>item.classList.remove('unread'))}catch(e){console.error(e)}}
 function closeOwnerMessages(){$('ownerMessagesPanel').classList.add('hidden');document.body.classList.remove('messages-open')}
 function showOwnerApp(){const welcome=$('ownerWelcomeView');welcome.classList.add('welcome-leaving');setTimeout(()=>{welcome.classList.add('hidden');$('ownerAppContent').classList.remove('hidden')},360)}
