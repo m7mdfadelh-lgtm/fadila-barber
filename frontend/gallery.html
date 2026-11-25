@@ -102,10 +102,19 @@
     }
 
     .modal img {
+      display: block;
       max-width: 90%;
       max-height: 90%;
+      object-fit: contain;
       border-radius: var(--radius, 12px);
       border: 2px solid var(--gold, #d4af37);
+    }
+
+    .gallery-status {
+      grid-column: 1 / -1;
+      padding: 24px;
+      color: #667085;
+      text-align: center;
     }
 
     .modal.active {
@@ -145,12 +154,12 @@
   © 2026 Fadila Barber
 </footer>
 
-<div class="modal" id="imageModal" onclick="closeModal()">
+<div class="modal" id="imageModal" role="dialog" aria-modal="true" aria-label="عرض الصورة" onclick="if(event.target===this)closeModal()">
   <img id="modalImage">
 </div>
 
+<script src="config.js?v=38"></script>
 <script>
-const API_URL = "https://railway-deploy-production-adc6.up.railway.app/api";
 const grid = document.getElementById("galleryGrid");
 const modal = document.getElementById("imageModal");
 const modalImage = document.getElementById("modalImage");
@@ -162,19 +171,28 @@ async function loadGallery() {
     
     const images = await res.json();
     if (!grid) return;
-    
     grid.innerHTML = "";
+    if (!Array.isArray(images) || images.length === 0) {
+      const status = document.createElement("p");
+      status.className = "gallery-status";
+      status.textContent = "لا توجد صور في المعرض حالياً";
+      grid.appendChild(status);
+      return;
+    }
 
-    images.forEach(img => {
+    images.forEach((img, index) => {
       const div = document.createElement("div");
       div.className = "gallery-item";
-
-      div.innerHTML = `
-        <img src="${img.image}" alt="Fadila Barber Work" loading="lazy">
-      `;
+      const imageUrl = `${API_URL}/gallery/${encodeURIComponent(img._id)}/image`;
+      const image = document.createElement("img");
+      image.src = imageUrl;
+      image.alt = `صورة ${index + 1} من أعمال فاديلا`;
+      image.loading = "lazy";
+      image.decoding = "async";
+      div.appendChild(image);
 
       div.addEventListener("click", () => {
-        modalImage.src = img.image;
+        modalImage.src = imageUrl;
         modal.classList.add("active");
       });
 
@@ -183,6 +201,13 @@ async function loadGallery() {
 
   } catch (err) {
     console.error("Gallery load error:", err);
+    if (grid) {
+      grid.replaceChildren();
+      const status = document.createElement("p");
+      status.className = "gallery-status";
+      status.textContent = "تعذر تحميل الصور الآن. تحقق من اتصال الإنترنت وحاول مجدداً.";
+      grid.appendChild(status);
+    }
   }
 }
 
@@ -200,7 +225,12 @@ function returnToBooking() {
 }
 function closeModal() {
   if (modal) modal.classList.remove("active");
+  if (modalImage) modalImage.removeAttribute("src");
 }
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeModal();
+});
 
 document.addEventListener("DOMContentLoaded", () => {
   const message = localStorage.getItem("bookingSuccess");

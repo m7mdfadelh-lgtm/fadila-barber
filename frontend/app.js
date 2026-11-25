@@ -19,17 +19,16 @@ function setBookingFormOpen(open){
   el('bookingCard')?.classList.toggle('is-open',open);
 }
 async function loadServices(){customerServices=await api('/services');el('service').innerHTML='<option value="">اختر خدمة</option>'+customerServices.map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)} — ₪${s.price}</option>`).join('')}
-function isSafeGalleryImage(value){return /^data:image\/(?:jpe?g|png|webp|gif);base64,[A-Za-z0-9+/]+={0,2}$/.test(String(value||''))}
 async function loadGalleryPreview(){
   const section=el('customerGallerySection'),grid=el('customerGalleryPreview');
   if(!section||!grid)return;
   try{
     const images=await api('/gallery');
-    const validImages=Array.isArray(images)?images.filter(item=>isSafeGalleryImage(item?.image)):[];
+    const validImages=Array.isArray(images)?images.filter(item=>/^[a-f0-9]{24}$/i.test(String(item?._id||''))):[];
     grid.replaceChildren();
     validImages.slice(0,3).forEach((item,index)=>{
       const image=document.createElement('img');
-      image.src=item.image;
+      image.src=`${API_URL}/gallery/${encodeURIComponent(item._id)}/image`;
       image.alt='صورة '+(index+1)+' من أعمال فاديلا';
       image.loading='lazy';
       image.decoding='async';

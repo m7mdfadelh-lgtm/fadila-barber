@@ -36,16 +36,25 @@ exports.addImage = async (req, res) => {
 // Fetch all images
 exports.getImages = async (req, res) => {
   try {
-    const images = await Gallery.find().sort({ order: 1, createdAt: -1 });
-
-    const formatted = images.map(img => ({
-      _id: img._id,
-      image: `data:${img.contentType};base64,${img.image.toString("base64")}`
-    }));
-
-    res.json(formatted);
+    const images = await Gallery.find().select("_id order createdAt").sort({ order: 1, createdAt: -1 }).lean();
+    res.json(images.map(img => ({ _id: img._id })));
 
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Serve image bytes separately so the gallery list stays small and fast.
+exports.getImage = async (req, res) => {
+  try {
+    const image = await Gallery.findById(req.params.id).select("image contentType").lean();
+    if (!image) return res.status(404).json({ error: "الصورة غير موجودة" });
+    res.set("Cache-Control", "public, max-age=3600, immutable");
+    res.set("X-Content-Type-Options", "nosniff");
+    res.type(image.contentType);
+    res.send(image.image);
+  } catch (error) {
+    if (error.name === "CastError") return res.status(404).json({ error: "الصورة غير موجودة" });
     res.status(500).json({ error: error.message });
   }
 };

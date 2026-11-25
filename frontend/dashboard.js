@@ -200,7 +200,7 @@ function renderOwnerGallery(){
  galleryAdminItems.forEach((item,index)=>{
   const card=document.createElement('article');card.className='owner-gallery-item';
   const image=document.createElement('img');image.alt='صورة '+(index+1)+' من أعمال المحل';image.loading='lazy';image.decoding='async';
-  image.src=/^data:image\/(?:jpe?g|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(String(item.image||''))?item.image:'';
+  image.src=`${API_URL}/gallery/${encodeURIComponent(item._id)}/image`;
   const controls=document.createElement('div');controls.className='owner-gallery-controls';
   const remove=document.createElement('button');remove.type='button';remove.className='danger compact';remove.dataset.galleryDelete=String(item._id);remove.textContent='حذف';
   const position=document.createElement('span');position.className='owner-gallery-position';position.textContent='الصورة '+(index+1);
