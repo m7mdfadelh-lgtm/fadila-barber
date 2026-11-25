@@ -47,7 +47,7 @@ exports.getImages = async (req, res) => {
 // Serve image bytes separately so the gallery list stays small and fast.
 exports.getImage = async (req, res) => {
   try {
-    const image = await Gallery.findById(req.params.id).select("image contentType").lean();
+    const image = await Gallery.findById(req.params.id).select("image contentType");
     if (!image) return res.status(404).json({ error: "الصورة غير موجودة" });
     res.set("Cache-Control", "public, max-age=3600, immutable");
     res.set("X-Content-Type-Options", "nosniff");
