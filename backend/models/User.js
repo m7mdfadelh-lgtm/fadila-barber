@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['owner', 'customer'], required: true, index: true },
   name: { type: String, required: true, trim: true },
   phone: { type: String, required: true, match: /^05\d{8}$/ },
-  active: { type: Boolean, default: true }
+  active: { type: Boolean, default: true },
+  instagramFollowedAt: { type: Date, default: null }
 }, { timestamps: true });
 
 userSchema.pre('save', async function hashPassword(next) {
@@ -21,7 +22,7 @@ userSchema.methods.comparePassword = function comparePassword(password) {
 };
 
 userSchema.methods.toSafeObject = function toSafeObject() {
-  return { id: this._id, username: this.username, role: this.role, name: this.name, phone: this.phone, active: this.active };
+  return { id: this._id, username: this.username, role: this.role, name: this.name, phone: this.phone, active: this.active, instagramFollowed: Boolean(this.instagramFollowedAt) };
 };
 
 module.exports = mongoose.model('User', userSchema);

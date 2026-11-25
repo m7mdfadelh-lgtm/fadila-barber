@@ -41,7 +41,24 @@ async function loadGalleryPreview(){
   }
 }
 async function loadSlots(){const date=el('date').value,service=el('service').value;if(!date||!service)return;const data=await api(`/appointments/available/${date}?service=${encodeURIComponent(service)}`);el('time').innerHTML='<option value="">اختر ساعة</option>'+data.availableSlots.map(t=>`<option>${t}</option>`).join('');el('time').disabled=!data.availableSlots.length}
-async function book(){try{await api('/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:el('service').value,date:el('date').value,time:el('time').value,notes:el('bookingNotes').value.trim()})});message('bookingMessage','تم تأكيد موعدك بنجاح','success');el('bookingNotes').value='';await loadAppointments()}catch(error){message('bookingMessage',error.message,'error')}}
+async function book(){try{await api('/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:el('service').value,date:el('date').value,time:el('time').value,notes:el('bookingNotes').value.trim()})});message('bookingMessage','تم تأكيد موعدك بنجاح','success');el('bookingNotes').value='';await loadAppointments();maybeShowInstagramFollowPrompt()}catch(error){message('bookingMessage',error.message,'error')}}
+function instagramPromptSnoozeKey(){return `instagramFollowPromptSnoozedUntil:${String(currentUser?.id||'')}`}
+function maybeShowInstagramFollowPrompt(){
+ if(!currentUser||currentUser.role!=='customer'||currentUser.instagramFollowed)return;
+ try{if(Number(localStorage.getItem(instagramPromptSnoozeKey())||0)>Date.now())return}catch(error){console.warn('Instagram prompt state unavailable:',error)}
+ const prompt=el('instagramFollowPrompt');if(!prompt)return;
+ prompt.classList.remove('hidden');document.body.classList.add('instagram-follow-prompt-open');el('instagramFollowConfirm')?.focus({preventScroll:true});
+}
+function closeInstagramFollowPrompt(snooze=true){
+ el('instagramFollowPrompt')?.classList.add('hidden');document.body.classList.remove('instagram-follow-prompt-open');
+ if(snooze&&currentUser?.id){try{localStorage.setItem(instagramPromptSnoozeKey(),String(Date.now()+14*24*60*60*1000))}catch(error){console.warn('Instagram prompt state unavailable:',error)}}
+}
+async function confirmInstagramFollow(){
+ const button=el('instagramFollowConfirm');button.disabled=true;message('instagramFollowMessage','','');
+ try{const result=await api('/auth/me/instagram-followed',{method:'POST'});currentUser=result.user;sessionUser=result.user;closeInstagramFollowPrompt(false)}
+ catch(error){message('instagramFollowMessage',error.message||'تعذر حفظ التأكيد، حاول مرة أخرى','error')}
+ finally{button.disabled=false}
+}
 async function loadAppointments(){
   const data=await api('/appointments');
   customerAppointments=data.data;
@@ -267,3 +284,10 @@ function setupCustomerNavigation(){
  document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeCustomerNavigation();closeLogoutConfirmation()}});
 }
 document.addEventListener('DOMContentLoaded',async()=>{el('date').min=new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Jerusalem'});setupCustomerNavigation();el('inAppMessageButton').onclick=openCustomerMessageComposer;el('closeCustomerMessage').onclick=closeCustomerMessageComposer;el('customerMessageSubmit').onclick=submitCustomerMessage;el('closeCustomerConversation').onclick=closeCustomerConversation;el('sendCustomerConversationReply').onclick=sendCustomerConversationReply;el('customerConversationPanel').addEventListener('click',event=>{if(event.target===el('customerConversationPanel'))closeCustomerConversation()});el('customerMessageComposer').addEventListener('click',event=>{if(event.target===el('customerMessageComposer'))closeCustomerMessageComposer()});el('enterButton').onclick=enterApp;el('loginButton').onclick=login;el('logoutButton').onclick=openLogoutConfirmation;el('cancelLogoutButton').onclick=closeLogoutConfirmation;el('confirmLogoutButton').onclick=logout;el('logoutConfirmDialog').addEventListener('click',event=>{if(event.target===el('logoutConfirmDialog'))closeLogoutConfirmation()});el('messagesButton').onclick=()=>{closeCustomerNavigation();openMessages()};el('customerRefreshButton').onclick=()=>{closeCustomerNavigation();refreshCustomerData()};el('closeMessages').onclick=closeMessages;el('feedbackPromptClose').onclick=dismissFeedbackPrompt;el('feedbackPromptLater').onclick=dismissFeedbackPrompt;el('feedbackPromptNow').onclick=openFeedbackFromPrompt;el('feedbackPrompt').addEventListener('click',event=>{if(event.target===el('feedbackPrompt'))dismissFeedbackPrompt()});document.addEventListener('keydown',event=>{if(event.key==='Escape'){if(!el('feedbackPrompt').classList.contains('hidden'))dismissFeedbackPrompt();if(!el('customerMessageComposer').classList.contains('hidden'))closeCustomerMessageComposer();if(!el('customerConversationPanel').classList.contains('hidden'))closeCustomerConversation()}});el('messagesPanel').addEventListener('click',event=>{if(event.target===el('messagesPanel'))closeMessages()});el('messagesList').addEventListener('click',handleCustomerMessageAction);el('messagesList').addEventListener('change',event=>{const checkbox=event.target.closest('[data-message-select]');if(!checkbox)return;const id=String(checkbox.value);if(checkbox.checked)selectedCustomerMessageIds.add(id);else selectedCustomerMessageIds.delete(id);updateCustomerMessageSelection()});el('selectAllCustomerMessages').addEventListener('change',event=>{selectedCustomerMessageIds.clear();if(event.target.checked)customerMessages.forEach(item=>selectedCustomerMessageIds.add(String(item._id)));renderCustomerMessages()});el('deleteSelectedCustomerMessages').onclick=deleteSelectedCustomerMessages;navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='fadila-message'&&currentUser){loadMessages();loadFeedback();if(activeCustomerConversationId&&!el('customerConversationPanel').classList.contains('hidden'))loadCustomerConversation()}});el('enableNotifications').onclick=enablePush;el('bookingToggle').onclick=()=>setBookingFormOpen(el('bookingToggle').getAttribute('aria-expanded')!=='true');setBookingFormOpen(false);el('service').onchange=loadSlots;el('date').onchange=loadSlots;el('bookButton').onclick=book;el('feedbackSubmit').onclick=submitFeedback;el('feedbackRating').addEventListener('click',event=>{const button=event.target.closest('.feedback-star');if(button)setFeedbackRating(button.dataset.rating)});setFeedbackRating(5);if(token()){try{const data=await api('/auth/me');sessionUser=data.user}catch{sessionUser=null}}});
+document.addEventListener('DOMContentLoaded',()=>{
+ el('instagramFollowClose').onclick=()=>closeInstagramFollowPrompt(true);
+ el('instagramFollowLater').onclick=()=>closeInstagramFollowPrompt(true);
+ el('instagramFollowConfirm').onclick=confirmInstagramFollow;
+ el('instagramFollowPrompt').addEventListener('click',event=>{if(event.target===el('instagramFollowPrompt'))closeInstagramFollowPrompt(true)});
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!el('instagramFollowPrompt').classList.contains('hidden'))closeInstagramFollowPrompt(true)});
+});

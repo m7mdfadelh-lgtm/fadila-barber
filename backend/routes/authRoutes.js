@@ -4,6 +4,7 @@ const { protect, ownerOnly } = require('../middleware/authMiddleware');
 
 router.post('/login', auth.login);
 router.get('/me', protect, auth.me);
+router.post('/me/instagram-followed', protect, auth.markInstagramFollowed);
 router.get('/customers', protect, ownerOnly, auth.listCustomers);
 router.post('/customers', protect, ownerOnly, auth.createCustomer);
 router.put('/customers/:id', protect, ownerOnly, auth.updateCustomer);

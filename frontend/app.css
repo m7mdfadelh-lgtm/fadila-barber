@@ -1615,6 +1615,54 @@
 
 
 /* Customer feedback reminder dialog. */
+.customer-page.instagram-follow-prompt-open { overflow: hidden; }
+.customer-page .instagram-follow-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 9600;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(9,27,51,.56);
+  backdrop-filter: blur(5px);
+}
+.customer-page .instagram-follow-card {
+  position: relative;
+  width: min(440px, 100%);
+  padding: 30px 24px 20px;
+  border: 1px solid #d8e1ee;
+  border-radius: 22px;
+  background: #fffdf8;
+  text-align: center;
+  box-shadow: 0 20px 55px rgba(8,38,82,.25);
+}
+.customer-page .instagram-follow-icon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin: 4px auto 16px;
+  border-radius: 23px;
+  background: linear-gradient(135deg,#feda75 0%,#fa7e1e 35%,#d62976 68%,#962fbf 100%);
+  color: #fff;
+}
+.customer-page .instagram-follow-icon svg { width: 42px; height: 42px; }
+.customer-page .instagram-follow-card h2 { margin: 0 0 8px; color: var(--app-navy,#0f4ea8); }
+.customer-page .instagram-follow-card > p:not(.message) { margin: 0; color: #667085; line-height: 1.6; }
+.customer-page .instagram-follow-primary {
+  display: block;
+  margin-top: 22px;
+  padding: 14px 18px;
+  border-radius: 15px;
+  background: linear-gradient(110deg,#0f4ea8,#2782e8);
+  color: #fff;
+  font-weight: 800;
+  font-size: 19px;
+  text-decoration: none;
+}
+.customer-page .instagram-follow-confirm,
+.customer-page .instagram-follow-card .feedback-prompt-later { width: 100%; margin-top: 10px; }
+.customer-page .instagram-follow-card .message:empty { display: none; }
 .customer-page.feedback-prompt-open { overflow: hidden; }
 .customer-page .feedback-prompt {
   position: fixed;

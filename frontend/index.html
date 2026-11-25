@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="FADILA BARBER">
   <title>FADILA BARBER — المواعيد</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=59">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=60">
 </head>
 <body class="customer-page">
   <div id="installGate" class="gate hidden">
@@ -89,6 +89,18 @@
     </div>
     </div>
   </main>
+  <div id="instagramFollowPrompt" class="instagram-follow-prompt hidden" role="dialog" aria-modal="true" aria-labelledby="instagramFollowPromptTitle" aria-describedby="instagramFollowPromptCopy">
+    <section class="instagram-follow-card">
+      <button id="instagramFollowClose" class="feedback-prompt-close" type="button" aria-label="إغلاق">×</button>
+      <div class="instagram-follow-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.7" r="1.2" fill="currentColor"/></svg></div>
+      <h2 id="instagramFollowPromptTitle">تابعنا على إنستغرام</h2>
+      <p id="instagramFollowPromptCopy">شاهد أحدث قصّاتنا وأعمالنا</p>
+      <a id="instagramFollowOpen" class="instagram-follow-primary" href="https://www.instagram.com/fadila_barber/" target="_blank" rel="noopener noreferrer">افتح إنستغرام</a>
+      <button id="instagramFollowConfirm" class="secondary instagram-follow-confirm" type="button">نعم، تابعت</button>
+      <button id="instagramFollowLater" class="secondary feedback-prompt-later" type="button">لاحقاً</button>
+      <p id="instagramFollowMessage" class="message" aria-live="polite"></p>
+    </section>
+  </div>
   <div id="feedbackPrompt" class="feedback-prompt hidden" role="dialog" aria-modal="true" aria-labelledby="feedbackPromptTitle" aria-describedby="feedbackPromptCopy">
     <section class="feedback-prompt-card">
       <button id="feedbackPromptClose" class="feedback-prompt-close" type="button" aria-label="إغلاق">×</button>
@@ -140,5 +152,5 @@
       </div>
     </section>
   </div>
-  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=54"></script>
+  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=55"></script>
 </body></html>

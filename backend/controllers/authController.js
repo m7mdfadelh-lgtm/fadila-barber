@@ -19,6 +19,17 @@ exports.login = async (req, res) => {
 
 exports.me = (req, res) => res.json({ success: true, user: req.user.toSafeObject() });
 
+exports.markInstagramFollowed = async (req, res) => {
+  if (req.user.role !== 'customer') {
+    return res.status(403).json({ success: false, error: 'هذه العملية متاحة للزبائن فقط' });
+  }
+  if (!req.user.instagramFollowedAt) {
+    req.user.instagramFollowedAt = new Date();
+    await req.user.save();
+  }
+  res.json({ success: true, user: req.user.toSafeObject() });
+};
+
 exports.createCustomer = async (req, res) => {
   try {
     const user = await User.create({
