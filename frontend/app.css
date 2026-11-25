@@ -2038,6 +2038,20 @@
 .owner-page .regular-customers-row:last-child { border-bottom:0; }
 .owner-page .regular-customers-row span:last-child { color:#52657e; text-align:left; direction:ltr; font-variant-numeric:tabular-nums; }
 .owner-page .regular-customers-empty { margin:0; padding:24px 8px; color:#667085; text-align:center; font-size:14px; }
+.owner-page .notification-campaign-history { margin-top:24px; padding-top:18px; border-top:1px solid #e3eaf3; }
+.owner-page .notification-campaign-history-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.owner-page .notification-campaign-history-heading h3 { margin:0; color:#0f4ea8; font-size:17px; }
+.owner-page .notification-campaign-card { margin:14px 0; padding:14px; border:1px solid #dce5f0; border-radius:14px; background:#f9fbfe; }
+.owner-page .notification-campaign-card > header { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.owner-page .notification-campaign-card > header div { display:grid; gap:4px; }
+.owner-page .notification-campaign-card > header time { color:#667085; font-size:12px; }
+.owner-page .notification-campaign-card > header > span { color:#52657e; font-size:12px; }
+.owner-page .notification-campaign-totals { margin:10px 0; color:#52657e; font-size:13px; }
+.owner-page .notification-campaign-card h4 { margin:12px 0 5px; color:#344054; font-size:14px; }
+.owner-page .notification-campaign-card ul { margin:0; padding:0 20px 0 0; }
+.owner-page .notification-campaign-card li { margin:5px 0; color:#172b4d; }
+.owner-page .notification-campaign-card li span,
+.owner-page .notification-campaign-card li small { display:block; color:#667085; font-size:12px; }
 @media (max-width:480px) {
   .owner-page .regular-customers-card { padding:16px; border-radius:16px; }
   .owner-page .regular-customers-day-picker { grid-template-columns:1fr; gap:6px; }

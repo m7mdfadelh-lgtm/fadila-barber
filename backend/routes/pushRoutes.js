@@ -1,11 +1,51 @@
 const router = require('express').Router();
 const pushService = require('../services/pushService');
 const User = require('../models/User');
+const PushSubscription = require('../models/PushSubscription');
+const PushCampaign = require('../models/PushCampaign');
 const Conversation = require('../models/Conversation');
 const crypto = require('crypto');
 const { protect, ownerOnly } = require('../middleware/authMiddleware');
 
+async function recordCampaign({ owner, audience, title, body, customers, result }) {
+  const deliveries = new Map((result.recipients || []).map((item) => [String(item.user), item]));
+  const campaign = await PushCampaign.create({
+    owner,
+    audience,
+    title,
+    body,
+    recipientCount: customers.length,
+    sentDevices: result.sent || 0,
+    failedDevices: result.failed || 0,
+    recipients: customers.map((customer) => {
+      const delivery = deliveries.get(String(customer._id)) || { attempted: 0, sent: 0, failed: 0 };
+      const status = delivery.attempted === 0
+        ? 'no-subscription'
+        : delivery.sent === 0
+          ? 'failed'
+          : delivery.failed > 0 ? 'partial' : 'sent';
+      return {
+        user: customer._id,
+        name: customer.name,
+        phone: customer.phone,
+        active: customer.active !== false,
+        status,
+        attemptedDevices: delivery.attempted,
+        sentDevices: delivery.sent,
+        failedDevices: delivery.failed
+      };
+    })
+  });
+  const olderCampaigns = await PushCampaign.find({ owner }).sort({ createdAt: -1 }).skip(5).select('_id').lean();
+  if (olderCampaigns.length) await PushCampaign.deleteMany({ _id: { $in: olderCampaigns.map((item) => item._id) } });
+  return campaign;
+}
+
 router.get('/public-key', protect, async (req, res) => res.json({ publicKey: await pushService.getPublicKey() }));
+router.get('/campaigns', protect, ownerOnly, async (req, res) => {
+  const campaigns = await PushCampaign.find({ owner: req.user._id }).sort({ createdAt: -1 }).limit(5).lean();
+  res.json({ success: true, data: campaigns });
+});
 router.post('/subscribe', protect, async (req, res) => {
   try {
     await pushService.saveSubscription(req.user._id, req.body.subscription, req.headers['user-agent']);
@@ -39,9 +79,9 @@ router.post('/send', protect, ownerOnly, async (req, res) => {
     }
 
     if (sendToAll) {
-      const customers = await User.find({ role: 'customer', active: true }).select('_id');
+      const customers = await User.find({ role: 'customer' }).select('_id name phone active');
       if (!customers.length) {
-        return res.status(404).json({ success: false, error: 'لم يتم العثور على زبائن نشطين' });
+        return res.status(404).json({ success: false, error: 'لم يتم العثور على زبائن' });
       }
 
       const threadBody = `${title}\n\n${body}`;
@@ -53,25 +93,33 @@ router.post('/send', protect, ownerOnly, async (req, res) => {
         conversation.customer.toString(),
         conversation._id.toString()
       ]));
+      const customerIds = customers.map((customer) => customer._id);
+      const subscriptions = await PushSubscription.find({ user: { $in: customerIds } }).select('user').lean();
+      const subscribedCustomerIds = new Set(subscriptions.map((subscription) => String(subscription.user)));
       const result = await pushService.sendToUsers(
-        customers.map((customer) => customer._id),
+        customerIds,
         {
           title, body, url: './index.html',
           tag: `manual-all-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
           actionType: 'owner-message',
           conversationIds
-        }
+        },
+        { includeRecipients: true }
       );
+      const campaign = await recordCampaign({ owner: req.user._id, audience: 'all', title, body, customers, result });
 
       return res.json({
         success: true,
         audience: 'all',
+        campaignId: campaign._id,
         customerCount: customers.length,
+        subscribedCustomerCount: subscribedCustomerIds.size,
+        noSubscriptionCount: customers.length - subscribedCustomerIds.size,
         ...result
       });
     }
 
-    const customer = await User.findOne({ _id: customerId, role: 'customer', active: true });
+    const customer = await User.findOne({ _id: customerId, role: 'customer' });
     if (!customer) return res.status(404).json({ success: false, error: 'لم يتم العثور على الزبون' });
 
     const conversation = await Conversation.create({
@@ -85,11 +133,13 @@ router.post('/send', protect, ownerOnly, async (req, res) => {
       tag: `manual-${customer._id}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
       actionType: 'owner-message',
       conversationId: conversation._id
-    });
+    }, { includeRecipients: true });
+    const campaign = await recordCampaign({ owner: req.user._id, audience: 'single', title, body, customers: [customer], result });
 
     return res.json({
       success: true,
       audience: 'single',
+      campaignId: campaign._id,
       customer: customer.toSafeObject(),
       ...result
     });

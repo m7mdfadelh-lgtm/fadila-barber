@@ -25,6 +25,7 @@ const dateOverrideSchema = new mongoose.Schema({
 const businessSettingsSchema = new mongoose.Schema({
   vapidPublicKey: { type: String, select: false },
   vapidPrivateKey: { type: String, select: false },
+  inactiveCustomerReportSentAt: { type: Date, default: null },
   workingHours: {
     sunday: daySchema,
     monday: daySchema,

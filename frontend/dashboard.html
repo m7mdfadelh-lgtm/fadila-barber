@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#0f4ea8"><meta name="apple-mobile-web-app-capable" content="yes">
   <title>Fadila — الإدارة</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=68">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=69">
 </head>
 <body class="owner-page">
 
@@ -88,7 +88,7 @@
 
   <section class="card collapsible-card owner-dashboard-panel hidden" data-section="customer-notification" data-owner-panel="customer-notification" id="ownerPanel-customer-notification">
     <div class="section-heading"><h2>إرسال إشعار للزبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إرسال إشعار للزبون">−</button></div>
-    <div class="section-content"><section class="notification-quick-action" aria-label="الإشعارات"><p id="notificationState" class="muted">فعّل الإشعارات لتلقي تذكير قبل الموعد بـ15 دقيقة.</p><button id="enableNotifications" class="secondary compact" type="button">تفعيل الإشعارات</button></section><p class="muted">سيُرسل الإشعار إلى جميع الأجهزة التي فعّل الزبون الإشعارات عليها.</p><label>البحث عن زبون<input id="notificationCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>الزبون<select id="notificationCustomer"><option value="">اختر زبوناً</option></select></label><label>العنوان<input id="notificationTitle" maxlength="80" placeholder="مثال: تحديث من Fadila"></label><label>الرسالة<textarea id="notificationBody" maxlength="240" rows="4" placeholder="اكتب محتوى الإشعار"></textarea></label><button id="sendCustomerNotification">إرسال الإشعار</button><p id="sendNotificationMessage" class="message"></p></div>
+    <div class="section-content"><section class="notification-quick-action" aria-label="الإشعارات"><p id="notificationState" class="muted">فعّل الإشعارات لتلقي تذكير قبل الموعد بـ15 دقيقة.</p><button id="enableNotifications" class="secondary compact" type="button">تفعيل الإشعارات</button></section><p class="muted">تُحفظ الرسالة لكل حساب عميل، نشط أو غير نشط. يصل إشعار فوري فقط للأجهزة ذات اشتراك إشعارات صالح؛ الحساب غير النشط لا يستطيع تسجيل الدخول إلى التطبيق.</p><label>البحث عن زبون<input id="notificationCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>الزبون<select id="notificationCustomer"><option value="">اختر زبوناً</option></select></label><label>العنوان<input id="notificationTitle" maxlength="80" placeholder="مثال: تحديث من Fadila"></label><label>الرسالة<textarea id="notificationBody" maxlength="240" rows="4" placeholder="اكتب محتوى الإشعار"></textarea></label><button id="sendCustomerNotification">إرسال الإشعار</button><p id="sendNotificationMessage" class="message"></p><section class="notification-campaign-history" aria-labelledby="notificationCampaignHistoryTitle"><div class="notification-campaign-history-heading"><h3 id="notificationCampaignHistoryTitle">تقارير آخر 5 رسائل</h3><button id="refreshNotificationCampaigns" class="secondary compact" type="button">تحديث</button></div><p class="muted">يعرض العملاء الذين لم يصلهم الإشعار، أو وصل لبعض أجهزتهم فقط.</p><div id="notificationCampaignReports" aria-live="polite"><p class="muted">افتح هذا القسم لتحميل التقارير.</p></div></section></div>
   </section>
 
   <section class="card collapsible-card owner-dashboard-panel hidden" data-section="manage-customers" data-owner-panel="manage-customers" id="ownerPanel-manage-customers">
@@ -170,5 +170,5 @@
       </div>
     </section>
   </div>
-<script src="config.js?v=43"></script><script src="pwa.js?v=44"></script><script src="dashboard.js?v=66"></script>
+<script src="config.js?v=43"></script><script src="pwa.js?v=44"></script><script src="dashboard.js?v=67"></script>
 </body></html>

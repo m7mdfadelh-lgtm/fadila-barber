@@ -46,33 +46,45 @@ exports.removeSubscription = async (userId, endpoint) => {
   await PushSubscription.deleteOne({ user: userId, endpoint });
 };
 
-exports.sendToUsers = async (userIds, payload) => {
+exports.saveMessagesForUsers = async (userIds, payload) => {
   const validUserIds = userIds.filter(Boolean);
-  if (!validUserIds.length) return { sent: 0, failed: 0 };
+  if (!validUserIds.length) return { saved: 0 };
   const tag = String(payload.tag || `message-${Date.now()}`);
   await Promise.all(validUserIds.map((user) => Message.updateOne(
     { user, tag },
     { $setOnInsert: { user, tag, title: String(payload.title || 'إشعار جديد'), body: String(payload.messageBody || payload.body || ''), url: String(payload.url || './index.html'), appointment: payload.appointmentId || null, actionType: String(payload.actionType || ''), conversationId: payload.conversationIds?.[String(user)] || payload.conversationId || null } },
     { upsert: true }
   )));
+  return { saved: validUserIds.length };
+};
+
+exports.sendToUsers = async (userIds, payload, { includeRecipients = false } = {}) => {
+  const validUserIds = userIds.filter(Boolean);
+  if (!validUserIds.length) return { sent: 0, failed: 0, ...(includeRecipients ? { recipients: [] } : {}) };
+  await exports.saveMessagesForUsers(validUserIds, payload);
   await configure();
   const subscriptions = await PushSubscription.find({ user: { $in: validUserIds } });
+  const recipients = includeRecipients ? new Map(validUserIds.map((user) => [String(user), { user, attempted: 0, sent: 0, failed: 0 }])) : null;
   let sent = 0;
   let failed = 0;
   for (const subscription of subscriptions) {
+    const recipient = recipients?.get(String(subscription.user));
+    if (recipient) recipient.attempted += 1;
     try {
       await webpush.sendNotification({ endpoint: subscription.endpoint, keys: subscription.keys }, JSON.stringify(payload));
       sent += 1;
+      if (recipient) recipient.sent += 1;
     } catch (error) {
       failed += 1;
+      if (recipient) recipient.failed += 1;
       if (error.statusCode === 404 || error.statusCode === 410) await subscription.deleteOne();
       else console.error('Push delivery failed:', error.message);
     }
   }
-  return { sent, failed };
+  return { sent, failed, ...(recipients ? { recipients: [...recipients.values()] } : {}) };
 };
 
-exports.sendToUser = (userId, payload) => exports.sendToUsers([userId], payload);
+exports.sendToUser = (userId, payload, options) => exports.sendToUsers([userId], payload, options);
 
 exports.sendToOwners = async (payload) => {
   const owners = await User.find({ role: 'owner', active: true }).select('_id');
