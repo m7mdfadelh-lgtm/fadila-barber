@@ -67,6 +67,16 @@ exports.createAppointment = async (req, res) => {
     if (customerId) {
       pushService.sendToUser(customerId, { title: 'تم تأكيد موعدك', body: `${service}، ${formatJerusalemDate(start)} الساعة ${time}`, url: './index.html', tag: `created-${appointment._id}` });
     }
+    if (req.user.role === 'customer') {
+      pushService.sendToOwners({
+        title: 'تم حجز موعد جديد',
+        body: `${customerName} · ${service} · ${formatJerusalemDate(start)} الساعة ${time}`,
+        url: './dashboard.html',
+        tag: `new-${appointment._id}`,
+        appointmentId: appointment._id,
+        actionType: 'new-booking'
+      }).catch((notificationError) => console.error('New booking owner notification failed:', notificationError));
+    }
   } catch (error) {
     console.error('Appointment creation failed:', error);
     res.status(500).json({ success: false, error: 'حدث خطأ أثناء إنشاء الموعد' });
