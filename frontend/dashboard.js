@@ -22,16 +22,23 @@ async function loadSlots(){const date=$('manualDate').value,service=$('manualSer
 async function createAppointment(){const oneOff=$('manualCustomer').value==='__walk_in__',customerId=$('manualCustomer').value,name=$('manualCustomerName').value.trim(),phone=$('manualCustomerPhone').value.replace(/\D/g,'');if(oneOff&&name.length<2)return msg('manualMessage','يرجى إدخال اسم العميل','error');if(oneOff&&!/^05\d{8}$/.test(phone))return msg('manualMessage','يرجى إدخال رقم هاتف صحيح بصيغة 05XXXXXXXX','error');if(!oneOff&&!customerId)return msg('manualMessage','يرجى اختيار العميل','error');try{const result=await api('/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({oneOff,customerId:oneOff?'':customerId,customerName:name,customerPhone:phone,service:$('manualService').value,date:$('manualDate').value,time:$('manualTime').value})});msg('manualMessage','تم إنشاء الموعد','success');await loadAppointments();if(result.data?.customerPhone)offerWhatsAppReminder(result.data,{},true);if(oneOff){$('manualCustomer').value='';$('manualCustomerName').value='';$('manualCustomerPhone').value='';updateManualCustomerFields()}}catch(e){msg('manualMessage',e.message,'error')}}
 const statusOptions=a=>['pending','confirmed','cancelled','completed','no-show'].map(s=>`<option value="${s}" ${a.status===s?'selected':''}>${statusLabel(s)}</option>`).join('');
 function getTodayInJerusalem(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
+function getOneMonthAgoInJerusalem(){
+ const [year,month,day]=getTodayInJerusalem().split('-').map(Number);
+ let cutoffYear=year,cutoffMonth=month-1;
+ if(cutoffMonth===0){cutoffMonth=12;cutoffYear-=1}
+ const lastDayOfMonth=new Date(Date.UTC(cutoffYear,cutoffMonth,0)).getUTCDate();
+ return `${cutoffYear}-${String(cutoffMonth).padStart(2,'0')}-${String(Math.min(day,lastDayOfMonth)).padStart(2,'0')}`;
+}
 
 const regularCustomerWeekdays=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 function getJerusalemWeekdayIndex(date){const weekday=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',weekday:'short'}).format(new Date(date));return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(weekday)}
 let regularCustomersSelectedWeekday=getJerusalemWeekdayIndex(new Date()),regularCustomersManualSelection=false;
 function getRegularCustomersForWeekday(weekdayIndex){
- const today=getTodayInJerusalem(),byPhone=new Map();
+ const today=getTodayInJerusalem(),cutoff=getOneMonthAgoInJerusalem(),byPhone=new Map();
  appointments.forEach(appointment=>{
   if(!['confirmed','completed','no-show'].includes(appointment.status))return;
   const date=new Date(appointment.date),dateString=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem'}).format(date);
-  if(!dateString||dateString>=today||getJerusalemWeekdayIndex(date)!==weekdayIndex)return;
+  if(!dateString||dateString<cutoff||dateString>=today||getJerusalemWeekdayIndex(date)!==weekdayIndex)return;
   const phone=String(appointment.customerPhone||'').replace(/\D/g,'');if(!phone)return;
   const existing=byPhone.get(phone);
   if(existing){existing.visits+=1;existing.name=String(appointment.customerName||existing.name);}
@@ -45,7 +52,7 @@ function renderRegularCustomersView(){
  const heading=$('regularCustomersDayHeading'),summary=$('regularCustomersCountSummary'),list=$('regularCustomersList');
  if(!heading||!summary||!list)return;
  heading.textContent=`الزبائن الذين يحجزون عادةً يوم ${weekday}`;
- summary.textContent=`${people.length} ${people.length===1?'زبون معتاد':'زبائن معتادون'}`;
+ summary.textContent=`${people.length} ${people.length===1?'زبون معتاد':'زبائن معتادون'} خلال الشهر الأخير`;
  list.innerHTML=people.length?people.map(person=>`<div class="regular-customers-row"><span>${safe(person.name)}</span><span dir="ltr">${safe(person.phone)}</span></div>`).join(''):'<p class="regular-customers-empty">لا يوجد زبائن متكررون في هذا اليوم بعد.</p>';
 }
 function setupRegularCustomersPanel(){
