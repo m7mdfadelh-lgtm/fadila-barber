@@ -184,7 +184,7 @@ async function loadGallery() {
     images.forEach((img, index) => {
       const div = document.createElement("div");
       div.className = "gallery-item";
-      const imageUrl = `${API_URL}/gallery/${encodeURIComponent(img._id)}/image`;
+      const imageUrl = `${API_URL}/gallery/${encodeURIComponent(img._id)}/image?v=2`;
       const image = document.createElement("img");
       image.src = imageUrl;
       image.alt = `صورة ${index + 1} من أعمال فاديلا`;

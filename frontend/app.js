@@ -28,7 +28,7 @@ async function loadGalleryPreview(){
     grid.replaceChildren();
     validImages.slice(0,3).forEach((item,index)=>{
       const image=document.createElement('img');
-      image.src=`${API_URL}/gallery/${encodeURIComponent(item._id)}/image`;
+      image.src=`${API_URL}/gallery/${encodeURIComponent(item._id)}/image?v=2`;
       image.alt='صورة '+(index+1)+' من أعمال فاديلا';
       image.loading='lazy';
       image.decoding='async';
