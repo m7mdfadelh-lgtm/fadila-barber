@@ -42,10 +42,14 @@ function getRegularCustomersForWeekday(weekdayIndex){
   if(!dateString||dateString<cutoff||dateString>=today||getJerusalemWeekdayIndex(date)!==weekdayIndex)return;
   const phone=String(appointment.customerPhone||'').replace(/\D/g,'');if(!phone)return;
   const existing=byPhone.get(phone);
-  if(existing){existing.visits+=1;existing.name=String(appointment.customerName||existing.name);}
-  else byPhone.set(phone,{name:String(appointment.customerName||'زبون'),phone:String(appointment.customerPhone),visits:1});
+  if(existing){existing.visitDates.add(dateString);existing.name=String(appointment.customerName||existing.name);}
+  else byPhone.set(phone,{name:String(appointment.customerName||'زبون'),phone:String(appointment.customerPhone),visitDates:new Set([dateString])});
  });
- return[...byPhone.values()].filter(customer=>customer.visits>=2).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+ return[...byPhone.values()].filter(customer=>{
+  const visitDates=[...customer.visitDates].map(value=>Date.parse(`${value}T00:00:00Z`)).sort((a,b)=>a-b);
+  const hasConsecutiveWeeks=visitDates.some((date,index)=>index>0&&date-visitDates[index-1]===7*24*60*60*1000);
+  return visitDates.length>=3&&hasConsecutiveWeeks;
+ }).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
 }
 function renderRegularCustomersView(){
  const weekdayIndex=regularCustomersSelectedWeekday,weekday=regularCustomerWeekdays[weekdayIndex]||regularCustomerWeekdays[getJerusalemWeekdayIndex(new Date())],people=getRegularCustomersForWeekday(weekdayIndex);
@@ -53,7 +57,7 @@ function renderRegularCustomersView(){
  const heading=$('regularCustomersDayHeading'),summary=$('regularCustomersCountSummary'),list=$('regularCustomersList');
  if(!heading||!summary||!list)return;
  heading.textContent=`الزبائن الذين يحجزون عادةً يوم ${weekday}`;
- summary.textContent=`${people.length} ${people.length===1?'زبون معتاد':'زبائن معتادون'} خلال آخر 3 أشهر`;
+ summary.textContent=`${people.length} ${people.length===1?'زبون معتاد':'زبائن معتادون'} خلال آخر 3 أشهر (3 مواعيد، بينها أسبوعان متتاليان)`;
  list.innerHTML=people.length?people.map(person=>`<div class="regular-customers-row"><span>${safe(person.name)}</span><span dir="ltr">${safe(person.phone)}</span></div>`).join(''):'<p class="regular-customers-empty">لا يوجد زبائن متكررون في هذا اليوم بعد.</p>';
 }
 function setupRegularCustomersPanel(){
