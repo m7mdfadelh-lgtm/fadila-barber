@@ -22,60 +22,75 @@ async function loadSlots(){const date=$('manualDate').value,service=$('manualSer
 async function createAppointment(){const oneOff=$('manualCustomer').value==='__walk_in__',customerId=$('manualCustomer').value,name=$('manualCustomerName').value.trim(),phone=$('manualCustomerPhone').value.replace(/\D/g,'');if(oneOff&&name.length<2)return msg('manualMessage','يرجى إدخال اسم العميل','error');if(oneOff&&!/^05\d{8}$/.test(phone))return msg('manualMessage','يرجى إدخال رقم هاتف صحيح بصيغة 05XXXXXXXX','error');if(!oneOff&&!customerId)return msg('manualMessage','يرجى اختيار العميل','error');try{const result=await api('/appointments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({oneOff,customerId:oneOff?'':customerId,customerName:name,customerPhone:phone,service:$('manualService').value,date:$('manualDate').value,time:$('manualTime').value})});msg('manualMessage','تم إنشاء الموعد','success');await loadAppointments();if(result.data?.customerPhone)offerWhatsAppReminder(result.data,{},true);if(oneOff){$('manualCustomer').value='';$('manualCustomerName').value='';$('manualCustomerPhone').value='';updateManualCustomerFields()}}catch(e){msg('manualMessage',e.message,'error')}}
 const statusOptions=a=>['pending','confirmed','cancelled','completed','no-show'].map(s=>`<option value="${s}" ${a.status===s?'selected':''}>${statusLabel(s)}</option>`).join('');
 function getTodayInJerusalem(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
-function getThreeMonthsAgoInJerusalem(){
- const [year,month,day]=getTodayInJerusalem().split('-').map(Number);
- const targetMonthIndex=month-4;
- const cutoffYear=year+Math.floor(targetMonthIndex/12);
- const cutoffMonth=((targetMonthIndex%12)+12)%12+1;
- const lastDayOfMonth=new Date(Date.UTC(cutoffYear,cutoffMonth,0)).getUTCDate();
- return `${cutoffYear}-${String(cutoffMonth).padStart(2,'0')}-${String(Math.min(day,lastDayOfMonth)).padStart(2,'0')}`;
-}
-
-const regularCustomerWeekdays=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-function getJerusalemWeekdayIndex(date){const weekday=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Jerusalem',weekday:'short'}).format(new Date(date));return['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(weekday)}
-let regularCustomersSelectedWeekday=getJerusalemWeekdayIndex(new Date()),regularCustomersManualSelection=false;
-function getRegularCustomersForWeekday(weekdayIndex){
- const today=getTodayInJerusalem(),cutoff=getThreeMonthsAgoInJerusalem(),byPhone=new Map();
- appointments.forEach(appointment=>{
-  if(!['confirmed','completed','no-show'].includes(appointment.status))return;
-  const date=new Date(appointment.date),dateString=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem'}).format(date);
-  if(!dateString||dateString<cutoff||dateString>=today||getJerusalemWeekdayIndex(date)!==weekdayIndex)return;
-  const phone=String(appointment.customerPhone||'').replace(/\D/g,'');if(!phone)return;
-  const existing=byPhone.get(phone);
-  if(existing){existing.visitDates.add(dateString);existing.name=String(appointment.customerName||existing.name);}
-  else byPhone.set(phone,{name:String(appointment.customerName||'زبون'),phone:String(appointment.customerPhone),visitDates:new Set([dateString])});
+let customerFollowupSelectedId='';
+function customerFollowupData(){
+ const phoneKey=value=>String(value||'').replace(/\D/g,'');
+ const byId=new Map(),byPhone=new Map();
+ appointments.filter(item=>item.status!=='cancelled').forEach(item=>{
+  const id=String(item.customer?._id||item.customer||''),phone=phoneKey(item.customerPhone);
+  const isLater=(previous)=>!previous||new Date(item.date)>new Date(previous.date)||(new Date(item.date).getTime()===new Date(previous.date).getTime()&&String(item.time||'')>String(previous.time||''));
+  if(id&&isLater(byId.get(id)))byId.set(id,item);
+  if(phone&&isLater(byPhone.get(phone)))byPhone.set(phone,item);
  });
- return[...byPhone.values()].filter(customer=>{
-  const visitDates=[...customer.visitDates].map(value=>Date.parse(`${value}T00:00:00Z`)).sort((a,b)=>a-b);
-  const hasConsecutiveWeeks=visitDates.some((date,index)=>index>0&&date-visitDates[index-1]===7*24*60*60*1000);
-  return visitDates.length>=3&&hasConsecutiveWeeks;
- }).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+ const today=getTodayInJerusalem(),todayMs=Date.parse(`${today}T00:00:00Z`);
+ return customers.map(customer=>{
+  const customerId=String(customer.id||customer._id||''),phone=phoneKey(customer.phone);
+  let last=byId.get(customerId)||null;const phoneLast=phone?byPhone.get(phone):null;
+  if(phoneLast&&(!last||new Date(phoneLast.date)>new Date(last.date)||(new Date(phoneLast.date).getTime()===new Date(last.date).getTime()&&String(phoneLast.time||'')>String(last.time||''))))last=phoneLast;
+  const date=last?new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem'}).format(new Date(last.date)):'';
+  const daysAgo=date?Math.floor((todayMs-Date.parse(`${date}T00:00:00Z`))/86400000):null;
+  const future=Boolean(last&&new Date(last.date).getTime()>Date.now());
+  const color=future?'' : daysAgo===null||daysAgo>21?'red':daysAgo>14?'orange':daysAgo>7?'yellow':'green';
+  return{...customer,id:customerId,last,date,daysAgo,future,color};
+ }).sort((a,b)=>{
+  if(!a.date&&!b.date)return String(a.name||'').localeCompare(String(b.name||''),'ar');
+  if(!a.date)return-1;if(!b.date)return 1;
+  return a.date.localeCompare(b.date)||String(a.last?.time||'').localeCompare(String(b.last?.time||''))||String(a.name||'').localeCompare(String(b.name||''),'ar');
+ });
 }
-function renderRegularCustomersView(){
- const weekdayIndex=regularCustomersSelectedWeekday,weekday=regularCustomerWeekdays[weekdayIndex]||regularCustomerWeekdays[getJerusalemWeekdayIndex(new Date())],people=getRegularCustomersForWeekday(weekdayIndex);
- $('overviewRegularCustomersCount').textContent=String(people.length);$('overviewRegularCustomersDay').textContent=`يوم ${weekday}`;
- const heading=$('regularCustomersDayHeading'),summary=$('regularCustomersCountSummary'),list=$('regularCustomersList');
- if(!heading||!summary||!list)return;
- heading.textContent=`الزبائن الذين يحجزون عادةً يوم ${weekday}`;
- summary.textContent=`${people.length} ${people.length===1?'زبون معتاد':'زبائن معتادون'} خلال آخر 3 أشهر (3 مواعيد، بينها أسبوعان متتاليان)`;
- list.innerHTML=people.length?people.map(person=>`<div class="regular-customers-row"><span>${safe(person.name)}</span><span dir="ltr">${safe(person.phone)}</span></div>`).join(''):'<p class="regular-customers-empty">لا يوجد زبائن متكررون في هذا اليوم بعد.</p>';
+function customerFollowupDateLabel(customer){
+ if(!customer.last)return'لم يسبق له حجز موعد';
+ const date=new Intl.DateTimeFormat('ar',{timeZone:'Asia/Jerusalem',day:'numeric',month:'short',year:'numeric'}).format(new Date(customer.last.date));
+ if(customer.future)return`الموعد القادم: ${date} · ${String(customer.last.time||'')}`;
+ const relative=customer.daysAgo===0?'اليوم':customer.daysAgo===1?'منذ يوم واحد':`منذ ${customer.daysAgo} أيام`;
+ return`آخر موعد: ${date} · ${relative}`;
 }
-function setupRegularCustomersPanel(){
- const select=$('regularCustomersDaySelect');
- select.innerHTML=regularCustomerWeekdays.map((day,index)=>`<option value="${index}">${day}</option>`).join('');
- select.value=String(regularCustomersSelectedWeekday);renderRegularCustomersView();
- select.addEventListener('change',()=>{regularCustomersSelectedWeekday=Number(select.value);regularCustomersManualSelection=true;renderRegularCustomersView()});
- $('closeRegularCustomers').addEventListener('click',closeRegularCustomersModal);
- $('regularCustomersModal').addEventListener('click',event=>{if(event.target===$('regularCustomersModal'))closeRegularCustomersModal()});
+function customerFollowupWhatsAppUrl(customer){
+ const phone=String(customer.phone||'').replace(/\D/g,'').replace(/^0/,'972');if(!phone)return'';
+ const text=`مرحباً ${customer.name||''} 👋\nاشتقنا لك في Fadila Barber 💈\nهل ترغب في حجز موعد جديد؟`;
+ return`https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
 }
-function openRegularCustomersModal(){if(!regularCustomersManualSelection)regularCustomersSelectedWeekday=getJerusalemWeekdayIndex(new Date());$('regularCustomersDaySelect').value=String(regularCustomersSelectedWeekday);renderRegularCustomersView();$('regularCustomersModal').classList.remove('hidden')}
-function closeRegularCustomersModal(){$('regularCustomersModal').classList.add('hidden')}
+function renderCustomerFollowup(){
+ const query=String($('customerFollowupSearch')?.value||'').trim().toLocaleLowerCase('ar'),all=customerFollowupData();
+ const overdue=all.filter(customer=>customer.color&&customer.color!=='green'&&!customer.future).length;
+ $('overviewCustomerFollowupCount').textContent=String(overdue);
+ const filtered=all.filter(customer=>!query||String(customer.name||'').toLocaleLowerCase('ar').includes(query));
+ if(customerFollowupSelectedId&&!filtered.some(customer=>customer.id===customerFollowupSelectedId))customerFollowupSelectedId='';
+ const list=$('customerFollowupList'),selectedBox=$('customerFollowupSelected');if(!list||!selectedBox)return;
+ $('customerFollowupSummary').textContent=`${all.length} عميل · ${overdue} بحاجة إلى متابعة`;
+ list.innerHTML=filtered.length?filtered.map(customer=>{
+  const dot=customer.color?`<i class="customer-followup-dot is-${customer.color}" aria-label="${customer.color}"></i>`:'<i class="customer-followup-dot is-future" aria-label="موعد قادم"></i>';
+  const whatsapp=customerFollowupWhatsAppUrl(customer);
+  return`<article class="customer-followup-row ${customer.id===customerFollowupSelectedId?'is-selected':''}"><button type="button" class="customer-followup-pick" data-followup-customer="${safe(customer.id)}">${dot}<span class="customer-followup-person"><strong>${safe(customer.name)}</strong><small dir="ltr">${safe(customer.phone)}</small><small class="customer-followup-last">${safe(customerFollowupDateLabel(customer))}</small></span></button>${whatsapp?`<a class="customer-followup-whatsapp" href="${safe(whatsapp)}" target="_blank" rel="noopener noreferrer" aria-label="إرسال رسالة WhatsApp إلى ${safe(customer.name)}">واتساب</a>`:''}</article>`
+ }).join(''):'<p class="customer-followup-empty">لا يوجد عملاء بهذا الاسم.</p>';
+ const selected=filtered.find(customer=>customer.id===customerFollowupSelectedId);
+ if(selected){const whatsapp=customerFollowupWhatsAppUrl(selected);selectedBox.classList.remove('hidden');selectedBox.innerHTML=`<i class="customer-followup-dot is-${selected.color||'future'}"></i><div><strong>${safe(selected.name)}</strong><small>${safe(customerFollowupDateLabel(selected))}</small></div>${whatsapp?`<a class="customer-followup-whatsapp" href="${safe(whatsapp)}" target="_blank" rel="noopener noreferrer">إرسال رسالة WhatsApp</a>`:''}`}
+ else{selectedBox.classList.add('hidden');selectedBox.replaceChildren()}
+}
+function setupCustomerFollowupPanel(){
+ $('customerFollowupSearch').addEventListener('input',()=>{customerFollowupSelectedId='';renderCustomerFollowup()});
+ $('customerFollowupList').addEventListener('click',event=>{const button=event.target.closest('[data-followup-customer]');if(!button)return;customerFollowupSelectedId=button.dataset.followupCustomer;renderCustomerFollowup()});
+ $('closeCustomerFollowup').addEventListener('click',closeCustomerFollowupModal);
+ $('customerFollowupModal').addEventListener('click',event=>{if(event.target===$('customerFollowupModal'))closeCustomerFollowupModal()});
+}
+function openCustomerFollowupModal(){$('customerFollowupSearch').value='';customerFollowupSelectedId='';renderCustomerFollowup();$('customerFollowupModal').classList.remove('hidden');$('customerFollowupSearch').focus({preventScroll:true})}
+function closeCustomerFollowupModal(){$('customerFollowupModal').classList.add('hidden')}
 
 function renderOwnerOverview(){
  const today=getTodayInJerusalem(),todayLabel=new Intl.DateTimeFormat('ar',{timeZone:'Asia/Jerusalem',weekday:'long',day:'numeric',month:'long'}).format(new Date());
  $('ownerOverviewDate').textContent=todayLabel;
  $('overviewTodayCount').textContent=String(appointments.filter(item=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Jerusalem'}).format(new Date(item.date))===today&&item.status!=='cancelled').length);
- renderRegularCustomersView();
+ renderCustomerFollowup();
  $('overviewUnreadCount').textContent=String(ownerMessages.filter(item=>!item.readAt).length);
  $('overviewFeedbackCount').textContent=String(ownerFeedback.length);
  const currentTime=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Jerusalem',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date());
@@ -297,8 +312,8 @@ function setupOwnerNavigation(){
  $('ownerMenuButton').addEventListener('click',()=>{if($('ownerNavDrawer').classList.contains('is-open'))closeOwnerNavigation();else openOwnerNavigation()});
  $('ownerNavClose').addEventListener('click',closeOwnerNavigation);$('ownerNavBackdrop').addEventListener('click',closeOwnerNavigation);
  $('ownerNavDrawer').addEventListener('click',event=>{const button=event.target.closest('[data-owner-target]');if(button)selectOwnerPanel(button.dataset.ownerTarget)});
- $('ownerOverview').addEventListener('click',event=>{if(event.target.closest('[data-overview-messages]')){openOwnerMessages();return}if(event.target.closest('[data-overview-regular-customers]')){openRegularCustomersModal();return}const button=event.target.closest('[data-overview-target]');if(!button)return;if(button.dataset.overviewTarget==='appointments'){if(button.dataset.overviewFilter==='pending'){appointmentStatusFilter='pending';$('filterDate').value=''}else{appointmentStatusFilter='all';$('filterDate').value=getTodayInJerusalem()}updateAppointmentFilterControls();renderAppointments();decorateAllAppointmentDates();selectOwnerPanel('appointments',true);return}selectOwnerPanel(button.dataset.overviewTarget)});
- document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeOwnerNavigation();closeLogoutConfirmation();closeRegularCustomersModal();if(!$('ownerConversationPanel').classList.contains('hidden'))closeOwnerConversation()}});
+ $('ownerOverview').addEventListener('click',event=>{if(event.target.closest('[data-overview-messages]')){openOwnerMessages();return}if(event.target.closest('[data-overview-customer-followup]')){openCustomerFollowupModal();return}const button=event.target.closest('[data-overview-target]');if(!button)return;if(button.dataset.overviewTarget==='appointments'){if(button.dataset.overviewFilter==='pending'){appointmentStatusFilter='pending';$('filterDate').value=''}else{appointmentStatusFilter='all';$('filterDate').value=getTodayInJerusalem()}updateAppointmentFilterControls();renderAppointments();decorateAllAppointmentDates();selectOwnerPanel('appointments',true);return}selectOwnerPanel(button.dataset.overviewTarget)});
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'){closeOwnerNavigation();closeLogoutConfirmation();closeCustomerFollowupModal();if(!$('ownerConversationPanel').classList.contains('hidden'))closeOwnerConversation()}});
  selectOwnerPanel('overview')
 }
 function setupOwnerGallery(){
@@ -309,4 +324,4 @@ function setupOwnerGallery(){
 document.addEventListener('input',event=>{if(event.target.id==='notificationCustomerSearch')renderCustomerSelectors();if(event.target.id==='manageCustomerSearch')renderCustomersManagement()});
 document.addEventListener('change',event=>{if(event.target.id==='manageCustomerSelect')renderCustomersManagement()});
 document.addEventListener('click',event=>{const open=event.target.closest('[data-open-conversation]');if(open)openOwnerConversation(open.dataset.openConversation);if(event.target.closest('#confirmMoveDate'))confirmMoveDate();if(event.target.closest('#cancelMoveDate'))closeMoveDatePanel()});
-document.addEventListener('DOMContentLoaded',async()=>{setupRegularCustomersPanel();setupCollapsibleSections();setupOwnerNavigation();renderOwnerOverview();setupOwnerGallery();$('ownerEnterButton').onclick=showOwnerApp;if(sessionStorage.getItem('skipDashboardIntro')==='1'){sessionStorage.removeItem('skipDashboardIntro');$('ownerWelcomeView').classList.add('hidden');$('ownerAppContent').classList.remove('hidden')}$('filterDate').value=getTodayInJerusalem();$('overrideStartDate').min=getTodayInJerusalem();$('overrideEndDate').min=getTodayInJerusalem();$('overrideStartDate').onchange=()=>{$('overrideEndDate').min=$('overrideStartDate').value||getTodayInJerusalem();if($('overrideEndDate').value&&$('overrideEndDate').value<$('overrideStartDate').value)$('overrideEndDate').value=$('overrideStartDate').value};updateAppointmentFilterControls();try{const me=await api('/auth/me');if(me.user.role!=='owner')location.href='index.html';await Promise.all([loadCustomers(),loadServices(),loadHours(),loadFeedback()]);await loadAppointments();await loadOwnerMessages()}catch(e){console.error(e)}$('logout').onclick=openLogoutConfirmation;$('cancelLogoutButton').onclick=closeLogoutConfirmation;$('confirmLogoutButton').onclick=performOwnerLogout;$('logoutConfirmDialog').addEventListener('click',event=>{if(event.target===$('logoutConfirmDialog'))closeLogoutConfirmation()});$('ownerMessagesButton').onclick=openOwnerMessages;$('closeOwnerConversation').onclick=closeOwnerConversation;$('sendOwnerConversationReply').onclick=sendOwnerConversationReply;$('ownerConversationPanel').addEventListener('click',event=>{if(event.target===$('ownerConversationPanel'))closeOwnerConversation()});$('closeOwnerMessages').onclick=closeOwnerMessages;$('ownerMessagesPanel').addEventListener('click',event=>{if(event.target===$('ownerMessagesPanel'))closeOwnerMessages()});navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='fadila-message'){refreshOwnerMessages();if(activeOwnerConversationId&&!$('ownerConversationPanel').classList.contains('hidden'))loadOwnerConversation()}});$('createCustomer').onclick=createCustomer;$('addService').onclick=addService;$('cancelServiceEdit').onclick=cancelServiceEdit;$('manualCustomer').onchange=updateManualCustomerFields;$('manualService').onchange=loadSlots;$('manualDate').onchange=loadSlots;$('createAppointment').onclick=createAppointment;$('filterDate').onchange=()=>{updateAppointmentFilterControls();renderAppointments();decorateAllAppointmentDates()};$('showAllAppointments').onclick=toggleAllAppointments;$('timelineEditorButton').onclick=openTimeline;$('closeTimeline').onclick=closeTimeline;$('applyTimelineChanges').onclick=applyTimelineChanges;$('timelineModal').addEventListener('click',event=>{if(event.target===$('timelineModal'))closeTimeline()});$('saveHours').onclick=saveHours;$('newDateOverride').onclick=startNewDateOverride;$('saveDateOverride').onclick=saveDateOverride;$('removeDateOverride').onclick=removeDateOverride;$('selectAllMessages').onchange=toggleAllMessages;$('deleteSelectedMessages').onclick=deleteSelectedMessages;$('enableNotifications').onclick=enablePush;$('sendCustomerNotification').onclick=sendCustomerNotification;$('refreshNotificationCampaigns').onclick=loadNotificationCampaignReports});
+document.addEventListener('DOMContentLoaded',async()=>{setupCustomerFollowupPanel();setupCollapsibleSections();setupOwnerNavigation();renderOwnerOverview();setupOwnerGallery();$('ownerEnterButton').onclick=showOwnerApp;if(sessionStorage.getItem('skipDashboardIntro')==='1'){sessionStorage.removeItem('skipDashboardIntro');$('ownerWelcomeView').classList.add('hidden');$('ownerAppContent').classList.remove('hidden')}$('filterDate').value=getTodayInJerusalem();$('overrideStartDate').min=getTodayInJerusalem();$('overrideEndDate').min=getTodayInJerusalem();$('overrideStartDate').onchange=()=>{$('overrideEndDate').min=$('overrideStartDate').value||getTodayInJerusalem();if($('overrideEndDate').value&&$('overrideEndDate').value<$('overrideStartDate').value)$('overrideEndDate').value=$('overrideStartDate').value};updateAppointmentFilterControls();try{const me=await api('/auth/me');if(me.user.role!=='owner')location.href='index.html';await Promise.all([loadCustomers(),loadServices(),loadHours(),loadFeedback()]);await loadAppointments();await loadOwnerMessages()}catch(e){console.error(e)}$('logout').onclick=openLogoutConfirmation;$('cancelLogoutButton').onclick=closeLogoutConfirmation;$('confirmLogoutButton').onclick=performOwnerLogout;$('logoutConfirmDialog').addEventListener('click',event=>{if(event.target===$('logoutConfirmDialog'))closeLogoutConfirmation()});$('ownerMessagesButton').onclick=openOwnerMessages;$('closeOwnerConversation').onclick=closeOwnerConversation;$('sendOwnerConversationReply').onclick=sendOwnerConversationReply;$('ownerConversationPanel').addEventListener('click',event=>{if(event.target===$('ownerConversationPanel'))closeOwnerConversation()});$('closeOwnerMessages').onclick=closeOwnerMessages;$('ownerMessagesPanel').addEventListener('click',event=>{if(event.target===$('ownerMessagesPanel'))closeOwnerMessages()});navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='fadila-message'){refreshOwnerMessages();if(activeOwnerConversationId&&!$('ownerConversationPanel').classList.contains('hidden'))loadOwnerConversation()}});$('createCustomer').onclick=createCustomer;$('addService').onclick=addService;$('cancelServiceEdit').onclick=cancelServiceEdit;$('manualCustomer').onchange=updateManualCustomerFields;$('manualService').onchange=loadSlots;$('manualDate').onchange=loadSlots;$('createAppointment').onclick=createAppointment;$('filterDate').onchange=()=>{updateAppointmentFilterControls();renderAppointments();decorateAllAppointmentDates()};$('showAllAppointments').onclick=toggleAllAppointments;$('timelineEditorButton').onclick=openTimeline;$('closeTimeline').onclick=closeTimeline;$('applyTimelineChanges').onclick=applyTimelineChanges;$('timelineModal').addEventListener('click',event=>{if(event.target===$('timelineModal'))closeTimeline()});$('saveHours').onclick=saveHours;$('newDateOverride').onclick=startNewDateOverride;$('saveDateOverride').onclick=saveDateOverride;$('removeDateOverride').onclick=removeDateOverride;$('selectAllMessages').onchange=toggleAllMessages;$('deleteSelectedMessages').onclick=deleteSelectedMessages;$('enableNotifications').onclick=enablePush;$('sendCustomerNotification').onclick=sendCustomerNotification;$('refreshNotificationCampaigns').onclick=loadNotificationCampaignReports});

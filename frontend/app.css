@@ -2100,6 +2100,47 @@
 .owner-page .notification-campaign-card li { margin:5px 0; color:#172b4d; }
 .owner-page .notification-campaign-card li span,
 .owner-page .notification-campaign-card li small { display:block; color:#667085; font-size:12px; }
+
+/* Customer follow-up modal in the owner overview. */
+.owner-page .customer-followup-modal { position:fixed; inset:0; z-index:9600; display:grid; place-items:center; padding:16px; background:rgba(9,27,51,.62); backdrop-filter:blur(5px); }
+.owner-page .customer-followup-card { width:min(700px,100%); max-height:calc(100dvh - 32px); display:flex; flex-direction:column; padding:20px; border-radius:20px; background:#fff; box-shadow:0 24px 70px rgba(9,27,51,.28); }
+.owner-page .customer-followup-header { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.owner-page .customer-followup-header h2 { margin:0; color:#0f4ea8; font-size:21px; }
+.owner-page .customer-followup-header p { margin:5px 0 0; font-size:13px; }
+.owner-page .customer-followup-search { display:grid; gap:6px; margin:16px 0 10px; color:#344054; font-size:14px; font-weight:650; }
+.owner-page .customer-followup-search input { width:100%; min-height:44px; margin:0; padding:9px 12px; border:1px solid #cdd9e8; border-radius:11px; background:#fff; color:#172b4d; font:inherit; }
+.owner-page .customer-followup-legend { display:flex; flex-wrap:wrap; align-items:center; gap:8px 15px; padding:10px 12px; border-radius:12px; background:#f5f8fc; color:#52657e; font-size:12px; }
+.owner-page .customer-followup-legend span { display:inline-flex; align-items:center; gap:6px; }
+.owner-page .customer-followup-dot { flex:0 0 12px; display:inline-block; width:12px; height:12px; border-radius:50%; }
+.owner-page .customer-followup-dot.is-green { background:#16a34a; }
+.owner-page .customer-followup-dot.is-yellow { background:#eab308; }
+.owner-page .customer-followup-dot.is-orange { background:#f97316; }
+.owner-page .customer-followup-dot.is-red { background:#dc2626; }
+.owner-page .customer-followup-dot.is-future { border:2px solid #1768d1; background:#fff; }
+.owner-page .customer-followup-list { min-height:0; max-height:min(480px,calc(100dvh - 280px)); overflow:auto; margin-top:10px; }
+.owner-page .customer-followup-row { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid #e7edf5; }
+.owner-page .customer-followup-row.is-selected { border-radius:10px; background:#eff6ff; }
+.owner-page .customer-followup-pick { display:flex; align-items:flex-start; gap:10px; min-width:0; padding:3px; border:0; background:transparent; color:#172b4d; text-align:right; }
+.owner-page .customer-followup-person { display:grid; gap:3px; min-width:0; }
+.owner-page .customer-followup-person strong { overflow-wrap:anywhere; font-size:14px; }
+.owner-page .customer-followup-person small { color:#667085; font-size:12px; }
+.owner-page .customer-followup-person small[dir="ltr"] { text-align:right; }
+.owner-page .customer-followup-last { line-height:1.45; }
+.owner-page .customer-followup-whatsapp { display:inline-flex; align-items:center; justify-content:center; min-height:36px; padding:7px 12px; border-radius:10px; background:#159447; color:#fff; font-size:12px; font-weight:700; text-decoration:none; white-space:nowrap; }
+.owner-page .customer-followup-whatsapp:hover { background:#117a3b; }
+.owner-page .customer-followup-selected { display:flex; align-items:center; gap:10px; margin-top:12px; padding:12px; border:1px solid #cfe0f7; border-radius:12px; background:#f6faff; }
+.owner-page .customer-followup-selected > div { display:grid; flex:1; gap:4px; min-width:0; }
+.owner-page .customer-followup-selected small { color:#667085; font-size:12px; }
+.owner-page .customer-followup-empty { margin:0; padding:24px 8px; color:#667085; text-align:center; font-size:14px; }
+@media (max-width:480px) {
+  .owner-page .customer-followup-card { padding:15px; border-radius:16px; }
+  .owner-page .customer-followup-legend { gap:7px 10px; font-size:11px; }
+  .owner-page .customer-followup-row { gap:6px; }
+  .owner-page .customer-followup-pick { gap:7px; }
+  .owner-page .customer-followup-person strong { font-size:13px; }
+  .owner-page .customer-followup-whatsapp { min-height:34px; padding:6px 9px; font-size:11px; }
+  .owner-page .customer-followup-selected { flex-wrap:wrap; }
+}
 @media (max-width:480px) {
   .owner-page .regular-customers-card { padding:16px; border-radius:16px; }
   .owner-page .regular-customers-day-picker { grid-template-columns:1fr; gap:6px; }

@@ -32,8 +32,8 @@
       <button type="button" class="owner-overview-stat" data-overview-target="appointments" aria-label="فتح مواعيد اليوم">
         <span class="owner-overview-icon" aria-hidden="true">▣</span><span class="owner-overview-stat-copy"><small>مواعيد اليوم</small><strong id="overviewTodayCount">0</strong></span>
       </button>
-      <button type="button" class="owner-overview-stat" data-overview-regular-customers="true" aria-label="عرض العملاء المعتادين للحجز حسب اليوم">
-        <span class="owner-overview-icon" aria-hidden="true">◷</span><span class="owner-overview-stat-copy"><small>زبائن يكررون الحجز</small><strong id="overviewRegularCustomersCount">0</strong><span id="overviewRegularCustomersDay" class="owner-overview-stat-day"></span></span>
+      <button type="button" class="owner-overview-stat" data-overview-customer-followup="true" aria-label="فتح قائمة متابعة العملاء">
+        <span class="owner-overview-icon" aria-hidden="true">◷</span><span class="owner-overview-stat-copy"><small>عملاء للمتابعة</small><strong id="overviewCustomerFollowupCount">0</strong><span class="owner-overview-stat-day">لم يحجزوا خلال آخر أسبوع</span></span>
       </button>
       <button type="button" class="owner-overview-stat" data-overview-messages="true" aria-label="فتح الرسائل غير المقروءة">
         <span class="owner-overview-icon" aria-hidden="true">✉</span><span class="owner-overview-stat-copy"><small>رسائل غير مقروءة</small><strong id="overviewUnreadCount">0</strong></span>
@@ -55,15 +55,18 @@
       <time id="overviewNextTime"></time>
     </article>
   </section>
-  <div id="regularCustomersModal" class="regular-customers-modal hidden" role="dialog" aria-modal="true" aria-labelledby="regularCustomersTitle">
-    <section class="regular-customers-card">
-      <header class="regular-customers-header">
-        <div><h2 id="regularCustomersTitle">الزبائن المعتادون</h2><p id="regularCustomersDayHeading" class="muted"></p></div>
-        <button id="closeRegularCustomers" class="secondary compact" type="button" aria-label="إغلاق القائمة">إغلاق</button>
+  <div id="customerFollowupModal" class="customer-followup-modal hidden" role="dialog" aria-modal="true" aria-labelledby="customerFollowupTitle">
+    <section class="customer-followup-card">
+      <header class="customer-followup-header">
+        <div><h2 id="customerFollowupTitle">متابعة العملاء</h2><p id="customerFollowupSummary" class="muted"></p></div>
+        <button id="closeCustomerFollowup" class="secondary compact" type="button" aria-label="إغلاق القائمة">إغلاق</button>
       </header>
-      <label class="regular-customers-day-picker">اليوم المختار<select id="regularCustomersDaySelect" aria-label="اختيار اليوم"></select></label>
-      <p id="regularCustomersCountSummary" class="regular-customers-count" aria-live="polite"></p>
-      <div id="regularCustomersList" class="regular-customers-list" aria-live="polite"></div>
+      <label class="customer-followup-search">البحث عن عميل بالاسم<input id="customerFollowupSearch" type="search" autocomplete="off" placeholder="اكتب اسم العميل"></label>
+      <div class="customer-followup-legend" aria-label="دلالة ألوان المواعيد">
+        <span><i class="customer-followup-dot is-green"></i> خلال أسبوع</span><span><i class="customer-followup-dot is-yellow"></i> أكثر من أسبوع</span><span><i class="customer-followup-dot is-orange"></i> أكثر من أسبوعين</span><span><i class="customer-followup-dot is-red"></i> أكثر من 3 أسابيع</span>
+      </div>
+      <div id="customerFollowupList" class="customer-followup-list" aria-live="polite"></div>
+      <div id="customerFollowupSelected" class="customer-followup-selected hidden" aria-live="polite"></div>
     </section>
   </div>
   <section class="card collapsible-card owner-dashboard-panel owner-feedback-card hidden" data-section="feedback" data-owner-panel="feedback" id="ownerPanel-feedback">
@@ -170,5 +173,5 @@
       </div>
     </section>
   </div>
-<script src="config.js?v=43"></script><script src="pwa.js?v=44"></script><script src="dashboard.js?v=73"></script>
+<script src="config.js?v=43"></script><script src="pwa.js?v=44"></script><script src="dashboard.js?v=74"></script>
 </body></html>
