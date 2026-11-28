@@ -1836,6 +1836,33 @@
   .owner-page .owner-gallery-controls { gap:6px; padding:8px; }
 }
 
+/* Booking helpers and owner follow-up tools. */
+.customer-page .waitlist-join-box { margin-top:12px; padding:14px; border:1px solid #d5e2f2; border-radius:12px; background:#f5f9ff; }
+.customer-page .waitlist-join-box p { margin:0 0 10px; }
+.customer-page .customer-calendar-link { display:inline-flex; align-items:center; margin:8px 0; padding:8px 12px; border-radius:9px; text-decoration:none; }
+.customer-page .customer-attendance-confirmed { color:#217a38; font-weight:700; }
+.customer-page .customer-cancel-request { margin-inline-start:8px; }
+.owner-page .owner-business-summary { margin-top:18px; padding:16px; border:1px solid #dce8f4; border-radius:14px; background:#f8fbff; }
+.owner-page .owner-business-summary h3 { margin:0 0 12px; color:#0f4ea8; }
+.owner-page .owner-business-summary-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.owner-page .owner-business-summary-grid article { display:grid; gap:5px; padding:12px; border-radius:11px; background:#fff; }
+.owner-page .owner-business-summary-grid small,.owner-page .owner-business-summary-grid span { color:#667085; font-size:12px; }
+.owner-page .owner-business-summary-grid strong { font-size:23px; }
+.owner-page .customer-history { margin-top:14px; padding:14px; border:1px solid #dce8f4; border-radius:12px; background:#f8fbff; }
+.owner-page .customer-history h3 { margin:0 0 8px; color:#0f4ea8; }
+.owner-page .customer-history ul { padding-inline-start:22px; }
+.owner-page .customer-history li { margin:6px 0; font-size:13px; }
+.owner-page .appointment-quick-actions { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin:8px 0; }
+.owner-page .appointment-quick-actions a { display:inline-flex; align-items:center; min-height:34px; padding:6px 10px; border-radius:9px; text-decoration:none; }
+.owner-page .appointment-arrival,.owner-page .appointment-attendance { color:#217a38; font-size:12px; font-weight:700; }
+.owner-page .waitlist-entry { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.owner-page .waitlist-entry p,.owner-page .waitlist-entry small { display:block; margin:4px 0; }
+.owner-page .change-request-actions { display:flex; flex-wrap:wrap; gap:8px; }
+@media(max-width:520px) {
+ .owner-page .owner-business-summary-grid { grid-template-columns:1fr; }
+ .customer-page .customer-cancel-request { margin-inline-start:0; margin-top:8px; }
+}
+
 
 /* Customer hamburger menu for secondary account actions. */
 .customer-page .app-header { padding-right:58px; padding-left:58px; }

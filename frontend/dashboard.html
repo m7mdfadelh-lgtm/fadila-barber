@@ -5,7 +5,7 @@
   <meta name="theme-color" content="#0f4ea8"><meta name="apple-mobile-web-app-capable" content="yes">
   <title>Fadila — الإدارة</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=70">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=71">
 </head>
 <body class="owner-page">
 
@@ -46,6 +46,7 @@
       <h3>إجراءات سريعة</h3>
       <div class="owner-overview-quick-grid">
         <button type="button" data-overview-target="appointments"><span aria-hidden="true">▣</span> عرض المواعيد</button>
+        <button type="button" data-overview-target="waitlist"><span aria-hidden="true">◷</span> قائمة الانتظار</button>
         <button type="button" data-overview-target="customer-notification"><span aria-hidden="true">♧</span> إرسال إشعار</button>
         <button type="button" data-overview-target="gallery"><span aria-hidden="true">▧</span> معرض الأعمال</button>
       </div>
@@ -54,6 +55,11 @@
       <div><small>الموعد القادم</small><strong id="overviewNextName">جارٍ تحميل المواعيد...</strong><span id="overviewNextService"></span></div>
       <time id="overviewNextTime"></time>
     </article>
+    <section class="owner-business-summary" aria-label="ملخص الحجوزات والإيرادات">
+      <h3>ملخص النشاط</h3>
+      <div class="owner-business-summary-grid"><article><small>حجوزات اليوم</small><strong id="summaryTodayBookings">0</strong><span id="summaryTodayRevenue">₪0</span></article><article><small>آخر 7 أيام</small><strong id="summaryWeekBookings">0</strong><span id="summaryWeekRevenue">₪0</span></article><article><small>هذا الشهر</small><strong id="summaryMonthBookings">0</strong><span id="summaryMonthRevenue">₪0</span></article></div>
+      <p class="muted">الإيرادات تقديرية حسب سعر الخدمات والمواعيد المؤكدة أو المكتملة.</p>
+    </section>
   </section>
   <div id="customerFollowupModal" class="customer-followup-modal hidden" role="dialog" aria-modal="true" aria-labelledby="customerFollowupTitle">
     <section class="customer-followup-card">
@@ -84,6 +90,10 @@
     <div class="section-content"><p class="muted">ستُفتح رسالة جاهزة في WhatsApp؛ أرسلها فقط إذا وافق الزبون على تلقي رسائل.</p><p id="oneOffReminderSummary" class="muted">تحميل المواعيد...</p><div id="oneOffReminders" class="appointment-list"></div></div>
   </section>
 
+  <section class="card collapsible-card owner-dashboard-panel hidden" data-section="waitlist" data-owner-panel="waitlist" id="ownerPanel-waitlist">
+    <div class="section-heading"><h2>قائمة انتظار المواعيد</h2><button id="refreshWaitlist" class="secondary compact" type="button">تحديث</button></div><div class="section-content"><p class="muted">عند إلغاء موعد، نرسل إشعاراً فورياً للعملاء المسجلين للخدمة واليوم نفسيهما إذا كانت إشعاراتهم مفعّلة.</p><div id="ownerWaitlistList" class="appointment-list"></div></div>
+  </section>
+
   <section class="card collapsible-card owner-dashboard-panel hidden" data-section="create-appointment" data-owner-panel="create-appointment" id="ownerPanel-create-appointment">
     <div class="section-heading"><h2>إنشاء موعد للزبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إنشاء موعد للزبون">−</button></div>
     <div class="section-content"><label>البحث عن زبون بالاسم<input id="manualCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>الزبون<select id="manualCustomer"></select></label><div id="manualOneOffFields" class="manual-one-off-fields hidden"><label>اسم العميل<input id="manualCustomerName" type="text" maxlength="50" autocomplete="off"></label><label>رقم الهاتف<input id="manualCustomerPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="05XXXXXXXX" autocomplete="tel"></label></div><label>الخدمة<select id="manualService"></select></label><div class="grid-two owner-date-time-pair"><label>التاريخ<input id="manualDate" type="date"></label><label>الساعة<select id="manualTime" disabled></select></label></div><button id="createAppointment">إنشاء موعد مؤكد</button><p id="manualMessage" class="message"></p></div>
@@ -91,12 +101,12 @@
 
   <section class="card collapsible-card owner-dashboard-panel hidden" data-section="customer-notification" data-owner-panel="customer-notification" id="ownerPanel-customer-notification">
     <div class="section-heading"><h2>إرسال إشعار للزبون</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إرسال إشعار للزبون">−</button></div>
-    <div class="section-content"><section class="notification-quick-action" aria-label="الإشعارات"><p id="notificationState" class="muted">فعّل الإشعارات لتلقي تذكير قبل الموعد بـ15 دقيقة.</p><button id="enableNotifications" class="secondary compact" type="button">تفعيل الإشعارات</button></section><p class="muted">تُحفظ الرسالة لكل حساب عميل، نشط أو غير نشط. يصل إشعار فوري فقط للأجهزة ذات اشتراك إشعارات صالح؛ الحساب غير النشط لا يستطيع تسجيل الدخول إلى التطبيق.</p><label>البحث عن زبون<input id="notificationCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>الزبون<select id="notificationCustomer"><option value="">اختر زبوناً</option></select></label><label>العنوان<input id="notificationTitle" maxlength="80" placeholder="مثال: تحديث من Fadila"></label><label>الرسالة<textarea id="notificationBody" maxlength="240" rows="4" placeholder="اكتب محتوى الإشعار"></textarea></label><button id="sendCustomerNotification">إرسال الإشعار</button><p id="sendNotificationMessage" class="message"></p><section class="notification-campaign-history" aria-labelledby="notificationCampaignHistoryTitle"><div class="notification-campaign-history-heading"><h3 id="notificationCampaignHistoryTitle">تقارير آخر 5 رسائل</h3><button id="refreshNotificationCampaigns" class="secondary compact" type="button">تحديث</button></div><p class="muted">يعرض العملاء الذين لم يصلهم الإشعار، أو وصل لبعض أجهزتهم فقط.</p><div id="notificationCampaignReports" aria-live="polite"><p class="muted">افتح هذا القسم لتحميل التقارير.</p></div></section></div>
+    <div class="section-content"><section class="notification-quick-action" aria-label="الإشعارات"><p id="notificationState" class="muted">فعّل الإشعارات لتلقي تذكير قبل الموعد بيوم وبـ15 دقيقة.</p><button id="enableNotifications" class="secondary compact" type="button">تفعيل الإشعارات</button></section><p class="muted">تُحفظ الرسالة لكل حساب عميل، نشط أو غير نشط. يصل إشعار فوري فقط للأجهزة ذات اشتراك إشعارات صالح؛ الحساب غير النشط لا يستطيع تسجيل الدخول إلى التطبيق.</p><label>البحث عن زبون<input id="notificationCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>الزبون<select id="notificationCustomer"><option value="">اختر زبوناً</option></select></label><label>العنوان<input id="notificationTitle" maxlength="80" placeholder="مثال: تحديث من Fadila"></label><label>الرسالة<textarea id="notificationBody" maxlength="240" rows="4" placeholder="اكتب محتوى الإشعار"></textarea></label><button id="sendCustomerNotification">إرسال الإشعار</button><p id="sendNotificationMessage" class="message"></p><section class="notification-campaign-history" aria-labelledby="notificationCampaignHistoryTitle"><div class="notification-campaign-history-heading"><h3 id="notificationCampaignHistoryTitle">تقارير آخر 5 رسائل</h3><button id="refreshNotificationCampaigns" class="secondary compact" type="button">تحديث</button></div><p class="muted">يعرض العملاء الذين لم يصلهم الإشعار، أو وصل لبعض أجهزتهم فقط.</p><div id="notificationCampaignReports" aria-live="polite"><p class="muted">افتح هذا القسم لتحميل التقارير.</p></div></section></div>
   </section>
 
   <section class="card collapsible-card owner-dashboard-panel hidden" data-section="manage-customers" data-owner-panel="manage-customers" id="ownerPanel-manage-customers">
     <div class="section-heading"><h2>إدارة الزبائن</h2><button class="collapse-button" type="button" aria-expanded="true" aria-label="طي قسم إدارة الزبائن">−</button></div>
-    <div class="section-content"><p class="muted">ابحث عن الزبون بالاسم أو اختره من القائمة لإظهار خيارات الإدارة.</p><label>البحث عن زبون<input id="manageCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>اختيار الزبون<select id="manageCustomerSelect"><option value="">اختر زبوناً</option></select></label><div id="customersManagement" class="customer-management-list"></div><p id="manageCustomerMessage" class="message"></p></div>
+    <div class="section-content"><p class="muted">ابحث عن الزبون بالاسم أو اختره من القائمة لإظهار خيارات الإدارة.</p><label>البحث عن زبون<input id="manageCustomerSearch" type="search" placeholder="اكتب اسم الزبون" autocomplete="off"></label><label>اختيار الزبون<select id="manageCustomerSelect"><option value="">اختر زبوناً</option></select></label><div id="customersManagement" class="customer-management-list"></div><div id="customerHistory" class="customer-history"></div><p id="manageCustomerMessage" class="message"></p></div>
   </section>
 
   <section class="card collapsible-card owner-dashboard-panel hidden" data-section="working-hours" data-owner-panel="working-hours" id="ownerPanel-working-hours">
@@ -134,6 +144,7 @@
   <button type="button" data-owner-target="overview"><span>⌂</span> نظرة عامة</button>
   <button type="button" data-owner-target="feedback"><span>★</span> تقييمات العملاء</button>
   <button type="button" data-owner-target="appointments"><span>▣</span> المواعيد</button>
+  <button type="button" data-owner-target="waitlist"><span>◷</span> قائمة الانتظار</button>
   <button type="button" data-owner-target="create-appointment"><span>＋</span> حجز موعد لزبون</button>
   <button type="button" data-owner-target="customer-notification"><span>♧</span> إرسال إشعار</button>
   <button type="button" data-owner-target="manage-customers"><span>♙</span> إدارة الزبائن</button>
@@ -173,5 +184,5 @@
       </div>
     </section>
   </div>
-<script src="config.js?v=43"></script><script src="pwa.js?v=44"></script><script src="dashboard.js?v=75"></script>
+<script src="config.js?v=43"></script><script src="pwa.js?v=44"></script><script src="dashboard.js?v=76"></script>
 </body></html>

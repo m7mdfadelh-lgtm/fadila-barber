@@ -8,7 +8,8 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   phone: { type: String, required: true, match: /^05\d{8}$/ },
   active: { type: Boolean, default: true },
-  instagramFollowedAt: { type: Date, default: null }
+  instagramFollowedAt: { type: Date, default: null },
+  ownerNotes: { type: String, maxlength: [500, 'الملاحظات محدودة بـ500 حرف'], default: '' }
 }, { timestamps: true });
 
 userSchema.pre('save', async function hashPassword(next) {

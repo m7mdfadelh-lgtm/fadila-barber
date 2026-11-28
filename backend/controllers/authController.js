@@ -52,7 +52,7 @@ exports.createCustomer = async (req, res) => {
 
 exports.listCustomers = async (req, res) => {
   const users = await User.find({ role: 'customer' }).sort({ active: -1, name: 1 });
-  res.json({ success: true, data: users.map((user) => user.toSafeObject()) });
+  res.json({ success: true, data: users.map((user) => ({ ...user.toSafeObject(), ownerNotes: user.ownerNotes || '' })) });
 };
 
 exports.updateCustomer = async (req, res) => {
@@ -61,7 +61,8 @@ exports.updateCustomer = async (req, res) => {
     const hasUsername = Object.prototype.hasOwnProperty.call(updates, 'username');
     const hasPhone = Object.prototype.hasOwnProperty.call(updates, 'phone');
     const hasPassword = Object.prototype.hasOwnProperty.call(updates, 'password');
-    if (!hasUsername && !hasPhone && !hasPassword) {
+    const hasOwnerNotes = Object.prototype.hasOwnProperty.call(updates, 'ownerNotes');
+    if (!hasUsername && !hasPhone && !hasPassword && !hasOwnerNotes) {
       return res.status(400).json({ success: false, error: 'لم يتم إرسال بيانات للتحديث' });
     }
     const user = await User.findOne({ _id: req.params.id, role: 'customer' });
@@ -86,6 +87,11 @@ exports.updateCustomer = async (req, res) => {
         if (password.length < 6) return res.status(400).json({ success: false, error: 'يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل' });
         user.password = password;
       }
+    }
+    if (hasOwnerNotes) {
+      const ownerNotes = String(updates.ownerNotes || '').trim();
+      if (ownerNotes.length > 500) return res.status(400).json({ success: false, error: 'الملاحظة طويلة جداً' });
+      user.ownerNotes = ownerNotes;
     }
     await user.save();
     if (phoneChanged) {

@@ -58,7 +58,7 @@ exports.createAppointment = async (req, res) => {
     const status = 'confirmed';
     const appointment = await Appointment.create({
       customer: customerId || null, customerName, customerPhone,
-      service, duration, date: start, time, notes, status,
+      service, duration, price: Number(serviceDoc.price) || 0, date: start, time, notes, status,
       approvalRequestedAt: status === 'pending' ? new Date() : null,
       approvalDecisionAt: status === 'confirmed' ? new Date() : null,
       approvalDecision: status === 'confirmed' ? 'approved' : null

@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="FADILA BARBER">
   <title>FADILA BARBER — المواعيد</title>
   <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="images/icon-192.png">
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=60">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="app.css?v=61">
 </head>
 <body class="customer-page">
   <div id="installGate" class="gate hidden">
@@ -44,7 +44,7 @@
         <div class="customer-nav-profile"><span aria-hidden="true">👤</span><div><strong id="customerDrawerName"></strong><small id="customerDrawerPhone"></small></div></div>
         <button type="button" class="customer-nav-item" data-customer-nav="appointments"><span aria-hidden="true">▣</span> مواعيدي</button>
         <button id="messagesButton" class="customer-nav-item hidden" type="button"><span aria-hidden="true">✉</span><span class="customer-nav-item-label">الرسائل</span><b id="messagesBadge" class="messages-badge hidden">0</b></button>
-        <section id="notificationCard" class="card customer-nav-notifications"><h2>الإشعارات</h2><p id="notificationState" class="muted">لتلقي التحديثات والتذكيرات، يرجى السماح بالإشعارات.</p></section>
+        <section id="notificationCard" class="card customer-nav-notifications"><h2>الإشعارات</h2><p id="notificationState" class="muted">لتلقي تحديثات المواعيد وتذكيراً قبل الموعد بيوم، يرجى السماح بالإشعارات.</p></section>
         <button id="enableNotifications" class="secondary customer-nav-item" type="button">تفعيل الإشعارات</button>
         <button id="customerRefreshButton" class="secondary customer-nav-item hidden" type="button"><span aria-hidden="true">↻</span> تحديث البيانات</button>
         <button class="secondary customer-nav-item" id="logoutButton" type="button">تسجيل الخروج</button>
@@ -58,10 +58,11 @@
           <span class="booking-toggle-copy"><span class="booking-toggle-title" role="heading" aria-level="2">حجز موعد</span><span id="bookingToggleHint" class="booking-toggle-hint">اضغط لاختيار الخدمة والتاريخ والساعة</span></span><span id="bookingToggleIcon" class="booking-toggle-icon" aria-hidden="true">⌄</span>
         </button>
         <div id="bookingFields" class="booking-fields hidden">
+          <button id="repeatLastBooking" class="secondary compact hidden" type="button">حجز نفس الخدمة السابقة</button>
           <label>الخدمة<select id="service"><option value="">اختر خدمة</option></select></label>
           <div class="grid-two customer-booking-date-time"><label>التاريخ<input id="date" type="date"></label><label>الساعة<select id="time" disabled><option value="">اختر خدمة وتاريخاً</option></select></label></div>
           <label>ملاحظة (اختياري)<textarea id="bookingNotes" maxlength="500" rows="3" placeholder="أضف أي تفاصيل تساعدنا"></textarea></label>
-          <button id="bookButton">تأكيد الموعد</button><p id="bookingMessage" class="message"></p>
+          <button id="bookButton">تأكيد الموعد</button><div id="waitlistJoinBox" class="waitlist-join-box hidden"><p class="muted">لا توجد ساعات متاحة في هذا اليوم. اترك طلباً لنبلغك إذا تحرر موعد.</p><button id="joinWaitlistButton" class="secondary" type="button">إضافتي إلى قائمة الانتظار</button></div><p id="bookingMessage" class="message"></p>
         </div>
       </section>
       <section class="card customer-feedback-card">
@@ -152,5 +153,5 @@
       </div>
     </section>
   </div>
-  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=55"></script>
+  <script src="config.js?v=38"></script><script src="pwa.js?v=39"></script><script src="app.js?v=56"></script>
 </body></html>

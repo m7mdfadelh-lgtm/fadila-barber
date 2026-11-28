@@ -4,6 +4,7 @@ const BusinessSettings = require('../models/BusinessSettings');
 const pushService = require('../services/pushService');
 const { jerusalemDateTimeToUtc, getAppointmentInstant, getJerusalemDateString, formatJerusalemDate } = require('../utils/timeZone');
 const { getScheduleForDate } = require('../utils/businessHours');
+const { notifyForReleasedAppointment } = require('../services/waitlistService');
 
 const allowed = ['pending', 'confirmed', 'cancelled', 'completed', 'no-show'];
 
@@ -39,9 +40,10 @@ exports.updateAppointment = async (req, res) => {
     if (others.some((item) => { const s = getAppointmentInstant(item); return start < new Date(s.getTime() + item.duration * 60000) && end > s; })) {
       return res.status(409).json({ success: false, error: 'الموعد يتعارض مع موعد موجود' });
     }
-    Object.assign(appointment, { service, duration, date: start, time, status, notes: String(req.body.notes || '') });
+    Object.assign(appointment, { service, duration, price: Number(serviceDoc.price) || 0, date: start, time, status, notes: String(req.body.notes || '') });
     const scheduleChanged = previous.date !== date || previous.time !== time || previous.service !== service;
-    if (scheduleChanged) { appointment.clientReminderSent = false; appointment.client15MinuteReminderSent = false; appointment.ownerHourReminderSent = false; appointment.ownerReminderSent = false; }
+    if (scheduleChanged) { appointment.clientReminderSent = false; appointment.client15MinuteReminderSent = false; appointment.clientDayReminderSent = false; appointment.customerConfirmedAt = null; appointment.customerArrivedAt = null; appointment.ownerHourReminderSent = false; appointment.ownerReminderSent = false; }
+    if (status === 'cancelled') { appointment.customerConfirmedAt = null; appointment.customerArrivedAt = null; }
     if (previous.status === 'pending' && ['confirmed', 'cancelled'].includes(status)) {
       appointment.approvalDecision = status === 'confirmed' ? 'approved' : 'rejected';
       appointment.approvalDecisionAt = new Date();
@@ -51,6 +53,9 @@ exports.updateAppointment = async (req, res) => {
       appointment.changeRequest.resolvedAt = new Date();
     }
     await appointment.save();
+    if (previous.status !== 'cancelled' && status === 'cancelled') {
+      notifyForReleasedAppointment(appointment).catch((error) => console.error('Waitlist release failed:', error));
+    }
     let title = 'تم تحديث موعدك';
     if (status === 'cancelled') title = 'تم إلغاء موعدك';
     else if (previous.status === 'pending' && status === 'confirmed') title = 'تم تأكيد موعدك';

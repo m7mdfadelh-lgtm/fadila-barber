@@ -26,6 +26,8 @@ const appointmentSchema = new mongoose.Schema({
     required: [true, 'يرجى اختيار نوع الخدمة']
   },
 
+  price: { type: Number, min: 0, default: null },
+
   date: {
     type: Date,
     required: [true, 'تاريخ الموعد مطلوب']
@@ -74,6 +76,10 @@ const appointmentSchema = new mongoose.Schema({
     default: false
   },
 
+  clientDayReminderSent: { type: Boolean, default: false },
+  customerConfirmedAt: { type: Date, default: null },
+  customerArrivedAt: { type: Date, default: null },
+
   ownerReminderSent: {
     type: Boolean,
     default: false
@@ -114,6 +120,7 @@ const appointmentSchema = new mongoose.Schema({
 
   changeRequest: {
     text: { type: String, maxlength: 500, default: '' },
+    action: { type: String, enum: ['change', 'cancel'], default: 'change' },
     requestedService: { type: String, default: '' },
     requestedDate: { type: String, default: '' },
     requestedTime: { type: String, default: '' },

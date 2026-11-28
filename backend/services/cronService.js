@@ -153,6 +153,18 @@ class CronService {
     this.running = true;
     try {
       const now = new Date();
+      const dayReminderStart = new Date(now.getTime() + 23 * 60 * 60 * 1000 + 55 * 60000);
+      const dayReminderEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000 + 5 * 60000);
+      const dayReminderAppointments = await Appointment.find({ status: 'confirmed', clientDayReminderSent: false, date: { $gte: dayReminderStart, $lte: dayReminderEnd } });
+      for (const appointment of dayReminderAppointments) {
+        if (!appointment.customer) continue;
+        const result = await pushService.sendToUser(appointment.customer, {
+          title: 'تذكير بموعدك غداً',
+          body: `${appointment.service} غداً الساعة ${appointment.time}. أكد حضورك أو اطلب إلغاء الموعد من التطبيق.`,
+          url: './index.html', tag: `client-day-reminder-${appointment._id}`
+        });
+        if (result.sent > 0) { appointment.clientDayReminderSent = true; await appointment.save(); }
+      }
       const appointments = await Appointment.find({
         status: 'confirmed',
         date: { $gte: now, $lte: new Date(now.getTime() + 61 * 60000) }
