@@ -1853,7 +1853,8 @@
 .owner-page .customer-history ul { padding-inline-start:22px; }
 .owner-page .customer-history li { margin:6px 0; font-size:13px; }
 .owner-page .appointment-quick-actions { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin:8px 0; }
-.owner-page .appointment-quick-actions a { display:inline-flex; align-items:center; min-height:34px; padding:6px 10px; border-radius:9px; text-decoration:none; }
+.owner-page .appointment-quick-actions a,.owner-page .appointment-quick-actions button { display:inline-flex; align-items:center; justify-content:center; width:auto; min-height:34px; padding:6px 10px; border-radius:9px; font-size:12px; line-height:1.2; }
+.owner-page .appointment-quick-actions a { text-decoration:none; }
 .owner-page .appointment-arrival,.owner-page .appointment-attendance { color:#217a38; font-size:12px; font-weight:700; }
 .owner-page .waitlist-entry { display:flex; justify-content:space-between; align-items:center; gap:12px; }
 .owner-page .waitlist-entry p,.owner-page .waitlist-entry small { display:block; margin:4px 0; }
